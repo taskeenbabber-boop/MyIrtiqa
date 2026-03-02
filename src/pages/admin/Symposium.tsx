@@ -1,0 +1,373 @@
+import { useState, useEffect } from "react";
+import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download, MessageSquare, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
+type Tab = "registrations" | "pitch" | "poster";
+type Status = "pending" | "approved" | "rejected";
+
+interface Registration {
+    id: string;
+    ticket_type: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    roll_number: string | null;
+    team_members: any;
+    selected_workshops: string[];
+    total_amount: number;
+    receipt_url: string | null;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
+interface PitchSubmission {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    roll_number: string | null;
+    pitch_description: string;
+    document_url: string | null;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
+interface PosterSubmission {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    roll_number: string | null;
+    topic_description: string;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
+const STATUS_COLORS: Record<Status, { bg: string; text: string; icon: any }> = {
+    pending: { bg: "bg-amber-500/10", text: "text-amber-400", icon: Clock },
+    approved: { bg: "bg-emerald-500/10", text: "text-emerald-400", icon: CheckCircle },
+    rejected: { bg: "bg-red-500/10", text: "text-red-400", icon: XCircle },
+};
+
+function StatusBadge({ status }: { status: string }) {
+    const s = STATUS_COLORS[status as Status] || STATUS_COLORS.pending;
+    const Icon = s.icon;
+    return (
+        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>
+            <Icon className="w-3 h-3" /> {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+    );
+}
+
+export default function AdminSymposium() {
+    const [tab, setTab] = useState<Tab>("registrations");
+    const [registrations, setRegistrations] = useState<Registration[]>([]);
+    const [pitchSubs, setPitchSubs] = useState<PitchSubmission[]>([]);
+    const [posterSubs, setPosterSubs] = useState<PosterSubmission[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [noteText, setNoteText] = useState("");
+    const [updating, setUpdating] = useState<string | null>(null);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [regRes, pitchRes, posterRes] = await Promise.all([
+                (supabase as any).from("symposium_registrations").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_pitch_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_poster_submissions").select("*").order("created_at", { ascending: false }),
+            ]);
+            setRegistrations(regRes.data || []);
+            setPitchSubs(pitchRes.data || []);
+            setPosterSubs(posterRes.data || []);
+        } catch (err) {
+            console.error("Failed to fetch symposium data:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchData(); }, []);
+
+    const updateStatus = async (table: string, id: string, newStatus: Status, notes?: string) => {
+        setUpdating(id);
+        try {
+            const updatePayload: any = { status: newStatus };
+            if (notes !== undefined) updatePayload.admin_notes = notes;
+            if (table === "symposium_registrations") updatePayload.updated_at = new Date().toISOString();
+
+            await (supabase as any).from(table).update(updatePayload).eq("id", id);
+
+            try {
+                const item = table === "symposium_registrations"
+                    ? registrations.find(r => r.id === id)
+                    : table === "symposium_pitch_submissions"
+                        ? pitchSubs.find(p => p.id === id)
+                        : posterSubs.find(p => p.id === id);
+
+                if (item && (newStatus === "approved" || newStatus === "rejected")) {
+                    await supabase.functions.invoke("send-symposium-email", {
+                        body: {
+                            to: item.email,
+                            name: item.name,
+                            status: newStatus,
+                            type: table.replace("symposium_", "").replace("_submissions", "").replace("_", " "),
+                            notes: notes || "",
+                        },
+                    });
+                }
+            } catch (emailErr) {
+                console.warn("Email notification failed (Edge Function may not be deployed yet):", emailErr);
+            }
+
+            fetchData();
+            setNoteText("");
+        } catch (err) {
+            console.error("Update failed:", err);
+        } finally {
+            setUpdating(null);
+        }
+    };
+
+    const getDownloadUrl = async (path: string) => {
+        const { data } = await supabase.storage.from("symposium-uploads").createSignedUrl(path, 3600);
+        if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+    };
+
+    const tabs: { key: Tab; label: string; count: number }[] = [
+        { key: "registrations", label: "Registrations", count: registrations.length },
+        { key: "pitch", label: "Pitch Submissions", count: pitchSubs.length },
+        { key: "poster", label: "Poster Submissions", count: posterSubs.length },
+    ];
+
+    const pendingCounts = {
+        registrations: registrations.filter(r => r.status === "pending").length,
+        pitch: pitchSubs.filter(p => p.status === "pending").length,
+        poster: posterSubs.filter(p => p.status === "pending").length,
+    };
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-2xl font-bold">AI Symposium Management</h1>
+                <p className="text-muted-foreground text-sm mt-1">Review registrations, pitch submissions, and poster applications</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {tabs.map(t => (
+                    <div key={t.key} className="rounded-xl border border-border p-4 bg-card">
+                        <div className="text-sm text-muted-foreground">{t.label}</div>
+                        <div className="text-3xl font-bold mt-1">{t.count}</div>
+                        {pendingCounts[t.key] > 0 && (
+                            <div className="text-xs text-amber-400 mt-1 flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> {pendingCounts[t.key]} pending review
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex gap-1 p-1 rounded-xl bg-muted/50 w-fit">
+                {tabs.map(t => (
+                    <button
+                        key={t.key}
+                        onClick={() => setTab(t.key)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === t.key ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                        {t.label}
+                        {pendingCounts[t.key] > 0 && (
+                            <span className="ml-1.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{pendingCounts[t.key]}</span>
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {loading ? (
+                <div className="flex items-center justify-center py-20">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {tab === "registrations" && registrations.map(reg => (
+                        <div key={reg.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === reg.id ? null : reg.id)}>
+                                <div className="flex items-center gap-4">
+                                    <div>
+                                        <div className="font-semibold">{reg.name}</div>
+                                        <div className="text-xs text-muted-foreground">{reg.email} • {reg.ticket_type.replace(/_/g, " ")}</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={reg.status} />
+                                    <span className="font-bold text-primary">{reg.total_amount.toLocaleString()} PKR</span>
+                                    {expandedId === reg.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === reg.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{reg.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Institution</span>{reg.institution || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{reg.roll_number || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Registered</span>{new Date(reg.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    {reg.selected_workshops?.length > 0 && (
+                                        <div>
+                                            <span className="text-xs text-muted-foreground block mb-1">Workshops</span>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {reg.selected_workshops.map(ws => (
+                                                    <span key={ws} className="px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-medium">{ws}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {reg.team_members && (
+                                        <div>
+                                            <span className="text-xs text-muted-foreground block mb-1">Team Members</span>
+                                            <div className="text-sm">{(reg.team_members as string[]).join(", ")}</div>
+                                        </div>
+                                    )}
+                                    {reg.receipt_url && (
+                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(reg.receipt_url!)}>
+                                            <Download className="w-3.5 h-3.5 mr-1.5" /> View Receipt
+                                        </Button>
+                                    )}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === reg.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === reg.id} onClick={() => updateStatus("symposium_registrations", reg.id, "approved", noteText)}>
+                                                {updating === reg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Approve
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === reg.id} onClick={() => updateStatus("symposium_registrations", reg.id, "rejected", noteText)}>
+                                                {updating === reg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "pitch" && pitchSubs.map(pitch => (
+                        <div key={pitch.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === pitch.id ? null : pitch.id)}>
+                                <div>
+                                    <div className="font-semibold">{pitch.name}</div>
+                                    <div className="text-xs text-muted-foreground">{pitch.email} • {pitch.institution || "No institution"}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={pitch.status} />
+                                    {expandedId === pitch.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === pitch.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{pitch.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{pitch.roll_number || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(pitch.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-muted-foreground block mb-1">Pitch Description</span>
+                                        <div className="text-sm bg-muted/30 rounded-lg p-3 whitespace-pre-wrap">{pitch.pitch_description}</div>
+                                    </div>
+                                    {pitch.document_url && (
+                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(pitch.document_url!)}>
+                                            <FileText className="w-3.5 h-3.5 mr-1.5" /> View Pitch Document
+                                        </Button>
+                                    )}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === pitch.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === pitch.id} onClick={() => updateStatus("symposium_pitch_submissions", pitch.id, "approved", noteText)}>
+                                                {updating === pitch.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === pitch.id} onClick={() => updateStatus("symposium_pitch_submissions", pitch.id, "rejected", noteText)}>
+                                                {updating === pitch.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "poster" && posterSubs.map(poster => (
+                        <div key={poster.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === poster.id ? null : poster.id)}>
+                                <div>
+                                    <div className="font-semibold">{poster.name}</div>
+                                    <div className="text-xs text-muted-foreground">{poster.email} • {poster.institution || "No institution"}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={poster.status} />
+                                    {expandedId === poster.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === poster.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{poster.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{poster.roll_number || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(poster.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-muted-foreground block mb-1">Poster Topic</span>
+                                        <div className="text-sm bg-muted/30 rounded-lg p-3 whitespace-pre-wrap">{poster.topic_description}</div>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === poster.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === poster.id} onClick={() => updateStatus("symposium_poster_submissions", poster.id, "approved", noteText)}>
+                                                {updating === poster.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === poster.id} onClick={() => updateStatus("symposium_poster_submissions", poster.id, "rejected", noteText)}>
+                                                {updating === poster.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "registrations" && registrations.length === 0 && (
+                        <div className="text-center py-16 text-muted-foreground">
+                            <Clock className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                            <p className="font-medium">No registrations yet</p>
+                            <p className="text-sm">Registrations will appear here as they come in.</p>
+                        </div>
+                    )}
+                    {tab === "pitch" && pitchSubs.length === 0 && (
+                        <div className="text-center py-16 text-muted-foreground">
+                            <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                            <p className="font-medium">No pitch submissions yet</p>
+                        </div>
+                    )}
+                    {tab === "poster" && posterSubs.length === 0 && (
+                        <div className="text-center py-16 text-muted-foreground">
+                            <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                            <p className="font-medium">No poster submissions yet</p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
