@@ -1,34 +1,48 @@
-name: Deploy to Hostinger
+name: Build & Deploy
 
 on:
   push:
     branches:
-      - main  # Trigger deploy when code is pushed to main
+      - main
 
 jobs:
-  web-deploy:
+  build-and-deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
     - name: Get latest code
       uses: actions/checkout@v4
-      
+
     - name: Use Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        
+        cache: 'npm'
+
     - name: Install Dependencies
-      run: npm install
-      
+      run: npm ci
+
     - name: Build Project
       run: npm run build
-      
-    - name: Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+
+    # Save the built files so you can download them manually if needed
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        retention-days: 30
+
+    # FTP Deploy — only runs if secrets are configured
+    # To enable: add FTP_SERVER, FTP_USERNAME, FTP_PASSWORD in repo Settings > Secrets
+    - name: Deploy to Hostinger via FTP
+      if: ${{ env.HAS_FTP == 'true' }}
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      env:
+        HAS_FTP: ${{ secrets.FTP_SERVER != '' }}
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist/ 
+        local-dir: ./dist/
         server-dir: ./public_html/
