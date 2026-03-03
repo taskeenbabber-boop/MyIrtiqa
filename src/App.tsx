@@ -27,6 +27,7 @@ import AdminMedia from "./pages/admin/Media";
 import AdminSettings from "./pages/admin/Settings";
 import AdminSymposium from "./pages/admin/Symposium";
 import NotFound from "./pages/NotFound";
+import { LaunchCountdown, isBeforeLaunch } from "./components/LaunchCountdown";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const App = () => (
         <TooltipProvider>
             <Toaster />
             <Sonner />
+            {isBeforeLaunch() && <LaunchCountdown />}
             <BrowserRouter>
                 <AppContent />
             </BrowserRouter>
