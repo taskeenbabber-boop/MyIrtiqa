@@ -9,7 +9,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # Otherwise, redirect everything to index.html for SPA routing
-RewriteRule ^ index.html [QSA,L]
+RewriteRule ^(.*)$ /index.html [QSA,L]
 
 # Enable gzip compression
 <IfModule mod_deflate.c>

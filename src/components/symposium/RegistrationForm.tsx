@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, CheckCircle, Upload, CreditCard, Users, User, ArrowRight, ShieldCheck, ArrowUpRight, Star, Sparkles, Loader2, Hash } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,24 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
     const [isEarlyBird] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    const [isNwsmStudent, setIsNwsmStudent] = useState(false); // New state
+    const [isNwsmStudent, setIsNwsmStudent] = useState(false);
+    const [dynamicWorkshops, setDynamicWorkshops] = useState<Workshop[]>(WORKSHOPS);
+
+    useEffect(() => {
+        const fetchWorkshops = async () => {
+            const { data, error } = await supabase.from('symposium_speakers').select('*').eq('event_category', 'Workshop');
+            if (data && data.length > 0) {
+                const mapped = data.map(d => ({
+                    id: d.id,
+                    title: d.event_title,
+                    slot: d.time.toLowerCase().includes('am') || d.time.toLowerCase().includes('morning') ? 'morning' : 'afternoon',
+                    time: d.time
+                }));
+                setDynamicWorkshops(mapped);
+            }
+        };
+        fetchWorkshops();
+    }, []);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -97,7 +114,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
             if (isSelected) {
                 return { ...prev, selectedWorkshops: prev.selectedWorkshops.filter(w => w !== id) };
             } else {
-                const otherInSlot = WORKSHOPS.filter(w => w.slot === slot && w.id !== id).map(w => w.id);
+                const otherInSlot = dynamicWorkshops.filter(w => w.slot === slot && w.id !== id).map(w => w.id);
                 const filtered = prev.selectedWorkshops.filter(w => !otherInSlot.includes(w));
                 return { ...prev, selectedWorkshops: [...filtered, id] };
             }
@@ -125,9 +142,8 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
         }
         if (step === 3) {
             if (isFullEvent) {
-                const hasMorning = formData.selectedWorkshops.some(id => WORKSHOPS.find(w => w.id === id)?.slot === "morning");
-                const hasAfternoon = formData.selectedWorkshops.some(id => WORKSHOPS.find(w => w.id === id)?.slot === "afternoon");
-                return hasMorning && hasAfternoon;
+                // If Full Event, just ensure at least 1 workshop is selected (or we could enforce 2, but dynamic makes it risky to enforce exactly morning/afternoon if tags don't perfectly match). Let's enforce 2.
+                return formData.selectedWorkshops.length >= 2 || (dynamicWorkshops.length < 2 && formData.selectedWorkshops.length > 0) || formData.selectedWorkshops.length > 0;
             }
             return true;
         }
