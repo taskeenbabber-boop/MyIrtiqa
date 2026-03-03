@@ -91,46 +91,41 @@ This creates a `dist/` folder with all your optimized files ready for hosting.
 
 ## Step 4: Host on Hostinger
 
-> ⚠️ **IMPORTANT**: Hostinger's built-in "Git Deployment" feature **does NOT work** for React/Vite apps.
-> It only works for PHP projects (it looks for `composer.json`). If you see it saying "Looking for composer.lock file... not found", that's why.
-> Use one of the two methods below instead.
+> ⚠️ **IMPORTANT**: Hostinger's Git Deployment feature looks for `composer.json` (PHP).
+> Since this is a React app, you MUST configure Hostinger to use the **`deploy`** branch (not `main`).
+> The `deploy` branch contains the pre-built static files that Hostinger can serve directly.
 
-### Method A: Automated Deploy via GitHub Actions (Recommended)
-This is already set up! The file `.github/workflows/deploy.yml` automatically builds and deploys on every `git push`.
+### How It Works
+```
+You push to `main` → GitHub Actions builds → pushes built files to `deploy` branch → Hostinger pulls from `deploy`
+```
 
-1. In Hostinger dashboard → **Hosting** → **FTP Accounts**
-2. Note your FTP credentials:
-   - **FTP Server** (hostname, e.g., `ftp.yourdomain.com` or from Hostinger panel)
-   - **FTP Username**
-   - **FTP Password**
-3. In your GitHub repo → **Settings** → **Secrets and variables** → **Actions**
-4. Add these 3 secrets:
-   - `FTP_SERVER` = your FTP hostname
-   - `FTP_USERNAME` = your FTP username
-   - `FTP_PASSWORD` = your FTP password
-5. Now push your code:
+### Setup Steps (One-Time)
+1. Push your code to GitHub (branch: `main`)
+2. Wait for GitHub Actions to finish (check the ✅ on your repo's Actions tab)
+3. Go to **Hostinger** → **Hosting** → **Advanced** → **Git**
+4. Enter your repository URL: `https://github.com/taskeenbabber-boop/MyIrtiqa.git`
+5. **⚡ CRITICAL: Change the branch to `deploy`** (NOT `main`!)
+6. Set the directory to `public_html`
+7. Click **Create** / **Deploy**
+8. Done! Your site is live ✅
+
+### Updating the Site
+Just push to `main`:
 ```bash
 git add .
-git commit -m "Deploy site"
+git commit -m "Update site"
 git push origin main
 ```
-6. Go to your GitHub repo → **Actions** tab → watch the deploy run
-7. Once green ✅, your site is live!
+GitHub Actions will automatically build and push to `deploy`. Then either:
+- Wait for Hostinger auto-deploy (if enabled), or
+- Click **Deploy** in Hostinger's Git panel to pull the latest
 
-### Method B: Manual Upload (One-Time or Backup)
+### Alternative: Manual Upload
 1. Run `npm run build` locally
-2. Open Hostinger → **File Manager** → navigate to `public_html/`
-3. **Delete everything** inside `public_html/`
-4. Upload the **contents** of your `dist/` folder:
-   - `index.html`
-   - `assets/` folder
-   - `.htaccess` (critical for SPA routing!)
-5. Your site is live
-
-### 4c. Connect Custom Domain (if needed)
-1. In Hostinger → **Domains** → select your domain
-2. Make sure DNS points to Hostinger's nameservers
-3. Enable **SSL certificate** (free in Hostinger dashboard)
+2. Open Hostinger → **File Manager** → `public_html/`
+3. Delete everything inside `public_html/`
+4. Upload contents of your `dist/` folder (index.html, assets/, .htaccess)
 
 ---
 
