@@ -28,12 +28,12 @@ const WORKSHOPS: Workshop[] = [
 ];
 
 const PASS_INFO: Record<TicketType, { label: string; desc: string }> = {
-    FULL_EVENT: { label: "Full Event Pass", desc: "All workshops + preliminary sessions + full event day" },
-    NWSM_STUDENT: { label: "NWSM Student", desc: "Conference day access for NWSM students — Rs. 1,500" },
-    OUTSIDER_STUDENT: { label: "Outsider Student", desc: "Conference day access for external students — Rs. 2,000" },
-    CLINICAL: { label: "Clinical / Doctor", desc: "Conference day access for doctors & consultants — Rs. 3,000" },
-    TEAM_3: { label: "Team of 3", desc: "Conference day pass for a team of 3 — Rs. 4,500" },
-    TEAM_4: { label: "Team of 4", desc: "Conference day pass for a team of 4 — Rs. 6,000" },
+    FULL_EVENT: { label: "Full Event Pass", desc: "All workshops + conference day — Rs. 2,000 (NWSM: Rs. 1,500)" },
+    NWSM_STUDENT: { label: "NWSM Student", desc: "Conference day only — Rs. 500 (+ Rs. 500/workshop)" },
+    OUTSIDER_STUDENT: { label: "Outsider Student", desc: "Conference day only — Rs. 1,500 (+ Rs. 500/workshop)" },
+    CLINICAL: { label: "Faculty / Doctor", desc: "Conference day only — Rs. 1,500 (+ Rs. 1,000/workshop)" },
+    TEAM_3: { label: "Team of 3", desc: "Conference day only for 3 members — Rs. 3,000 (no workshops)" },
+    TEAM_4: { label: "Team of 4", desc: "Conference day only for 4 members — Rs. 4,000 (no workshops)" },
 };
 
 interface RegistrationFormProps {
@@ -79,30 +79,31 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
     const isFullEvent = ticketType === "FULL_EVENT";
     const isNwsm = ticketType === "NWSM_STUDENT"; // Keep this for specific NWSM student pass logic if needed elsewhere
 
-    /* ——— pricing (hidden in step 1) ——— */
+    /* ——— pricing ——— */
+    const isTeamPass = ticketType === "TEAM_3" || ticketType === "TEAM_4";
+
     const calculateTotal = () => {
-        if (!ticketType) return 0; // Handle case where no ticket type is selected yet
+        if (!ticketType) return 0;
         let total = 0;
 
         if (isFullEvent) {
-            // Full Event Pass pricing: 2000 normally, 1500 for NWSM students
+            // Full Event Pass: 2000, NWSM students 1500
             total = isNwsmStudent ? 1500 : 2000;
-            // Full Event Pass includes all workshops, so no additional workshop fee calculation here
         } else {
-            // Other passes have a base price + optional workshop add-ons
+            // Conference day base prices
             switch (ticketType) {
-                case "NWSM_STUDENT": total += 1500; break;
-                case "OUTSIDER_STUDENT": total += 2000; break;
-                case "CLINICAL": total += 3000; break;
-                case "TEAM_3": total += 4500; break;
-                case "TEAM_4": total += 6000; break;
+                case "NWSM_STUDENT": total += 500; break;
+                case "OUTSIDER_STUDENT": total += 1500; break;
+                case "CLINICAL": total += 1500; break;
+                case "TEAM_3": total += 3000; break;
+                case "TEAM_4": total += 4000; break;
             }
 
-            // Workshop add-ons for non-Full Event passes
-            const isStudentOrTeam = ticketType === "NWSM_STUDENT" || ticketType === "OUTSIDER_STUDENT" || ticketType?.startsWith("TEAM");
-            const workshopFee = isStudentOrTeam ? 500 : 1000;
-            const multiplier = ticketType === "TEAM_3" ? 3 : ticketType === "TEAM_4" ? 4 : 1;
-            total += formData.selectedWorkshops.length * workshopFee * multiplier;
+            // Workshop add-ons (NOT available for team passes)
+            if (!isTeamPass) {
+                const workshopFee = ticketType === "CLINICAL" ? 1000 : 500;
+                total += formData.selectedWorkshops.length * workshopFee;
+            }
         }
         return total;
     };
@@ -141,9 +142,10 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
             return baseValid;
         }
         if (step === 3) {
+            // Team passes skip workshops entirely
+            if (isTeamPass) return true;
             if (isFullEvent) {
-                // If Full Event, just ensure at least 1 workshop is selected (or we could enforce 2, but dynamic makes it risky to enforce exactly morning/afternoon if tags don't perfectly match). Let's enforce 2.
-                return formData.selectedWorkshops.length >= 2 || (dynamicWorkshops.length < 2 && formData.selectedWorkshops.length > 0) || formData.selectedWorkshops.length > 0;
+                return formData.selectedWorkshops.length > 0;
             }
             return true;
         }

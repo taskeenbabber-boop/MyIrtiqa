@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X, MapPin, Clock, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb } from "lucide-react";
+import { X, MapPin, Clock, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { RegistrationForm } from "@/components/symposium/RegistrationForm";
@@ -791,6 +791,30 @@ const AISymposium = () => {
                     }
                 </AnimatePresence >
             </section >
+
+            {/* ═══════════════ CERTIFICATE PROMO ═══════════════ */}
+            <section className="max-w-[1400px] mx-auto px-6 md:px-12 pb-16">
+                <div className="relative overflow-hidden rounded-3xl" style={{ background: `linear-gradient(135deg, rgba(59,130,246,0.08), rgba(168,85,247,0.08))`, border: `1px solid ${BORDER}` }}>
+                    <div className="absolute top-0 right-0 w-64 h-64 rounded-full" style={{ background: `radial-gradient(circle, rgba(59,130,246,0.15), transparent)`, transform: 'translate(30%, -30%)' }} />
+                    <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+                        <div className="flex-shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.1)', border: `1px solid rgba(59,130,246,0.2)` }}>
+                            <ShieldCheck className="w-10 h-10" style={{ color: ACCENT }} />
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                            <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                                Verifiable Digital Certificates
+                            </h3>
+                            <p className="text-sm md:text-base text-gray-500 dark:text-white/50 max-w-xl">
+                                Every registered participant receives a <strong className="text-foreground">digitally verifiable certificate</strong> with a unique QR code.
+                                Share it on LinkedIn, verify it anytime on our portal — your achievement, permanently validated.
+                            </p>
+                        </div>
+                        <a href="/verify" className="flex-shrink-0 px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wider transition-all duration-300 hover:scale-105 hover:shadow-lg" style={{ background: ACCENT, color: '#000' }}>
+                            Verify Certificate
+                        </a>
+                    </div>
+                </div>
+            </section>
 
             {/* ═══════════════ AGENDA ═══════════════ */}
             < section id="agenda" className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24" >

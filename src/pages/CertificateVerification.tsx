@@ -22,9 +22,9 @@ const CertificateVerification = () => {
 
   const handleVerify = async (e?: React.FormEvent, code?: string) => {
     if (e) e.preventDefault();
-    
+
     const searchCode = code || verificationCode;
-    
+
     if (!searchCode.trim()) {
       toast({
         title: "Error",
@@ -35,26 +35,33 @@ const CertificateVerification = () => {
     }
 
     setIsSearching(true);
-    
+
     try {
-      const { data, error } = await supabase.functions.invoke("verify-certificate", {
-        body: { code: searchCode },
-      });
+      const { data, error } = await (supabase as any)
+        .from('certificates')
+        .select('*')
+        .eq('verification_code', searchCode.trim().toUpperCase())
+        .single();
 
-      if (error) throw error;
-
-      if (data.success) {
-        setCertificateData(data.certificate);
-        toast({
-          title: "Success",
-          description: "Certificate found!",
-        });
-      } else {
+      if (error || !data) {
         setCertificateData(null);
         toast({
           title: "Not Found",
-          description: data.message || "Certificate not found",
+          description: "No certificate found with this verification code.",
           variant: "destructive",
+        });
+      } else {
+        setCertificateData({
+          studentName: data.student_name,
+          courseTitle: data.course_title,
+          issueDate: data.issue_date,
+          verificationCode: data.verification_code,
+          status: data.status,
+          fileUrl: data.file_url || data.certificate_image_url,
+        });
+        toast({
+          title: "Success",
+          description: "Certificate found!",
         });
       }
     } catch (error: any) {
@@ -73,7 +80,7 @@ const CertificateVerification = () => {
   const handleShare = (platform: string) => {
     const url = `${window.location.origin}/verify/${verificationCode}`;
     const text = `Verified certificate for ${certificateData?.courseTitle}`;
-    
+
     switch (platform) {
       case 'linkedin':
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
@@ -133,8 +140,8 @@ const CertificateVerification = () => {
                         className="pl-10 h-12 text-lg"
                       />
                     </div>
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full h-12"
                       disabled={isSearching}
                     >
@@ -153,11 +160,10 @@ const CertificateVerification = () => {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
                 {/* Status Banner */}
-                <Card className={`border-2 ${
-                  certificateData.status === "valid" 
-                    ? "border-green-500 bg-green-500/5" 
+                <Card className={`border-2 ${certificateData.status === "valid"
+                    ? "border-green-500 bg-green-500/5"
                     : "border-red-500 bg-red-500/5"
-                }`}>
+                  }`}>
                   <CardContent className="p-6">
                     <div className="flex items-center">
                       {certificateData.status === "valid" ? (
@@ -167,8 +173,8 @@ const CertificateVerification = () => {
                       )}
                       <div>
                         <h3 className="text-xl font-heading font-semibold">
-                          {certificateData.status === "valid" 
-                            ? "Certificate Verified" 
+                          {certificateData.status === "valid"
+                            ? "Certificate Verified"
                             : "Certificate Revoked"}
                         </h3>
                         <p className="text-muted-foreground">
@@ -196,10 +202,10 @@ const CertificateVerification = () => {
                       <div>
                         <div className="text-sm text-muted-foreground mb-1">Issue Date</div>
                         <div className="text-lg font-semibold">
-                          {new Date(certificateData.issueDate).toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
+                          {new Date(certificateData.issueDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
                           })}
                         </div>
                       </div>
@@ -212,7 +218,7 @@ const CertificateVerification = () => {
                     {/* Certificate Preview */}
                     {certificateData.fileUrl && (
                       <div className="aspect-[1.414/1] bg-muted rounded-lg border-2 border-border mb-6 overflow-hidden">
-                        <iframe 
+                        <iframe
                           src={certificateData.fileUrl}
                           className="w-full h-full"
                           title="Certificate Preview"
@@ -222,30 +228,30 @@ const CertificateVerification = () => {
 
                     {/* Action Buttons */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full"
                         onClick={() => window.open(certificateData.fileUrl, '_blank')}
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full"
                         onClick={() => window.print()}
                       >
                         Print
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full"
                         onClick={() => handleShare('copy')}
                       >
                         Copy Link
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full"
                         onClick={() => handleShare('linkedin')}
                       >
@@ -258,22 +264,22 @@ const CertificateVerification = () => {
                     <div className="mt-4 pt-4 border-t border-border">
                       <p className="text-sm text-muted-foreground mb-3">Share on:</p>
                       <div className="flex gap-2 flex-wrap">
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
                           onClick={() => handleShare('linkedin')}
                         >
                           LinkedIn
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
                           onClick={() => handleShare('twitter')}
                         >
                           Twitter / X
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
                           onClick={() => handleShare('whatsapp')}
                         >
