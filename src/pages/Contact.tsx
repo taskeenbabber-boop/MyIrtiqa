@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mail, Linkedin, Twitter, Facebook, MapPin, Send } from "lucide-react";
+import { Mail, Linkedin, Twitter, Facebook, MapPin, Send, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 const Contact = () => {
@@ -158,10 +158,31 @@ const Contact = () => {
                         <div>
                           <h3 className="font-heading font-semibold mb-2">Email</h3>
                           <a
-                            href="mailto:info@irtiqa.org"
+                            href="mailto:info.irtiqa@gmail.com"
                             className="text-muted-foreground hover:text-primary transition-smooth"
                           >
-                            info@irtiqa.org
+                            info.irtiqa@gmail.com
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-soft hover:shadow-medium transition-smooth">
+                    <CardContent className="p-6">
+                      <div className="flex items-start">
+                        <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                          <Phone className="h-6 w-6 text-green-500" />
+                        </div>
+                        <div>
+                          <h3 className="font-heading font-semibold mb-2">WhatsApp</h3>
+                          <a
+                            href="https://wa.link/lq1d1p"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-green-500 transition-smooth"
+                          >
+                            +1 (226) 350-6873
                           </a>
                         </div>
                       </div>
@@ -191,21 +212,27 @@ const Contact = () => {
                 <h3 className="text-2xl font-heading font-bold mb-4">Follow Us</h3>
                 <div className="flex gap-4">
                   <a
-                    href="#"
+                    href="https://pk.linkedin.com/company/irtiqaresearch"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-smooth"
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="h-5 w-5" />
                   </a>
                   <a
-                    href="#"
+                    href="https://x.com/irtiqa_research"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-smooth"
                     aria-label="Twitter"
                   >
                     <Twitter className="h-5 w-5" />
                   </a>
                   <a
-                    href="#"
+                    href="https://www.facebook.com/irtiqa_research"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-smooth"
                     aria-label="Facebook"
                   >
@@ -222,7 +249,7 @@ const Contact = () => {
                     Interested in partnerships, sponsorships, or corporate training programs?
                   </p>
                   <Button variant="outline" asChild className="w-full">
-                    <a href="mailto:partnerships@irtiqa.org">
+                    <a href="mailto:partnership@myirtiqa.com">
                       Contact Partnerships Team
                     </a>
                   </Button>

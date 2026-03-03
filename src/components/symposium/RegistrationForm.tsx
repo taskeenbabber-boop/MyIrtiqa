@@ -29,11 +29,11 @@ const WORKSHOPS: Workshop[] = [
 
 const PASS_INFO: Record<TicketType, { label: string; desc: string }> = {
     FULL_EVENT: { label: "Full Event Pass", desc: "All workshops + preliminary sessions + full event day" },
-    NWSM_STUDENT: { label: "NWSM Student", desc: "Conference day access for NWSM students" },
-    OUTSIDER_STUDENT: { label: "Outsider Student", desc: "Conference day access for external students" },
-    CLINICAL: { label: "Clinical / Doctor", desc: "Conference day access for professionals" },
-    TEAM_3: { label: "Team of 3", desc: "Conference day pass for a team of 3" },
-    TEAM_4: { label: "Team of 4", desc: "Conference day pass for a team of 4" },
+    NWSM_STUDENT: { label: "NWSM Student", desc: "Conference day access for NWSM students — Rs. 1,500" },
+    OUTSIDER_STUDENT: { label: "Outsider Student", desc: "Conference day access for external students — Rs. 2,000" },
+    CLINICAL: { label: "Clinical / Doctor", desc: "Conference day access for doctors & consultants — Rs. 3,000" },
+    TEAM_3: { label: "Team of 3", desc: "Conference day pass for a team of 3 — Rs. 4,500" },
+    TEAM_4: { label: "Team of 4", desc: "Conference day pass for a team of 4 — Rs. 6,000" },
 };
 
 interface RegistrationFormProps {
@@ -63,14 +63,14 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
 
     /* ——— pricing (hidden in step 1) ——— */
     const calculateTotal = () => {
-        if (isFullEvent) return 2000;
+        if (isFullEvent) return 2500;
         let total = 0;
         switch (ticketType) {
-            case "NWSM_STUDENT": total += 500; break;
-            case "OUTSIDER_STUDENT": total += isEarlyBird ? 1000 : 1500; break;
-            case "CLINICAL": total += isEarlyBird ? 2000 : 2500; break;
-            case "TEAM_3": total += 3000; break;
-            case "TEAM_4": total += 4000; break;
+            case "NWSM_STUDENT": total += 1500; break;
+            case "OUTSIDER_STUDENT": total += 2000; break;
+            case "CLINICAL": total += 3000; break;
+            case "TEAM_3": total += 4500; break;
+            case "TEAM_4": total += 6000; break;
         }
         if (!isFullEvent) {
             const isStudent = ticketType === "NWSM_STUDENT" || ticketType === "OUTSIDER_STUDENT" || ticketType?.startsWith("TEAM");
