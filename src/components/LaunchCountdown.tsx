@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Launch: March 5, 2026 12:00 AM PKT = March 4, 2026 19:00:00 UTC
 const LAUNCH_UTC = new Date("2026-03-05T00:00:00+05:00").getTime();
@@ -13,6 +14,32 @@ interface TimeLeft {
 export function LaunchCountdown() {
     const [timeLeft, setTimeLeft] = useState<TimeLeft>(getTimeLeft());
     const [isLaunched, setIsLaunched] = useState(Date.now() >= LAUNCH_UTC);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
+
+    // Check if current user is admin/superadmin
+    useEffect(() => {
+        const checkAdmin = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const { data } = await (supabase as any)
+                        .from("user_roles")
+                        .select("role")
+                        .eq("user_id", user.id)
+                        .single();
+                    if (data && (data.role === "admin" || data.role === "superadmin")) {
+                        setIsAdmin(true);
+                    }
+                }
+            } catch {
+                // Not logged in or no admin role — stay on countdown
+            } finally {
+                setCheckingAuth(false);
+            }
+        };
+        checkAdmin();
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -28,7 +55,7 @@ export function LaunchCountdown() {
         return () => clearInterval(timer);
     }, []);
 
-    if (isLaunched) return null;
+    if (isLaunched || isAdmin) return null;
 
     return (
         <div className="launch-screen">
