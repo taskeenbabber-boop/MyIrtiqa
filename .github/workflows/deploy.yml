@@ -30,12 +30,36 @@ jobs:
       run: npm run build
 
     # Push built files to 'deploy' branch for Hostinger Git deployment
+    # Uses incremental commits (not force-push) so Hostinger can fast-forward pull
     - name: Deploy to deploy branch
       run: |
-        cd dist
-        git init
+        REPO_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+        DEPLOY_DIR=$(mktemp -d)
+        
+        # Try to clone existing deploy branch; if it doesn't exist, init fresh
+        if git clone --single-branch --branch deploy "$REPO_URL" "$DEPLOY_DIR" 2>/dev/null; then
+          echo "Cloned existing deploy branch"
+        else
+          echo "No deploy branch yet, creating fresh"
+          cd "$DEPLOY_DIR"
+          git init
+          git checkout -b deploy
+          cd -
+        fi
+        
+        cd "$DEPLOY_DIR"
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
+        
+        # Remove old files (except .git) and copy new build
+        find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
+        cp -r "$GITHUB_WORKSPACE/dist/"* .
+        
         git add -A
-        git commit -m "Deploy: ${{ github.sha }}"
-        git push --force https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git HEAD:deploy
+        # Only commit and push if there are changes
+        if git diff --cached --quiet; then
+          echo "No changes to deploy"
+        else
+          git commit -m "Deploy: ${{ github.sha }}"
+          git push origin deploy
+        fi
