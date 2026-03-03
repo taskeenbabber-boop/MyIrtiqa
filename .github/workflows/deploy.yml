@@ -53,7 +53,8 @@ jobs:
         
         # Remove old files (except .git) and copy new build
         find . -maxdepth 1 ! -name '.git' ! -name '.' -exec rm -rf {} +
-        cp -r "$GITHUB_WORKSPACE/dist/"* .
+        shopt -s dotglob
+        cp -a "$GITHUB_WORKSPACE/dist/"* .
         
         git add -A
         # Only commit and push if there are changes
