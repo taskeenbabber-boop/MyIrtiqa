@@ -91,22 +91,41 @@ This creates a `dist/` folder with all your optimized files ready for hosting.
 
 ## Step 4: Host on Hostinger
 
-### 4a. Upload Files
-1. Log in to your **Hostinger** dashboard
-2. Go to **Hosting** → your plan → **File Manager**
-3. Navigate to `public_html` folder
-4. **Delete everything** inside `public_html` (the default Hostinger files)
-5. Upload the **contents** of your `dist/` folder:
-   - `index.html`
-   - `assets/` folder (with all JS, CSS, images)
-   - `.htaccess` (this is already included — handles SPA routing!)
-6. That's it! Your site should be live at your domain
+> ⚠️ **IMPORTANT**: Hostinger's built-in "Git Deployment" feature **does NOT work** for React/Vite apps.
+> It only works for PHP projects (it looks for `composer.json`). If you see it saying "Looking for composer.lock file... not found", that's why.
+> Use one of the two methods below instead.
 
-### 4b. Using FTP (Alternative Method)
-1. In Hostinger → **Hosting** → **FTP Accounts**
-2. Get your FTP credentials (host, username, password)
-3. Use FileZilla or any FTP client
-4. Connect and upload `dist/` contents to `public_html/`
+### Method A: Automated Deploy via GitHub Actions (Recommended)
+This is already set up! The file `.github/workflows/deploy.yml` automatically builds and deploys on every `git push`.
+
+1. In Hostinger dashboard → **Hosting** → **FTP Accounts**
+2. Note your FTP credentials:
+   - **FTP Server** (hostname, e.g., `ftp.yourdomain.com` or from Hostinger panel)
+   - **FTP Username**
+   - **FTP Password**
+3. In your GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+4. Add these 3 secrets:
+   - `FTP_SERVER` = your FTP hostname
+   - `FTP_USERNAME` = your FTP username
+   - `FTP_PASSWORD` = your FTP password
+5. Now push your code:
+```bash
+git add .
+git commit -m "Deploy site"
+git push origin main
+```
+6. Go to your GitHub repo → **Actions** tab → watch the deploy run
+7. Once green ✅, your site is live!
+
+### Method B: Manual Upload (One-Time or Backup)
+1. Run `npm run build` locally
+2. Open Hostinger → **File Manager** → navigate to `public_html/`
+3. **Delete everything** inside `public_html/`
+4. Upload the **contents** of your `dist/` folder:
+   - `index.html`
+   - `assets/` folder
+   - `.htaccess` (critical for SPA routing!)
+5. Your site is live
 
 ### 4c. Connect Custom Domain (if needed)
 1. In Hostinger → **Domains** → select your domain
