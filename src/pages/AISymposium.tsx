@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { RegistrationForm } from "@/components/symposium/RegistrationForm";
 import { PitchForm } from "@/components/symposium/PitchForm";
 import { PosterForm } from "@/components/symposium/PosterForm";
+import { MemeForm } from "@/components/symposium/MemeForm";
 import aiIconLogo from "@/assets/AI-icon.png";
 
 /* ——— accent tokens ——— */
@@ -137,6 +138,7 @@ const AISymposium = () => {
     const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
     const [isPitchFormOpen, setIsPitchFormOpen] = useState(false);
     const [isPosterFormOpen, setIsPosterFormOpen] = useState(false);
+    const [isMemeFormOpen, setIsMemeFormOpen] = useState(false);
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const heroRef = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -843,23 +845,91 @@ const AISymposium = () => {
                                                     </div>
                                                     <h3 className="text-lg font-bold text-foreground">Competitions</h3>
                                                 </div>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    {[
-                                                        { title: "AI Poster Competition", venue: "Exhibition Hall", time: "TBA" },
-                                                        { title: "AI Drill", venue: "Computer Lab", time: "1 Hour" },
-                                                        { title: "AI Debate", venue: "Debate Hall", time: "TBA" },
-                                                        { title: "AI Pitch Competition", venue: "Pitch Room", time: "5m + 3m Q&A" },
-                                                    ].map((comp, i) => (
-                                                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                            <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                                                                {i + 1}
+                                                <div className="grid grid-cols-1 gap-4">
+                                                    {/* AI Pitch Competition */}
+                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                        <div className="flex items-start sm:items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                1
                                                             </div>
                                                             <div>
-                                                                <div className="text-sm font-semibold text-foreground">{comp.title}</div>
-                                                                <div className="text-[11px] text-gray-400 dark:text-white/25">{comp.venue} • {comp.time}</div>
+                                                                <div className="text-sm font-semibold text-foreground">AI Pitch Competition</div>
+                                                                <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Pitch Room • 5m Pitch + 3m Q&A</div>
                                                             </div>
                                                         </div>
-                                                    ))}
+                                                        <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                            <a href="/guidelines/AI_Pitch_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
+                                                                Guidelines
+                                                            </a>
+                                                            <button onClick={() => setIsPitchFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
+                                                                Apply
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* AI Poster Competition */}
+                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                        <div className="flex items-start sm:items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                2
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI Poster Competition</div>
+                                                                <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Exhibition Hall • Live Demo</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                            <a href="/guidelines/AI_Poster_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
+                                                                Guidelines
+                                                            </a>
+                                                            <button onClick={() => setIsPosterFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
+                                                                Apply
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* AI Meme Competition */}
+                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                        <div className="flex items-start sm:items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                3
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI Meme Competition</div>
+                                                                <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Online Submission • Viral Hits</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                            <a href="/guidelines/Meme_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
+                                                                Guidelines
+                                                            </a>
+                                                            <button onClick={() => setIsMemeFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
+                                                                Apply
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* AI Drill & Debate (No guidelines/forms yet just info) */}
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                                                        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                4
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI Drill</div>
+                                                                <div className="text-[11px] text-gray-400 dark:text-white/40">Computer Lab • 1 Hour</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                5
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI Debate</div>
+                                                                <div className="text-[11px] text-gray-400 dark:text-white/40">Debate Hall • TBA</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1241,25 +1311,11 @@ const AISymposium = () => {
                 )}
             </AnimatePresence>
 
-            {/* ═══════════════ REGISTRATION OVERLAY ═══════════════ */}
             <AnimatePresence>
-                {isRegistrationOpen && (
-                    <RegistrationForm onClose={() => setIsRegistrationOpen(false)} />
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════════ PITCH FORM OVERLAY ═══════════════ */}
-            <AnimatePresence>
-                {isPitchFormOpen && (
-                    <PitchForm onClose={() => setIsPitchFormOpen(false)} />
-                )}
-            </AnimatePresence>
-
-            {/* ═══════════════ POSTER FORM OVERLAY ═══════════════ */}
-            <AnimatePresence>
-                {isPosterFormOpen && (
-                    <PosterForm onClose={() => setIsPosterFormOpen(false)} />
-                )}
+                {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} />}
+                {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} />}
+                {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} />}
+                {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} />}
             </AnimatePresence>
         </div>
     );
