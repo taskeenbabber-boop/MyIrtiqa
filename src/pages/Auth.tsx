@@ -24,7 +24,7 @@ export default function Auth() {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/admin");
       }
     });
   }, [navigate]);
@@ -120,7 +120,7 @@ export default function Auth() {
         variant: "destructive",
       });
     } else {
-      navigate("/");
+      navigate("/admin");
     }
   };
 
@@ -128,7 +128,7 @@ export default function Auth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/admin`,
       },
     });
 

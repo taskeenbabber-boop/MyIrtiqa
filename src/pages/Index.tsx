@@ -61,7 +61,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
 
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section className="relative pt-16 overflow-hidden min-h-[90vh]">
+      <section className="relative pt-16 overflow-hidden min-h-[80vh] sm:min-h-[85vh] md:min-h-[90vh]">
         <ScientificBackground />
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/30 via-background/60 to-background pointer-events-none" />
 
@@ -69,16 +69,16 @@ const Index = () => {
         <div className="absolute z-[1] w-[50vw] h-[50vw] rounded-full top-1/4 -left-1/4 bg-primary/5 blur-[120px] animate-pulse" />
         <div className="absolute z-[1] w-[40vw] h-[40vw] rounded-full bottom-0 right-0 bg-purple-500/5 blur-[100px] animate-pulse" style={{ animationDelay: '3s' }} />
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20 pb-32">
-          <div className="max-w-5xl mx-auto text-center space-y-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-24 md:pb-32">
+          <div className="max-w-5xl mx-auto text-center space-y-5 sm:space-y-6 md:space-y-8">
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase px-5 py-2.5 rounded-full border border-primary/30 bg-primary/5 text-primary">
-                <Sparkles className="w-3.5 h-3.5" /> Empowering Researchers Since 2024
+              <span className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-semibold tracking-widest uppercase px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-primary/30 bg-primary/5 text-primary">
+                <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Empowering Researchers Since 2024
               </span>
             </motion.div>
 
@@ -87,13 +87,13 @@ const Index = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-heading font-bold leading-tight"
             >
               Start from a point.{" "}
               <span className="text-gradient relative">
                 Grow with IRTIQA.
                 <motion.span
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-full"
+                  className="absolute -bottom-1 sm:-bottom-2 left-0 w-full h-0.5 sm:h-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-full"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ duration: 1, delay: 0.8 }}
@@ -107,7 +107,7 @@ const Index = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto px-2"
             >
               Empowering researchers and learners through quality training, innovation, and mentorship
             </motion.p>
@@ -117,21 +117,21 @@ const Index = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-2"
             >
-              <Button asChild size="lg" className="shadow-medium hover:shadow-large transition-smooth group">
+              <Button asChild size="lg" className="w-full sm:w-auto shadow-medium hover:shadow-large transition-smooth group">
                 <Link to="/ai-symposium">
                   <Zap className="mr-2 h-5 w-5" />
                   AI Symposium 2026
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="shadow-soft hover:shadow-medium transition-smooth">
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto shadow-soft hover:shadow-medium transition-smooth">
                 <Link to="/programs">
                   Explore Programs
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="lg" className="transition-smooth">
+              <Button asChild variant="ghost" size="lg" className="w-full sm:w-auto transition-smooth">
                 <Link to="/verify">
                   Verify Certificate
                 </Link>
@@ -144,7 +144,7 @@ const Index = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.8 }}
-            className="max-w-5xl mx-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+            className="max-w-5xl mx-auto mt-12 sm:mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center"
           >
             {[
               { value: "550+", label: "Learners Trained" },
@@ -159,10 +159,10 @@ const Index = () => {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="space-y-2"
+                className="space-y-1 sm:space-y-2"
               >
-                <div className="text-4xl font-heading font-bold text-primary">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-primary">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>

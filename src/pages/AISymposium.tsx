@@ -11,9 +11,10 @@ import aiIconLogo from "@/assets/AI-icon.png";
 const ACCENT = "#3b82f6";       // vibrant blue
 const ACCENT_LIGHT = "#60a5fa"; // lighter blue
 const ACCENT_BG = "rgba(59,130,246,0.08)";
-const SURFACE = "#111111";
-const SURFACE_2 = "#1a1a1a";
-const BORDER = "#222222";
+/* Theme-aware surface tokens — use CSS variables from the design system */
+const SURFACE = "hsl(var(--card))";
+const SURFACE_2 = "hsl(var(--muted))";
+const BORDER = "hsl(var(--border))";
 
 /* ——— event data ——— */
 const SYMPOSIUM_EVENTS = [
@@ -146,21 +147,25 @@ const AISymposium = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <div className="min-h-screen bg-background text-foreground overflow-x-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
 
             {/* ═══════════════ HERO ═══════════════ */}
-            <header ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+            <header ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50/80 via-white to-white dark:from-[#0a0a0a] dark:via-[#0a0a0a] dark:to-[#0a0a0a]">
                 {/* Grid background */}
                 <div className="absolute inset-0 z-0" style={{
-                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                    backgroundImage: 'linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px)',
                     backgroundSize: '50px 50px',
                     backgroundPosition: 'center center',
+                }} />
+                <div className="dark:hidden absolute inset-0 z-0" style={{
+                    backgroundImage: 'linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px)',
+                    backgroundSize: '50px 50px',
                 }} />
 
                 {/* Ambient radial glow */}
                 <div className="absolute z-0" style={{
                     width: '70vw', height: '70vw',
-                    background: 'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 60%)',
+                    background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%)',
                     top: '50%', left: '50%',
                     transform: 'translate(-50%, -50%)',
                     borderRadius: '50%',
@@ -171,7 +176,7 @@ const AISymposium = () => {
                 {/* Pink secondary glow */}
                 <div className="absolute z-0" style={{
                     width: '40vw', height: '40vw',
-                    background: 'radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 60%)',
+                    background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 60%)',
                     top: '40%', left: '55%',
                     transform: 'translate(-50%, -50%)',
                     borderRadius: '50%',
@@ -230,14 +235,14 @@ const AISymposium = () => {
                             className="absolute flex flex-col items-center text-center"
                             style={{ animation: 'kineticLoop1 8s infinite cubic-bezier(0.25, 1, 0.5, 1)', willChange: 'transform, opacity, filter' }}
                         >
-                            <div className="text-sm md:text-xl font-medium tracking-[6px] uppercase text-white mb-1">
+                            <div className="text-sm md:text-xl font-medium tracking-[6px] uppercase text-gray-800 dark:text-white mb-1">
                                 SYMPOSIUM
                             </div>
                             <div
                                 className="font-black leading-none"
                                 style={{
                                     fontSize: 'clamp(4rem, 12vw, 7rem)',
-                                    background: 'linear-gradient(to bottom, #ffffff, #60a5fa)',
+                                    background: 'linear-gradient(to bottom, #1e3a5f, #3b82f6)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     filter: 'drop-shadow(0 5px 15px rgba(59,130,246,0.3))',
@@ -252,7 +257,7 @@ const AISymposium = () => {
                             className="absolute flex flex-col items-center text-center"
                             style={{ animation: 'kineticLoop2 8s infinite cubic-bezier(0.25, 1, 0.5, 1)', willChange: 'transform, opacity, filter' }}
                         >
-                            <div className="font-semibold text-white leading-tight" style={{ fontSize: 'clamp(2.5rem, 7vw, 4rem)', letterSpacing: '-2px' }}>
+                            <div className="font-semibold text-gray-900 dark:text-white leading-tight" style={{ fontSize: 'clamp(2.5rem, 7vw, 4rem)', letterSpacing: '-2px' }}>
                                 #Code
                             </div>
                             <div className="flex items-center justify-center">
@@ -268,7 +273,7 @@ const AISymposium = () => {
                                 >
                                     Se
                                 </span>
-                                <span className="font-extrabold text-white leading-none" style={{ fontSize: 'clamp(2.5rem, 7vw, 4rem)', letterSpacing: '-3px' }}>
+                                <span className="font-extrabold text-gray-900 dark:text-white leading-none" style={{ fontSize: 'clamp(2.5rem, 7vw, 4rem)', letterSpacing: '-3px' }}>
                                     Cure
                                 </span>
                             </div>
@@ -280,7 +285,7 @@ const AISymposium = () => {
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.9 }}
-                        className="max-w-xl text-white/40 text-sm md:text-base leading-relaxed mb-10 mt-2"
+                        className="max-w-xl text-gray-500 dark:text-white/40 text-sm md:text-base leading-relaxed mb-10 mt-2"
                     >
                         A two-day exploration at the intersection of AI, neurosurgery, and clinical diagnostics — where breakthrough meets bedside. April 2026, NWSM Peshawar.
                     </motion.p>
@@ -294,7 +299,7 @@ const AISymposium = () => {
                     >
                         <button
                             onClick={() => setIsRegistrationOpen(true)}
-                            className="group flex items-center gap-3 text-black font-bold text-sm uppercase tracking-widest px-8 py-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
+                            className="group flex items-center gap-3 text-white font-bold text-sm uppercase tracking-widest px-8 py-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
                             style={{ background: ACCENT }}
                         >
                             Register Now
@@ -302,8 +307,8 @@ const AISymposium = () => {
                         </button>
                         <button
                             onClick={() => document.getElementById("agenda")?.scrollIntoView({ behavior: "smooth" })}
-                            className="group flex items-center gap-3 text-white font-bold text-sm uppercase tracking-widest px-8 py-4 rounded-full border transition-all duration-300 hover:bg-white/5"
-                            style={{ borderColor: '#333' }}
+                            className="group flex items-center gap-3 text-gray-700 dark:text-white font-bold text-sm uppercase tracking-widest px-8 py-4 rounded-full border transition-all duration-300 hover:bg-blue-50 dark:hover:bg-white/5"
+                            style={{ borderColor: 'hsl(var(--border))' }}
                         >
                             Explore Agenda
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -322,7 +327,7 @@ const AISymposium = () => {
                         animate={{ y: [0, 8, 0] }}
                         transition={{ duration: 2, repeat: Infinity }}
                         className="w-5 h-8 rounded-full border-2 flex justify-center pt-1.5"
-                        style={{ borderColor: '#444' }}
+                        style={{ borderColor: 'hsl(var(--border))' }}
                     >
                         <motion.div className="w-1 h-1.5 rounded-full" style={{ background: ACCENT }} />
                     </motion.div>
@@ -341,8 +346,7 @@ const AISymposium = () => {
                         className="absolute"
                         style={{ top: '18%', left: '4%', animation: 'glassFloat1 7s ease-in-out infinite' }}
                     >
-                        <div className="rounded-2xl border border-white/10 p-5 w-[220px]"
-                            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 30px rgba(59,130,246,0.08)' }}>
+                        <div className="rounded-2xl border border-blue-100 dark:border-white/10 p-5 w-[220px] bg-white/95 dark:bg-slate-900/60 shadow-lg shadow-blue-100/50 dark:shadow-none" style={{ backdropFilter: 'blur(20px)' }}>
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
                                     <Calendar className="w-5 h-5 text-white" />
@@ -351,8 +355,8 @@ const AISymposium = () => {
                                     <div className="text-[10px] font-bold tracking-widest uppercase text-blue-400">Event Date</div>
                                 </div>
                             </div>
-                            <div className="text-2xl font-bold text-white mb-0.5">Apr 10–11</div>
-                            <div className="text-xs text-white/30">2026 • Two Days</div>
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-0.5">Apr 10–11</div>
+                            <div className="text-xs text-gray-400 dark:text-white/30">2026 • Two Days</div>
                             <div className="mt-3 flex gap-1.5">
                                 <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                                 <span className="w-2 h-2 rounded-full bg-blue-400/40" />
@@ -369,29 +373,28 @@ const AISymposium = () => {
                         className="absolute"
                         style={{ top: '45%', left: '2%', animation: 'glassFloat2 8s ease-in-out infinite' }}
                     >
-                        <div className="rounded-2xl border border-white/10 p-5 w-[210px]"
-                            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 30px rgba(168,85,247,0.08)' }}>
+                        <div className="rounded-2xl border border-blue-100 dark:border-white/10 p-5 w-[210px] bg-white/95 dark:bg-slate-900/60 shadow-lg shadow-blue-100/50 dark:shadow-none" style={{ backdropFilter: 'blur(20px)' }}>
                             <div className="text-[10px] font-bold tracking-widest uppercase text-purple-400 mb-2">⏰ Deadlines</div>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-6 rounded-full bg-purple-500" />
                                     <div>
-                                        <div className="text-xs font-semibold text-white">Poster Submission</div>
-                                        <div className="text-[10px] text-white/30">Mar 25, 2026</div>
+                                        <div className="text-xs font-semibold text-gray-800 dark:text-white">Poster Submission</div>
+                                        <div className="text-[10px] text-gray-400 dark:text-white/30">Mar 25, 2026</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-6 rounded-full bg-blue-500" />
                                     <div>
-                                        <div className="text-xs font-semibold text-white">Pitch Abstract</div>
-                                        <div className="text-[10px] text-white/30">Mar 30, 2026</div>
+                                        <div className="text-xs font-semibold text-gray-800 dark:text-white">Pitch Abstract</div>
+                                        <div className="text-[10px] text-gray-400 dark:text-white/30">Mar 30, 2026</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-1 h-6 rounded-full bg-cyan-500" />
                                     <div>
-                                        <div className="text-xs font-semibold text-white">Registration</div>
-                                        <div className="text-[10px] text-white/30">Apr 5, 2026</div>
+                                        <div className="text-xs font-semibold text-gray-800 dark:text-white">Registration</div>
+                                        <div className="text-[10px] text-gray-400 dark:text-white/30">Apr 5, 2026</div>
                                     </div>
                                 </div>
                             </div>
@@ -406,15 +409,14 @@ const AISymposium = () => {
                         className="absolute"
                         style={{ top: '74%', left: '5%', animation: 'glassFloat3 6s ease-in-out infinite' }}
                     >
-                        <div className="rounded-2xl border border-white/10 p-4 w-[190px]"
-                            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 30px rgba(59,130,246,0.08)' }}>
+                        <div className="rounded-2xl border border-blue-100 dark:border-white/10 p-4 w-[190px] bg-white/95 dark:bg-slate-900/60 shadow-lg shadow-blue-100/50 dark:shadow-none" style={{ backdropFilter: 'blur(20px)' }}>
                             <div className="flex items-center justify-between mb-2">
                                 <div className="text-[10px] font-bold tracking-widest uppercase text-blue-400">Speakers</div>
                                 <Users className="w-3.5 h-3.5 text-blue-400/60" />
                             </div>
-                            <div className="text-3xl font-black text-white">12+</div>
-                            <div className="text-[10px] text-white/30 mt-1">Expert Panelists & Judges</div>
-                            <div className="mt-2 h-1 rounded-full bg-white/5 overflow-hidden">
+                            <div className="text-3xl font-black text-gray-900 dark:text-white">12+</div>
+                            <div className="text-[10px] text-gray-400 dark:text-white/30 mt-1">Expert Panelists & Judges</div>
+                            <div className="mt-2 h-1 rounded-full bg-gray-200 dark:bg-white/5 overflow-hidden">
                                 <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
                             </div>
                         </div>
@@ -430,8 +432,7 @@ const AISymposium = () => {
                         className="absolute"
                         style={{ top: '16%', right: '4%', animation: 'glassFloat2 7.5s ease-in-out infinite' }}
                     >
-                        <div className="rounded-2xl border border-white/10 p-5 w-[220px]"
-                            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 30px rgba(6,182,212,0.08)' }}>
+                        <div className="rounded-2xl border border-blue-100 dark:border-white/10 p-5 w-[220px] bg-white/95 dark:bg-slate-900/60 shadow-lg shadow-blue-100/50 dark:shadow-none" style={{ backdropFilter: 'blur(20px)' }}>
                             <div className="flex items-center gap-3 mb-3">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}>
                                     <Navigation className="w-5 h-5 text-white" />
@@ -440,8 +441,8 @@ const AISymposium = () => {
                                     <div className="text-[10px] font-bold tracking-widest uppercase text-cyan-400">Venue</div>
                                 </div>
                             </div>
-                            <div className="text-sm font-bold text-white mb-0.5">NWSM Peshawar</div>
-                            <div className="text-[10px] text-white/30 leading-relaxed">Northwest School of Medicine & Gandhara University</div>
+                            <div className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">NWSM Peshawar</div>
+                            <div className="text-[10px] text-gray-400 dark:text-white/30 leading-relaxed">Northwest School of Medicine & Gandhara University</div>
                         </div>
                     </motion.div>
 
@@ -453,8 +454,7 @@ const AISymposium = () => {
                         className="absolute"
                         style={{ top: '44%', right: '2%', animation: 'glassFloat1 8.5s ease-in-out infinite' }}
                     >
-                        <div className="rounded-2xl border border-white/10 p-5 w-[210px]"
-                            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 30px rgba(236,72,153,0.08)' }}>
+                        <div className="rounded-2xl border border-blue-100 dark:border-white/10 p-5 w-[210px] bg-white/95 dark:bg-slate-900/60 shadow-lg shadow-blue-100/50 dark:shadow-none" style={{ backdropFilter: 'blur(20px)' }}>
                             <div className="text-[10px] font-bold tracking-widest uppercase text-pink-400 mb-3">🧠 Key Tracks</div>
                             <div className="space-y-2">
                                 {['Neurosurgery & AI', 'Prompt Engineering', 'Clinical Diagnostics', 'AI in Research'].map((topic, i) => (
@@ -463,7 +463,7 @@ const AISymposium = () => {
                                             style={{ background: `hsl(${220 + i * 30}, 80%, 60%, 0.15)`, color: `hsl(${220 + i * 30}, 80%, 65%)` }}>
                                             {i + 1}
                                         </div>
-                                        <span className="text-white/70">{topic}</span>
+                                        <span className="text-gray-600 dark:text-white/70">{topic}</span>
                                     </div>
                                 ))}
                             </div>
@@ -478,8 +478,7 @@ const AISymposium = () => {
                         className="absolute"
                         style={{ top: '74%', right: '5%', animation: 'glassFloat3 7s ease-in-out infinite' }}
                     >
-                        <div className="rounded-2xl border border-white/10 p-4 w-[190px]"
-                            style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 0 30px rgba(59,130,246,0.08)' }}>
+                        <div className="rounded-2xl border border-blue-100 dark:border-white/10 p-4 w-[190px] bg-white/95 dark:bg-slate-900/60 shadow-lg shadow-blue-100/50 dark:shadow-none" style={{ backdropFilter: 'blur(20px)' }}>
                             <div className="flex items-center justify-between mb-3">
                                 <div className="text-[10px] font-bold tracking-widest uppercase text-emerald-400">Live</div>
                                 <span className="flex items-center gap-1">
@@ -489,20 +488,20 @@ const AISymposium = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <div className="text-lg font-black text-white">6</div>
-                                    <div className="text-[9px] text-white/30">Workshops</div>
+                                    <div className="text-lg font-black text-gray-900 dark:text-white">6</div>
+                                    <div className="text-[9px] text-gray-400 dark:text-white/30">Workshops</div>
                                 </div>
                                 <div>
-                                    <div className="text-lg font-black text-white">3</div>
-                                    <div className="text-[9px] text-white/30">Keynotes</div>
+                                    <div className="text-lg font-black text-gray-900 dark:text-white">3</div>
+                                    <div className="text-[9px] text-gray-400 dark:text-white/30">Keynotes</div>
                                 </div>
                                 <div>
-                                    <div className="text-lg font-black text-white">2</div>
-                                    <div className="text-[9px] text-white/30">Competitions</div>
+                                    <div className="text-lg font-black text-gray-900 dark:text-white">2</div>
+                                    <div className="text-[9px] text-gray-400 dark:text-white/30">Competitions</div>
                                 </div>
                                 <div>
-                                    <div className="text-lg font-black text-white">4</div>
-                                    <div className="text-[9px] text-white/30">Panels</div>
+                                    <div className="text-lg font-black text-gray-900 dark:text-white">4</div>
+                                    <div className="text-[9px] text-gray-400 dark:text-white/30">Panels</div>
                                 </div>
                             </div>
                         </div>
@@ -555,7 +554,7 @@ const AISymposium = () => {
                 >
                     {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
                         <span key={i} className="flex items-center gap-4 text-xl md:text-2xl font-bold uppercase tracking-wider">
-                            <span className="text-white/30">{item}</span>
+                            <span className="text-gray-400 dark:text-white/30">{item}</span>
                             <span className="w-2 h-2 rounded-full" style={{ background: ACCENT }} />
                         </span>
                     ))}
@@ -573,7 +572,7 @@ const AISymposium = () => {
                             Your Gateway to<br />
                             <span style={{ color: ACCENT }}>AI in Medicine</span>
                         </h2>
-                        <p className="text-white/40 leading-relaxed">
+                        <p className="text-gray-500 dark:text-white/40 leading-relaxed">
                             Expert-led workshops, inspiring keynotes, and competitive tracks designed to transform how you think about artificial intelligence in healthcare.
                         </p>
                     </div>
@@ -589,7 +588,7 @@ const AISymposium = () => {
                                 style={{ background: SURFACE, borderColor: BORDER }}
                             >
                                 <div className="text-4xl font-black mb-2" style={{ color: ACCENT }}>{s.value}</div>
-                                <div className="text-xs text-white/40 uppercase tracking-wider font-medium">{s.label}</div>
+                                <div className="text-xs text-gray-500 dark:text-white/40 uppercase tracking-wider font-medium">{s.label}</div>
                             </motion.div>
                         ))}
                     </div>
@@ -606,7 +605,7 @@ const AISymposium = () => {
                     <h2 className="text-4xl md:text-6xl font-black uppercase leading-tight">
                         Event at a <span style={{ color: ACCENT }}>Glance</span>
                     </h2>
-                    <p className="text-white/30 mt-4 max-w-lg mx-auto">
+                    <p className="text-gray-500 dark:text-white/30 mt-4 max-w-lg mx-auto">
                         Two days of workshops, keynotes, panel discussions, and competitions — here's how it all unfolds.
                     </p>
                     <button
@@ -652,8 +651,8 @@ const AISymposium = () => {
                                             >
                                                 Thu
                                             </span>
-                                            <div className="text-6xl lg:text-7xl font-black leading-none text-white mt-1">10</div>
-                                            <div className="text-sm text-white/30 font-medium">April, 2026</div>
+                                            <div className="text-6xl lg:text-7xl font-black leading-none text-foreground mt-1">10</div>
+                                            <div className="text-sm text-gray-400 dark:text-white/30 font-medium">April, 2026</div>
                                         </div>
 
                                         {/* Timeline dot (desktop) */}
@@ -665,41 +664,41 @@ const AISymposium = () => {
 
                                         {/* Events for this day */}
                                         <div className="lg:pl-12 flex-grow space-y-4">
-                                            <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-white/20">Pre-Conference Day</div>
+                                            <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-gray-300 dark:text-white/20">Pre-Conference Day</div>
 
                                             {/* Morning Block */}
                                             <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
                                                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                                                    <h3 className="text-lg font-bold text-white">Morning Workshops</h3>
+                                                    <h3 className="text-lg font-bold text-foreground">Morning Workshops</h3>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="flex items-center gap-1.5 text-xs text-white/30">
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
                                                             <Clock className="w-3 h-3" style={{ color: ACCENT }} />
                                                             <span>10:00 AM – 12:00 PM</span>
                                                         </div>
-                                                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white/40" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-gray-400 dark:text-white/40" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
                                                             Parallel
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
                                                             A
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-semibold text-white">AI for Note Taking</div>
-                                                            <div className="text-xs text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
-                                                            <div className="text-xs text-white/25 mt-0.5">Haroon — AI Specialist</div>
+                                                            <div className="text-sm font-semibold text-foreground">AI for Note Taking</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Haroon — AI Specialist</div>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
                                                             B
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-semibold text-white">Prompt Engineering & Design</div>
-                                                            <div className="text-xs text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
-                                                            <div className="text-xs text-white/25 mt-0.5">Mr. Asad — Design Lead</div>
+                                                            <div className="text-sm font-semibold text-foreground">Prompt Engineering & Design</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Mr. Asad — Design Lead</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -708,42 +707,42 @@ const AISymposium = () => {
                                             {/* Break indicator */}
                                             <div className="flex items-center gap-3 pl-4">
                                                 <div className="w-2 h-2 rounded-full" style={{ background: "#333" }} />
-                                                <span className="text-xs text-white/15 uppercase tracking-widest font-medium">12:00 PM – 2:00 PM • Lunch & Networking</span>
+                                                <span className="text-xs text-gray-400 dark:text-white/15 uppercase tracking-widest font-medium">12:00 PM – 2:00 PM • Lunch & Networking</span>
                                             </div>
 
                                             {/* Afternoon Block */}
                                             <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
                                                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                                                    <h3 className="text-lg font-bold text-white">Afternoon Workshops</h3>
+                                                    <h3 className="text-lg font-bold text-foreground">Afternoon Workshops</h3>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="flex items-center gap-1.5 text-xs text-white/30">
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
                                                             <Clock className="w-3 h-3" style={{ color: ACCENT }} />
                                                             <span>2:00 PM – 4:00 PM</span>
                                                         </div>
-                                                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white/40" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-gray-400 dark:text-white/40" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
                                                             Parallel
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
                                                             C
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-semibold text-white">AI in Research</div>
-                                                            <div className="text-xs text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
-                                                            <div className="text-xs text-white/25 mt-0.5">Iftikhar — Research Fellow</div>
+                                                            <div className="text-sm font-semibold text-foreground">AI in Research</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Iftikhar — Research Fellow</div>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
                                                             D
                                                         </div>
                                                         <div>
-                                                            <div className="text-sm font-semibold text-white">Clinical Audit & AI in Clinical Use</div>
-                                                            <div className="text-xs text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
-                                                            <div className="text-xs text-white/25 mt-0.5">Dr. Almas Fasih Khattak</div>
+                                                            <div className="text-sm font-semibold text-foreground">Clinical Audit & AI in Clinical Use</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Dr. Almas Fasih Khattak</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -770,8 +769,8 @@ const AISymposium = () => {
                                             >
                                                 Fri
                                             </span>
-                                            <div className="text-6xl lg:text-7xl font-black leading-none text-white mt-1">11</div>
-                                            <div className="text-sm text-white/30 font-medium">April, 2026</div>
+                                            <div className="text-6xl lg:text-7xl font-black leading-none text-foreground mt-1">11</div>
+                                            <div className="text-sm text-gray-400 dark:text-white/30 font-medium">April, 2026</div>
                                         </div>
 
                                         {/* Timeline dot (desktop) */}
@@ -783,7 +782,7 @@ const AISymposium = () => {
 
                                         {/* Events for this day */}
                                         <div className="lg:pl-12 flex-grow space-y-4">
-                                            <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-white/20">Main Conference Day</div>
+                                            <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-gray-300 dark:text-white/20">Main Conference Day</div>
 
                                             {/* Keynotes */}
                                             <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
@@ -791,25 +790,25 @@ const AISymposium = () => {
                                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(251,191,36,0.1)" }}>
                                                         <Award className="w-4 h-4 text-amber-400" />
                                                     </div>
-                                                    <h3 className="text-lg font-bold text-white">Keynote Addresses</h3>
-                                                    <div className="flex items-center gap-1.5 text-xs text-white/30">
+                                                    <h3 className="text-lg font-bold text-foreground">Keynote Addresses</h3>
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
                                                         <Clock className="w-3 h-3" style={{ color: ACCENT }} />
                                                         <span>Morning – Midday</span>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                         <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
                                                         <div>
-                                                            <div className="text-sm font-semibold text-white">AI and the Future of Global Surgery</div>
-                                                            <div className="text-xs text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Morning Session</div>
+                                                            <div className="text-sm font-semibold text-foreground">AI and the Future of Global Surgery</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Morning Session</div>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                         <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
                                                         <div>
-                                                            <div className="text-sm font-semibold text-white">Thinking Like a Builder: AI Solutions in Healthcare</div>
-                                                            <div className="text-xs text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Midday Session</div>
+                                                            <div className="text-sm font-semibold text-foreground">Thinking Like a Builder: AI Solutions in Healthcare</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Midday Session</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -821,17 +820,17 @@ const AISymposium = () => {
                                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(168,85,247,0.1)" }}>
                                                         <Users className="w-4 h-4 text-purple-400" />
                                                     </div>
-                                                    <h3 className="text-lg font-bold text-white">Panel Discussion</h3>
-                                                    <div className="flex items-center gap-1.5 text-xs text-white/30">
+                                                    <h3 className="text-lg font-bold text-foreground">Panel Discussion</h3>
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
                                                         <Clock className="w-3 h-3" style={{ color: ACCENT }} />
                                                         <span>60 Minutes</span>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                     <div className="w-1 h-10 rounded-full flex-shrink-0 bg-purple-500" />
                                                     <div>
-                                                        <div className="text-sm font-semibold text-white">Human Expertise vs AI Systems: Competition or Collaboration?</div>
-                                                        <div className="text-xs text-white/25 mt-0.5">Expert Panelists • Main Auditorium</div>
+                                                        <div className="text-sm font-semibold text-foreground">Human Expertise vs AI Systems: Competition or Collaboration?</div>
+                                                        <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Expert Panelists • Main Auditorium</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -842,7 +841,7 @@ const AISymposium = () => {
                                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(34,197,94,0.1)" }}>
                                                         <Zap className="w-4 h-4 text-emerald-400" />
                                                     </div>
-                                                    <h3 className="text-lg font-bold text-white">Competitions</h3>
+                                                    <h3 className="text-lg font-bold text-foreground">Competitions</h3>
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     {[
@@ -851,13 +850,13 @@ const AISymposium = () => {
                                                         { title: "AI Debate", venue: "Debate Hall", time: "TBA" },
                                                         { title: "AI Pitch Competition", venue: "Pitch Room", time: "5m + 3m Q&A" },
                                                     ].map((comp, i) => (
-                                                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${BORDER}` }}>
+                                                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
                                                             <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
                                                                 {i + 1}
                                                             </div>
                                                             <div>
-                                                                <div className="text-sm font-semibold text-white">{comp.title}</div>
-                                                                <div className="text-[11px] text-white/25">{comp.venue} • {comp.time}</div>
+                                                                <div className="text-sm font-semibold text-foreground">{comp.title}</div>
+                                                                <div className="text-[11px] text-gray-400 dark:text-white/25">{comp.venue} • {comp.time}</div>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -893,7 +892,7 @@ const AISymposium = () => {
                                 className="px-5 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wider transition-all duration-300"
                                 style={{
                                     background: filter === cat ? ACCENT : "transparent",
-                                    color: filter === cat ? "#000" : "rgba(255,255,255,0.4)",
+                                    color: filter === cat ? "#000" : "hsl(var(--muted-foreground))",
                                     border: filter === cat ? "none" : `1px solid ${BORDER}`,
                                 }}
                             >
@@ -942,16 +941,16 @@ const AISymposium = () => {
                                     >
                                         {ev.category}
                                     </span>
-                                    <span className="text-xs text-white/30">{ev.date}</span>
+                                    <span className="text-xs text-muted-foreground">{ev.date}</span>
                                 </div>
-                                <h3 className="text-lg md:text-xl font-bold text-white truncate group-hover:text-[#3b82f6] transition-colors">
+                                <h3 className="text-lg md:text-xl font-bold text-foreground truncate group-hover:text-[#3b82f6] transition-colors">
                                     {ev.title}
                                 </h3>
                                 <div className="flex items-center gap-4 mt-1">
-                                    <span className="text-xs text-white/30 flex items-center gap-1">
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
                                         <Clock className="w-3 h-3" /> {ev.time}
                                     </span>
-                                    <span className="text-xs text-white/30 flex items-center gap-1">
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
                                         <MapPin className="w-3 h-3" /> {ev.location}
                                     </span>
                                 </div>
@@ -962,8 +961,8 @@ const AISymposium = () => {
                                 <div className="flex items-center gap-3">
                                     <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
                                     <div>
-                                        <p className="text-sm font-semibold text-white">{ev.speaker}</p>
-                                        <p className="text-xs text-white/30">{ev.speakerRole}</p>
+                                        <p className="text-sm font-semibold text-foreground">{ev.speaker}</p>
+                                        <p className="text-xs text-muted-foreground">{ev.speakerRole}</p>
                                     </div>
                                 </div>
                                 <div
@@ -979,7 +978,7 @@ const AISymposium = () => {
 
                 {filteredEvents.length === 0 && (
                     <div className="py-24 text-center">
-                        <p className="text-xl font-bold text-white/20 uppercase tracking-widest">No Events in This Track</p>
+                        <p className="text-xl font-bold text-muted-foreground uppercase tracking-widest">No Events in This Track</p>
                     </div>
                 )}
             </section>
@@ -993,7 +992,7 @@ const AISymposium = () => {
                 >
                     {["Innovate", "Inspire", "Create", "Disrupt", "Heal", "Build", "Transform", "Innovate", "Inspire", "Create", "Disrupt", "Heal", "Build", "Transform"].map((item, i) => (
                         <span key={i} className="flex items-center gap-4 font-black uppercase" style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)" }}>
-                            <span className={i % 2 === 0 ? "text-white" : "text-white/20"}>{item}</span>
+                            <span className={i % 2 === 0 ? "text-foreground" : "text-muted-foreground/40"}>{item}</span>
                             <span className="text-lg" style={{ color: ACCENT }}>✦</span>
                         </span>
                     ))}
@@ -1009,25 +1008,25 @@ const AISymposium = () => {
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.2971176909746!2d71.43616203908233!3d33.995492331174624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38d910fb7687dd83%3A0x8a51a8a869531635!2sNorthwest%20School%20of%20Medicine%2C%20Peshawar!5e0!3m2!1sen!2s!4v1772317442416!5m2!1sen!2s"
                             width="100%"
                             height="100%"
-                            style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) brightness(0.95) contrast(1.1)" }}
+                            style={{ border: 0 }}
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
                             className="absolute inset-0"
                         />
                         {/* Map overlay gradient */}
-                        <div className="absolute inset-0 pointer-events-none" style={{ background: `linear-gradient(to right, transparent 70%, #0e0e0e)` }} />
+                        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, transparent 70%, hsl(var(--background)))' }} />
                     </div>
 
                     {/* Details side */}
-                    <div className="lg:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center" style={{ background: "#0e0e0e" }}>
+                    <div className="lg:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white dark:bg-[#0e0e0e]">
                         <p className="text-xs font-semibold tracking-[4px] uppercase mb-4" style={{ color: ACCENT }}>
                             Venue
                         </p>
                         <h2 className="text-3xl md:text-5xl font-black uppercase leading-tight mb-6">
                             Northwest School<br />of <span style={{ color: ACCENT }}>Medicine</span>
                         </h2>
-                        <p className="text-white/40 leading-relaxed mb-8">
+                        <p className="text-gray-500 dark:text-white/40 leading-relaxed mb-8">
                             Join us at one of Pakistan's premier medical institutions. Located in Peshawar, NWSM provides a state-of-the-art environment for our two-day AI symposium.
                         </p>
 
@@ -1043,8 +1042,8 @@ const AISymposium = () => {
                                         <span style={{ color: ACCENT }}>{item.icon}</span>
                                     </div>
                                     <div>
-                                        <div className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-0.5">{item.label}</div>
-                                        <div className="text-sm font-medium text-white/70">{item.value}</div>
+                                        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-white/25 mb-0.5">{item.label}</div>
+                                        <div className="text-sm font-medium text-gray-700 dark:text-white/70">{item.value}</div>
                                     </div>
                                 </div>
                             ))}
@@ -1080,7 +1079,7 @@ const AISymposium = () => {
                             TO HAVE YOU<br />
                             <span style={{ color: ACCENT }}>JOIN US</span>
                         </h2>
-                        <p className="text-white/40 max-w-md mx-auto mb-10 text-lg">
+                        <p className="text-gray-500 dark:text-white/40 max-w-md mx-auto mb-10 text-lg">
                             Two days of workshops, keynotes, competitions, and unparalleled networking. Register now before seats fill up.
                         </p>
                         <div className="flex flex-wrap justify-center gap-4">
@@ -1104,7 +1103,7 @@ const AISymposium = () => {
                         <div className="w-3 h-3 rounded-full" style={{ background: ACCENT }} />
                         <span className="text-sm font-bold uppercase tracking-widest">GSRH × IRTIQA</span>
                     </div>
-                    <p className="text-xs text-white/30">© 2026 AI Symposium. Northwest School of Medicine, Peshawar.</p>
+                    <p className="text-xs text-muted-foreground">© 2026 AI Symposium. Northwest School of Medicine, Peshawar.</p>
                 </div>
             </footer>
 
