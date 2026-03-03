@@ -665,10 +665,15 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                         <CreditCard className="w-4 h-4" style={{ color: ACCENT }} /> Payment Instructions
                                     </h3>
                                     <div className="p-4 rounded-xl text-sm text-white/40 leading-relaxed" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                        Transfer the total amount to:<br />
-                                        <strong className="text-white/60">Bank:</strong> Habib Bank Limited (HBL)<br />
-                                        <strong className="text-white/60">Account Title:</strong> IRTIQA Society<br />
-                                        <strong className="text-white/60">Account No:</strong> 0000-0000-0000-00<br />
+                                        Transfer the total amount via <strong className="text-white/60">Bank Transfer</strong> or <strong className="text-white/60">Easypaisa</strong>:<br /><br />
+                                        <strong className="text-white/60">🏦 Meezan Bank Limited</strong><br />
+                                        <strong className="text-white/60">Account Title:</strong> Zahoor Ahmed Khan<br />
+                                        <strong className="text-white/60">Account No:</strong> 00300113953149<br />
+                                        <strong className="text-white/60">IBAN:</strong> PK56MEZN0000300113953149<br /><br />
+                                        <strong className="text-white/60">📱 Easypaisa</strong><br />
+                                        <strong className="text-white/60">Number:</strong> 03139802668<br />
+                                        <strong className="text-white/60">Account Title:</strong> Zahoor Ahmad Khan<br />
+                                        <strong className="text-white/60">IBAN:</strong> PK47TMFB0000000043652207<br /><br />
                                         Upload receipt below after transfer.
                                     </div>
                                 </div>
