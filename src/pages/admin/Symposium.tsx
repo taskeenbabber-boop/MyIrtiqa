@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "registrations" | "pitch" | "poster";
+type Tab = "registrations" | "pitch" | "poster" | "speakers";
 type Status = "pending" | "approved" | "rejected";
 
 interface Registration {
@@ -50,6 +50,22 @@ interface PosterSubmission {
     created_at: string;
 }
 
+interface Speaker {
+    id: string;
+    name: string;
+    role: string;
+    image_url: string;
+    event_category: string;
+    event_title: string;
+    location: string;
+    time: string;
+    date: string;
+    description: string;
+    fee: string;
+    capacity: string;
+    created_at: string;
+}
+
 const STATUS_COLORS: Record<Status, { bg: string; text: string; icon: any }> = {
     pending: { bg: "bg-amber-500/10", text: "text-amber-400", icon: Clock },
     approved: { bg: "bg-emerald-500/10", text: "text-emerald-400", icon: CheckCircle },
@@ -71,22 +87,32 @@ export default function AdminSymposium() {
     const [registrations, setRegistrations] = useState<Registration[]>([]);
     const [pitchSubs, setPitchSubs] = useState<PitchSubmission[]>([]);
     const [posterSubs, setPosterSubs] = useState<PosterSubmission[]>([]);
+    const [speakers, setSpeakers] = useState<Speaker[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [noteText, setNoteText] = useState("");
     const [updating, setUpdating] = useState<string | null>(null);
 
+    // New Speaker Form State
+    const [newSpeaker, setNewSpeaker] = useState({
+        name: "", role: "", image_url: "", event_category: "Workshop",
+        event_title: "", location: "", time: "", date: "", description: "", fee: "", capacity: ""
+    });
+    const [showSpeakerForm, setShowSpeakerForm] = useState(false);
+
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [regRes, pitchRes, posterRes] = await Promise.all([
+            const [regRes, pitchRes, posterRes, speakersRes] = await Promise.all([
                 (supabase as any).from("symposium_registrations").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_pitch_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_poster_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_speakers").select("*").order("created_at", { ascending: false }),
             ]);
             setRegistrations(regRes.data || []);
             setPitchSubs(pitchRes.data || []);
             setPosterSubs(posterRes.data || []);
+            setSpeakers(speakersRes.data || []);
         } catch (err) {
             console.error("Failed to fetch symposium data:", err);
         } finally {
@@ -141,10 +167,43 @@ export default function AdminSymposium() {
         if (data?.signedUrl) window.open(data.signedUrl, "_blank");
     };
 
+    const handleAddSpeaker = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setUpdating("speaker-form");
+        try {
+            const { error } = await supabase.from("symposium_speakers").insert(newSpeaker);
+            if (error) throw error;
+            setShowSpeakerForm(false);
+            setNewSpeaker({ name: "", role: "", image_url: "", event_category: "Workshop", event_title: "", location: "", time: "", date: "", description: "", fee: "", capacity: "" });
+            fetchData();
+        } catch (err) {
+            console.error("Failed to add speaker:", err);
+            alert("Failed to add speaker");
+        } finally {
+            setUpdating(null);
+        }
+    };
+
+    const handleDeleteSpeaker = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this speaker/event?")) return;
+        setUpdating(id);
+        try {
+            const { error } = await supabase.from("symposium_speakers").delete().eq("id", id);
+            if (error) throw error;
+            fetchData();
+        } catch (err) {
+            console.error("Failed to delete speaker:", err);
+            alert("Failed to delete speaker");
+        } finally {
+            setUpdating(null);
+        }
+    };
+
     const tabs: { key: Tab; label: string; count: number }[] = [
         { key: "registrations", label: "Registrations", count: registrations.length },
         { key: "pitch", label: "Pitch Submissions", count: pitchSubs.length },
         { key: "poster", label: "Poster Submissions", count: posterSubs.length },
+        { key: "speakers", label: "Speakers & Tutors", count: speakers.length },
     ];
 
     const pendingCounts = {
@@ -346,6 +405,67 @@ export default function AdminSymposium() {
                             )}
                         </div>
                     ))}
+
+                    {tab === "speakers" && (
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-lg font-bold">Manage Speakers & Events</h3>
+                                <Button onClick={() => setShowSpeakerForm(!showSpeakerForm)}>
+                                    {showSpeakerForm ? "Cancel" : "+ Add Speaker/Event"}
+                                </Button>
+                            </div>
+
+                            {showSpeakerForm && (
+                                <form onSubmit={handleAddSpeaker} className="rounded-xl border border-border bg-card p-6 space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div><label className="text-xs text-muted-foreground">Name</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.name} onChange={e => setNewSpeaker({ ...newSpeaker, name: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Role</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.role} onChange={e => setNewSpeaker({ ...newSpeaker, role: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Image URL (unsplash etc)</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.image_url} onChange={e => setNewSpeaker({ ...newSpeaker, image_url: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Event Category</label>
+                                            <select required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.event_category} onChange={e => setNewSpeaker({ ...newSpeaker, event_category: e.target.value })}>
+                                                <option value="Workshop">Workshop</option>
+                                                <option value="Keynote">Keynote</option>
+                                                <option value="Panel">Panel</option>
+                                                <option value="Competition">Competition</option>
+                                            </select>
+                                        </div>
+                                        <div><label className="text-xs text-muted-foreground">Event Title</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.event_title} onChange={e => setNewSpeaker({ ...newSpeaker, event_title: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Location</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.location} onChange={e => setNewSpeaker({ ...newSpeaker, location: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Time (e.g. 10:00 AM)</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.time} onChange={e => setNewSpeaker({ ...newSpeaker, time: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Date (e.g. 10 Apr 2026)</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.date} onChange={e => setNewSpeaker({ ...newSpeaker, date: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Fee</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.fee} onChange={e => setNewSpeaker({ ...newSpeaker, fee: e.target.value })} /></div>
+                                        <div><label className="text-xs text-muted-foreground">Capacity</label><input required className="w-full mt-1 p-2 bg-background border rounded-md" value={newSpeaker.capacity} onChange={e => setNewSpeaker({ ...newSpeaker, capacity: e.target.value })} /></div>
+                                        <div className="md:col-span-2"><label className="text-xs text-muted-foreground">Description</label><textarea required rows={3} className="w-full mt-1 p-2 bg-background border rounded-md resize-none" value={newSpeaker.description} onChange={e => setNewSpeaker({ ...newSpeaker, description: e.target.value })} /></div>
+                                    </div>
+                                    <div className="flex justify-end pt-2">
+                                        <Button type="submit" disabled={updating === "speaker-form"}>
+                                            {updating === "speaker-form" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null} Save Speaker
+                                        </Button>
+                                    </div>
+                                </form>
+                            )}
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {speakers.map(speaker => (
+                                    <div key={speaker.id} className="rounded-xl border border-border bg-card p-4 flex items-start gap-4">
+                                        <img src={speaker.image_url} alt={speaker.name} className="w-16 h-16 rounded-full object-cover bg-muted" />
+                                        <div className="flex-grow">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <h4 className="font-bold">{speaker.name}</h4>
+                                                    <p className="text-xs text-muted-foreground">{speaker.role} • {speaker.event_category}</p>
+                                                    <p className="text-sm mt-1">{speaker.event_title}</p>
+                                                </div>
+                                                <Button size="sm" variant="destructive" onClick={() => handleDeleteSpeaker(speaker.id)} disabled={updating === speaker.id}>
+                                                    {updating === speaker.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {tab === "registrations" && registrations.length === 0 && (
                         <div className="text-center py-16 text-muted-foreground">

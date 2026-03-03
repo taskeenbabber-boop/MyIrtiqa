@@ -46,6 +46,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
     const [isEarlyBird] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [isNwsmStudent, setIsNwsmStudent] = useState(false); // New state
 
     const [formData, setFormData] = useState({
         name: "",
@@ -59,22 +60,30 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
     });
 
     const isFullEvent = ticketType === "FULL_EVENT";
-    const isNwsm = ticketType === "NWSM_STUDENT";
+    const isNwsm = ticketType === "NWSM_STUDENT"; // Keep this for specific NWSM student pass logic if needed elsewhere
 
     /* ——— pricing (hidden in step 1) ——— */
     const calculateTotal = () => {
-        if (isFullEvent) return 2500;
+        if (!ticketType) return 0; // Handle case where no ticket type is selected yet
         let total = 0;
-        switch (ticketType) {
-            case "NWSM_STUDENT": total += 1500; break;
-            case "OUTSIDER_STUDENT": total += 2000; break;
-            case "CLINICAL": total += 3000; break;
-            case "TEAM_3": total += 4500; break;
-            case "TEAM_4": total += 6000; break;
-        }
-        if (!isFullEvent) {
-            const isStudent = ticketType === "NWSM_STUDENT" || ticketType === "OUTSIDER_STUDENT" || ticketType?.startsWith("TEAM");
-            const workshopFee = isStudent ? 500 : 1000;
+
+        if (isFullEvent) {
+            // Full Event Pass pricing: 2000 normally, 1500 for NWSM students
+            total = isNwsmStudent ? 1500 : 2000;
+            // Full Event Pass includes all workshops, so no additional workshop fee calculation here
+        } else {
+            // Other passes have a base price + optional workshop add-ons
+            switch (ticketType) {
+                case "NWSM_STUDENT": total += 1500; break;
+                case "OUTSIDER_STUDENT": total += 2000; break;
+                case "CLINICAL": total += 3000; break;
+                case "TEAM_3": total += 4500; break;
+                case "TEAM_4": total += 6000; break;
+            }
+
+            // Workshop add-ons for non-Full Event passes
+            const isStudentOrTeam = ticketType === "NWSM_STUDENT" || ticketType === "OUTSIDER_STUDENT" || ticketType?.startsWith("TEAM");
+            const workshopFee = isStudentOrTeam ? 500 : 1000;
             const multiplier = ticketType === "TEAM_3" ? 3 : ticketType === "TEAM_4" ? 4 : 1;
             total += formData.selectedWorkshops.length * workshopFee * multiplier;
         }
@@ -101,7 +110,19 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
 
     const canContinue = () => {
         if (step === 1) return !!ticketType;
-        if (step === 2) return formData.name.trim() !== "" && formData.email.trim() !== "" && formData.phone.trim() !== "" && (!isNwsm || formData.rollNumber.trim() !== "");
+        if (step === 2) {
+            // Updated validation for step 2
+            const baseValid = formData.name.trim() !== "" && formData.email.trim() !== "" && formData.phone.trim() !== "";
+            if (isFullEvent) {
+                // For Full Event, if NWSM student is checked, roll number is required
+                return baseValid && (!isNwsmStudent || formData.rollNumber.trim() !== "");
+            } else if (isNwsm) {
+                // For NWSM_STUDENT pass, roll number is always required
+                return baseValid && formData.rollNumber.trim() !== "";
+            }
+            // For other passes, roll number is optional
+            return baseValid;
+        }
         if (step === 3) {
             if (isFullEvent) {
                 const hasMorning = formData.selectedWorkshops.some(id => WORKSHOPS.find(w => w.id === id)?.slot === "morning");
@@ -143,6 +164,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                 total_amount: calculateTotal(),
                 receipt_url: receiptUrl,
                 status: "pending",
+                is_nwsm_student: isFullEvent ? isNwsmStudent : isNwsm, // Store NWSM status
             });
 
             if (error) throw error;
@@ -360,7 +382,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                         ))}
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Team</div>
+                                        <div className="10px] font-bold text-white/20 uppercase tracking-widest">Team</div>
                                         {([
                                             { id: "TEAM_3" as TicketType, label: "Team of 3", desc: "Conference day only" },
                                             { id: "TEAM_4" as TicketType, label: "Team of 4", desc: "Conference day only" },
@@ -404,6 +426,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                             <div className="text-white font-bold text-lg flex items-center gap-2">
                                                 {isFullEvent && <Star className="w-4 h-4" style={{ color: ACCENT }} />}
                                                 {ticketType ? PASS_INFO[ticketType].label : ""}
+                                                {isFullEvent && isNwsmStudent && <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: ACCENT, color: "#000" }}>NWSM Student</span>}
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -419,7 +442,6 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                         { id: "name", label: "Full Name", placeholder: "Dr. Jane Doe", value: formData.name, key: "name" as const },
                                         { id: "email", label: "Email Address", placeholder: "jane@example.com", value: formData.email, key: "email" as const },
                                         { id: "phone", label: "WhatsApp / Phone", placeholder: "+92 300 0000000", value: formData.phone, key: "phone" as const },
-                                        { id: "inst", label: "Institution", placeholder: "Northwest School of Medicine", value: formData.institution, key: "institution" as const },
                                     ].map(field => (
                                         <div key={field.id} className="space-y-2">
                                             <Label htmlFor={field.id} className="text-xs font-bold uppercase tracking-wider text-white/30">{field.label}</Label>
@@ -436,23 +458,53 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                     ))}
                                 </div>
 
-                                {/* Roll Number — only for NWSM students */}
-                                {isNwsm && (
-                                    <div className="space-y-2 pt-2" style={{ borderTop: `1px solid ${BORDER}` }}>
-                                        <Label htmlFor="rollNo" className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: ACCENT }}>
-                                            <Hash className="w-3 h-3" /> NWSM Roll Number <span className="text-white/20 font-normal">(Required for verification)</span>
-                                        </Label>
+                                {/* New Institution, NWSM Checkbox, and Roll Number fields */}
+                                <div className="space-y-4 pt-2">
+                                    {/* Institution Field */}
+                                    <div className="space-y-1.5 rounded-lg p-3" style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${BORDER}` }}>
+                                        <Label htmlFor="inst" className="text-xs uppercase tracking-wider text-white/50 block mb-2 cursor-pointer">Institution</Label>
                                         <Input
-                                            id="rollNo"
-                                            required
-                                            placeholder="e.g. 2024-MBBS-001"
-                                            value={formData.rollNumber}
-                                            onChange={e => setFormData({ ...formData, rollNumber: e.target.value })}
-                                            className="h-12 rounded-xl text-white placeholder:text-white/20"
-                                            style={{ background: SURFACE, borderColor: BORDER }}
+                                            id="inst"
+                                            value={formData.institution}
+                                            onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                                            placeholder="E.g., Northwest School of Medicine"
+                                            className="w-full h-11 text-sm bg-transparent border-none p-0 focus-visible:ring-0 text-white placeholder:text-white/20"
                                         />
                                     </div>
-                                )}
+
+                                    {/* NWSM Student Checkbox */}
+                                    {isFullEvent && ( // Only show for Full Event pass
+                                        <div className="flex items-center gap-2 p-3 rounded-lg" style={{ background: isNwsmStudent ? ACCENT_BG : "rgba(255,255,255,0.02)", border: `1px solid ${isNwsmStudent ? ACCENT : BORDER}` }}>
+                                            <input
+                                                type="checkbox"
+                                                id="nwsm-check"
+                                                checked={isNwsmStudent}
+                                                onChange={(e) => setIsNwsmStudent(e.target.checked)}
+                                                className="w-4 h-4 rounded appearance-none flex items-center justify-center bg-black border-2 border-white/20 checked:bg-blue-500 checked:border-blue-500 transition-colors relative before:content-[''] before:absolute before:w-1.5 before:h-2.5 before:border-r-2 before:border-b-2 before:border-white before:rotate-45 before:opacity-0 checked:before:opacity-100 before:-translate-y-0.5"
+                                            />
+                                            <Label htmlFor="nwsm-check" className="cursor-pointer text-sm font-semibold text-white/80 select-none">
+                                                I am a student at Northwest School of Medicine (NWSM)
+                                            </Label>
+                                        </div>
+                                    )}
+
+                                    {/* Roll Number Field */}
+                                    {(isNwsm || (isFullEvent && isNwsmStudent)) && ( // Show if NWSM_STUDENT pass OR Full Event + NWSM student checked
+                                        <div className={`space-y-1.5 rounded-lg p-3 transition-all ${isNwsm || isNwsmStudent ? 'opacity-100' : 'opacity-50'}`} style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${BORDER}` }}>
+                                            <Label htmlFor="roll" className="text-xs uppercase tracking-wider text-white/50 block mb-2 cursor-pointer">
+                                                Roll Number / ID <span className='text-blue-400'>*</span>
+                                            </Label>
+                                            <Input
+                                                id="roll"
+                                                value={formData.rollNumber}
+                                                onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })}
+                                                placeholder="Required for NWSM students"
+                                                required={isNwsm || isNwsmStudent}
+                                                className="w-full h-11 text-sm bg-transparent border-none p-0 focus-visible:ring-0 text-white placeholder:text-white/20"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
 
                                 {/* Team members */}
                                 {ticketType?.startsWith("TEAM") && (

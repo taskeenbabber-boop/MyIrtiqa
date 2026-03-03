@@ -6,6 +6,7 @@ import { RegistrationForm } from "@/components/symposium/RegistrationForm";
 import { PitchForm } from "@/components/symposium/PitchForm";
 import { PosterForm } from "@/components/symposium/PosterForm";
 import { MemeForm } from "@/components/symposium/MemeForm";
+import { supabase } from "@/integrations/supabase/client";
 import aiIconLogo from "@/assets/AI-icon.png";
 
 /* ——— accent tokens ——— */
@@ -134,11 +135,43 @@ const MARQUEE_ITEMS = ["Artificial Intelligence", "Neurosurgery", "Clinical Diag
 /* ————————————————————————————————————————————— */
 const AISymposium = () => {
     const [filter, setFilter] = useState("All");
+    const [events, setEvents] = useState(SYMPOSIUM_EVENTS);
     const [selectedEvent, setSelectedEvent] = useState<typeof SYMPOSIUM_EVENTS[0] | null>(null);
     const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
     const [isPitchFormOpen, setIsPitchFormOpen] = useState(false);
     const [isPosterFormOpen, setIsPosterFormOpen] = useState(false);
     const [isMemeFormOpen, setIsMemeFormOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchSpeakers = async () => {
+            const { data, error } = await supabase.from("symposium_speakers").select("*");
+            if (error) {
+                console.error("Error fetching speakers:", error);
+                return;
+            }
+            if (data && data.length > 0) {
+                // Map the DB rows to the format expected by the UI
+                const mappedEvents = data.map(item => ({
+                    id: item.id,
+                    category: item.event_category,
+                    title: item.event_title,
+                    speaker: item.name,
+                    speakerRole: item.role,
+                    speakerImage: item.image_url,
+                    location: item.location,
+                    time: item.time,
+                    date: item.date,
+                    image: item.image_url, // Fallback to use the same image for the event mostly
+                    description: item.description,
+                    fee: item.fee,
+                    capacity: item.capacity
+                }));
+                setEvents(mappedEvents);
+            }
+        };
+
+        fetchSpeakers();
+    }, []);
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const heroRef = useRef<HTMLElement>(null);
     const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -600,7 +633,7 @@ const AISymposium = () => {
             {/* ═══════════════ EVENT SCHEDULE TIMELINE ═══════════════ */}
             <section id="schedule" className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24">
                 {/* Section heading + toggle */}
-                <div className="text-center mb-10">
+                < div className="text-center mb-10" >
                     <p className="text-xs font-semibold tracking-[4px] uppercase mb-4" style={{ color: ACCENT }}>
                         Schedule
                     </p>
@@ -620,331 +653,333 @@ const AISymposium = () => {
                             <ChevronDown className="w-4 h-4" />
                         </motion.div>
                     </button>
-                </div>
+                </div >
 
                 {/* Collapsible timeline */}
                 <AnimatePresence>
-                    {scheduleOpen && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                            className="overflow-hidden"
-                        >
-                            <div className="relative pt-4">
-                                {/* Vertical timeline line (desktop) */}
-                                <div className="absolute left-[140px] top-0 bottom-0 w-px hidden lg:block" style={{ background: `linear-gradient(to bottom, transparent, ${BORDER} 5%, ${BORDER} 95%, transparent)` }} />
+                    {
+                        scheduleOpen && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                                className="overflow-hidden"
+                            >
+                                <div className="relative pt-4">
+                                    {/* Vertical timeline line (desktop) */}
+                                    <div className="absolute left-[140px] top-0 bottom-0 w-px hidden lg:block" style={{ background: `linear-gradient(to bottom, transparent, ${BORDER} 5%, ${BORDER} 95%, transparent)` }} />
 
-                                <div className="space-y-6 lg:space-y-0">
-                                    {/* ——— DAY 1 ——— */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.5 }}
-                                        className="flex flex-col lg:flex-row gap-6 lg:gap-0 relative pb-8 lg:pb-12"
-                                    >
-                                        {/* Date block */}
-                                        <div className="lg:w-[140px] flex-shrink-0 flex lg:flex-col items-center lg:items-end gap-3 lg:gap-0 lg:pr-8 lg:text-right">
-                                            <span
-                                                className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                                                style={{ background: ACCENT, color: "#000" }}
-                                            >
-                                                Thu
-                                            </span>
-                                            <div className="text-6xl lg:text-7xl font-black leading-none text-foreground mt-1">10</div>
-                                            <div className="text-sm text-gray-400 dark:text-white/30 font-medium">April, 2026</div>
-                                        </div>
-
-                                        {/* Timeline dot (desktop) */}
-                                        <div className="hidden lg:flex absolute left-[140px] top-4 -translate-x-1/2 items-center justify-center">
-                                            <div className="w-4 h-4 rounded-full border-2 relative" style={{ borderColor: ACCENT, background: "#0a0a0a" }}>
-                                                <div className="absolute inset-1 rounded-full" style={{ background: ACCENT }} />
+                                    <div className="space-y-6 lg:space-y-0">
+                                        {/* ——— DAY 1 ——— */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.5 }}
+                                            className="flex flex-col lg:flex-row gap-6 lg:gap-0 relative pb-8 lg:pb-12"
+                                        >
+                                            {/* Date block */}
+                                            <div className="lg:w-[140px] flex-shrink-0 flex lg:flex-col items-center lg:items-end gap-3 lg:gap-0 lg:pr-8 lg:text-right">
+                                                <span
+                                                    className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                                                    style={{ background: ACCENT, color: "#000" }}
+                                                >
+                                                    Thu
+                                                </span>
+                                                <div className="text-6xl lg:text-7xl font-black leading-none text-foreground mt-1">10</div>
+                                                <div className="text-sm text-gray-400 dark:text-white/30 font-medium">April, 2026</div>
                                             </div>
-                                        </div>
 
-                                        {/* Events for this day */}
-                                        <div className="lg:pl-12 flex-grow space-y-4">
-                                            <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-gray-300 dark:text-white/20">Pre-Conference Day</div>
+                                            {/* Timeline dot (desktop) */}
+                                            <div className="hidden lg:flex absolute left-[140px] top-4 -translate-x-1/2 items-center justify-center">
+                                                <div className="w-4 h-4 rounded-full border-2 relative" style={{ borderColor: ACCENT, background: "#0a0a0a" }}>
+                                                    <div className="absolute inset-1 rounded-full" style={{ background: ACCENT }} />
+                                                </div>
+                                            </div>
 
-                                            {/* Morning Block */}
-                                            <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                                                    <h3 className="text-lg font-bold text-foreground">Morning Workshops</h3>
-                                                    <div className="flex items-center gap-2">
+                                            {/* Events for this day */}
+                                            <div className="lg:pl-12 flex-grow space-y-4">
+                                                <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-gray-300 dark:text-white/20">Pre-Conference Day</div>
+
+                                                {/* Morning Block */}
+                                                <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                                                        <h3 className="text-lg font-bold text-foreground">Morning Workshops</h3>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
+                                                                <Clock className="w-3 h-3" style={{ color: ACCENT }} />
+                                                                <span>10:00 AM – 12:00 PM</span>
+                                                            </div>
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-gray-400 dark:text-white/40" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
+                                                                Parallel
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
+                                                                A
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI for Note Taking</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Haroon — AI Specialist</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
+                                                                B
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">Prompt Engineering & Design</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Mr. Asad — Design Lead</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Break indicator */}
+                                                <div className="flex items-center gap-3 pl-4">
+                                                    <div className="w-2 h-2 rounded-full" style={{ background: "#333" }} />
+                                                    <span className="text-xs text-gray-400 dark:text-white/15 uppercase tracking-widest font-medium">12:00 PM – 2:00 PM • Lunch & Networking</span>
+                                                </div>
+
+                                                {/* Afternoon Block */}
+                                                <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                                                        <h3 className="text-lg font-bold text-foreground">Afternoon Workshops</h3>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
+                                                                <Clock className="w-3 h-3" style={{ color: ACCENT }} />
+                                                                <span>2:00 PM – 4:00 PM</span>
+                                                            </div>
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-gray-400 dark:text-white/40" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
+                                                                Parallel
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
+                                                                C
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI in Research</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Iftikhar — Research Fellow</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
+                                                                D
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">Clinical Audit & AI in Clinical Use</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Dr. Almas Fasih Khattak</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+
+                                        {/* Day separator */}
+                                        <div className="hidden lg:block h-6" />
+
+                                        {/* ——— DAY 2 ——— */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.5, delay: 0.1 }}
+                                            className="flex flex-col lg:flex-row gap-6 lg:gap-0 relative"
+                                        >
+                                            {/* Date block */}
+                                            <div className="lg:w-[140px] flex-shrink-0 flex lg:flex-col items-center lg:items-end gap-3 lg:gap-0 lg:pr-8 lg:text-right">
+                                                <span
+                                                    className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                                                    style={{ background: ACCENT, color: "#000" }}
+                                                >
+                                                    Fri
+                                                </span>
+                                                <div className="text-6xl lg:text-7xl font-black leading-none text-foreground mt-1">11</div>
+                                                <div className="text-sm text-gray-400 dark:text-white/30 font-medium">April, 2026</div>
+                                            </div>
+
+                                            {/* Timeline dot (desktop) */}
+                                            <div className="hidden lg:flex absolute left-[140px] top-4 -translate-x-1/2 items-center justify-center">
+                                                <div className="w-4 h-4 rounded-full border-2 relative" style={{ borderColor: ACCENT, background: "#0a0a0a" }}>
+                                                    <div className="absolute inset-1 rounded-full" style={{ background: ACCENT }} />
+                                                </div>
+                                            </div>
+
+                                            {/* Events for this day */}
+                                            <div className="lg:pl-12 flex-grow space-y-4">
+                                                <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-gray-300 dark:text-white/20">Main Conference Day</div>
+
+                                                {/* Keynotes */}
+                                                <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(251,191,36,0.1)" }}>
+                                                            <Award className="w-4 h-4 text-amber-400" />
+                                                        </div>
+                                                        <h3 className="text-lg font-bold text-foreground">Keynote Addresses</h3>
                                                         <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
                                                             <Clock className="w-3 h-3" style={{ color: ACCENT }} />
-                                                            <span>10:00 AM – 12:00 PM</span>
-                                                        </div>
-                                                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-gray-400 dark:text-white/40" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
-                                                            Parallel
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
-                                                            A
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-sm font-semibold text-foreground">AI for Note Taking</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Haroon — AI Specialist</div>
+                                                            <span>Morning – Midday</span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl transition-colors" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
-                                                            B
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">AI and the Future of Global Surgery</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Morning Session</div>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <div className="text-sm font-semibold text-foreground">Prompt Engineering & Design</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Mr. Asad — Design Lead</div>
+                                                        <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
+                                                            <div>
+                                                                <div className="text-sm font-semibold text-foreground">Thinking Like a Builder: AI Solutions in Healthcare</div>
+                                                                <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Midday Session</div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            {/* Break indicator */}
-                                            <div className="flex items-center gap-3 pl-4">
-                                                <div className="w-2 h-2 rounded-full" style={{ background: "#333" }} />
-                                                <span className="text-xs text-gray-400 dark:text-white/15 uppercase tracking-widest font-medium">12:00 PM – 2:00 PM • Lunch & Networking</span>
-                                            </div>
-
-                                            {/* Afternoon Block */}
-                                            <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                                                    <h3 className="text-lg font-bold text-foreground">Afternoon Workshops</h3>
-                                                    <div className="flex items-center gap-2">
+                                                {/* Panel Discussion */}
+                                                <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(168,85,247,0.1)" }}>
+                                                            <Users className="w-4 h-4 text-purple-400" />
+                                                        </div>
+                                                        <h3 className="text-lg font-bold text-foreground">Panel Discussion</h3>
                                                         <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
                                                             <Clock className="w-3 h-3" style={{ color: ACCENT }} />
-                                                            <span>2:00 PM – 4:00 PM</span>
-                                                        </div>
-                                                        <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-gray-400 dark:text-white/40" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
-                                                            Parallel
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
-                                                            C
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-sm font-semibold text-foreground">AI in Research</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 1</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Iftikhar — Research Fellow</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: ACCENT_BG, color: ACCENT }}>
-                                                            D
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-sm font-semibold text-foreground">Clinical Audit & AI in Clinical Use</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5 flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Workshop Room 2</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Dr. Almas Fasih Khattak</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-
-                                    {/* Day separator */}
-                                    <div className="hidden lg:block h-6" />
-
-                                    {/* ——— DAY 2 ——— */}
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.5, delay: 0.1 }}
-                                        className="flex flex-col lg:flex-row gap-6 lg:gap-0 relative"
-                                    >
-                                        {/* Date block */}
-                                        <div className="lg:w-[140px] flex-shrink-0 flex lg:flex-col items-center lg:items-end gap-3 lg:gap-0 lg:pr-8 lg:text-right">
-                                            <span
-                                                className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                                                style={{ background: ACCENT, color: "#000" }}
-                                            >
-                                                Fri
-                                            </span>
-                                            <div className="text-6xl lg:text-7xl font-black leading-none text-foreground mt-1">11</div>
-                                            <div className="text-sm text-gray-400 dark:text-white/30 font-medium">April, 2026</div>
-                                        </div>
-
-                                        {/* Timeline dot (desktop) */}
-                                        <div className="hidden lg:flex absolute left-[140px] top-4 -translate-x-1/2 items-center justify-center">
-                                            <div className="w-4 h-4 rounded-full border-2 relative" style={{ borderColor: ACCENT, background: "#0a0a0a" }}>
-                                                <div className="absolute inset-1 rounded-full" style={{ background: ACCENT }} />
-                                            </div>
-                                        </div>
-
-                                        {/* Events for this day */}
-                                        <div className="lg:pl-12 flex-grow space-y-4">
-                                            <div className="text-xs font-bold uppercase tracking-[3px] mb-2 text-gray-300 dark:text-white/20">Main Conference Day</div>
-
-                                            {/* Keynotes */}
-                                            <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(251,191,36,0.1)" }}>
-                                                        <Award className="w-4 h-4 text-amber-400" />
-                                                    </div>
-                                                    <h3 className="text-lg font-bold text-foreground">Keynote Addresses</h3>
-                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
-                                                        <Clock className="w-3 h-3" style={{ color: ACCENT }} />
-                                                        <span>Morning – Midday</span>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
-                                                        <div>
-                                                            <div className="text-sm font-semibold text-foreground">AI and the Future of Global Surgery</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Morning Session</div>
+                                                            <span>60 Minutes</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="w-1 h-10 rounded-full flex-shrink-0" style={{ background: ACCENT }} />
+                                                        <div className="w-1 h-10 rounded-full flex-shrink-0 bg-purple-500" />
                                                         <div>
-                                                            <div className="text-sm font-semibold text-foreground">Thinking Like a Builder: AI Solutions in Healthcare</div>
-                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Keynote Speaker • Main Auditorium • Midday Session</div>
+                                                            <div className="text-sm font-semibold text-foreground">Human Expertise vs AI Systems: Competition or Collaboration?</div>
+                                                            <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Expert Panelists • Main Auditorium</div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            {/* Panel Discussion */}
-                                            <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(168,85,247,0.1)" }}>
-                                                        <Users className="w-4 h-4 text-purple-400" />
+                                                {/* Competitions */}
+                                                <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(34,197,94,0.1)" }}>
+                                                            <Zap className="w-4 h-4 text-emerald-400" />
+                                                        </div>
+                                                        <h3 className="text-lg font-bold text-foreground">Competitions</h3>
                                                     </div>
-                                                    <h3 className="text-lg font-bold text-foreground">Panel Discussion</h3>
-                                                    <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-white/30">
-                                                        <Clock className="w-3 h-3" style={{ color: ACCENT }} />
-                                                        <span>60 Minutes</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-4 p-3.5 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                    <div className="w-1 h-10 rounded-full flex-shrink-0 bg-purple-500" />
-                                                    <div>
-                                                        <div className="text-sm font-semibold text-foreground">Human Expertise vs AI Systems: Competition or Collaboration?</div>
-                                                        <div className="text-xs text-gray-400 dark:text-white/25 mt-0.5">Expert Panelists • Main Auditorium</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    <div className="grid grid-cols-1 gap-4">
+                                                        {/* AI Pitch Competition */}
+                                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="flex items-start sm:items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                    1
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-sm font-semibold text-foreground">AI Pitch Competition</div>
+                                                                    <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Pitch Room • 5m Pitch + 3m Q&A</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                                <a href="/guidelines/AI_Pitch_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
+                                                                    Guidelines
+                                                                </a>
+                                                                <button onClick={() => setIsPitchFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
+                                                                    Apply
+                                                                </button>
+                                                            </div>
+                                                        </div>
 
-                                            {/* Competitions */}
-                                            <div className="rounded-2xl p-5 md:p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "rgba(34,197,94,0.1)" }}>
-                                                        <Zap className="w-4 h-4 text-emerald-400" />
-                                                    </div>
-                                                    <h3 className="text-lg font-bold text-foreground">Competitions</h3>
-                                                </div>
-                                                <div className="grid grid-cols-1 gap-4">
-                                                    {/* AI Pitch Competition */}
-                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="flex items-start sm:items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                                                                1
+                                                        {/* AI Poster Competition */}
+                                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="flex items-start sm:items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                    2
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-sm font-semibold text-foreground">AI Poster Competition</div>
+                                                                    <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Exhibition Hall • Live Demo</div>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <div className="text-sm font-semibold text-foreground">AI Pitch Competition</div>
-                                                                <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Pitch Room • 5m Pitch + 3m Q&A</div>
+                                                            <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                                <a href="/guidelines/AI_Poster_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
+                                                                    Guidelines
+                                                                </a>
+                                                                <button onClick={() => setIsPosterFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
+                                                                    Apply
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
-                                                            <a href="/guidelines/AI_Pitch_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
-                                                                Guidelines
-                                                            </a>
-                                                            <button onClick={() => setIsPitchFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
-                                                                Apply
-                                                            </button>
-                                                        </div>
-                                                    </div>
 
-                                                    {/* AI Poster Competition */}
-                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="flex items-start sm:items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                                                                2
+                                                        {/* AI Meme Competition */}
+                                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                            <div className="flex items-start sm:items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                    3
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-sm font-semibold text-foreground">AI Meme Competition</div>
+                                                                    <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Online Submission • Viral Hits</div>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <div className="text-sm font-semibold text-foreground">AI Poster Competition</div>
-                                                                <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Exhibition Hall • Live Demo</div>
+                                                            <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                                <a href="/guidelines/Meme_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
+                                                                    Guidelines
+                                                                </a>
+                                                                <button onClick={() => setIsMemeFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
+                                                                    Apply
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
-                                                            <a href="/guidelines/AI_Poster_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
-                                                                Guidelines
-                                                            </a>
-                                                            <button onClick={() => setIsPosterFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
-                                                                Apply
-                                                            </button>
-                                                        </div>
-                                                    </div>
 
-                                                    {/* AI Meme Competition */}
-                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                        <div className="flex items-start sm:items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                                                                3
+                                                        {/* AI Drill & Debate (No guidelines/forms yet just info) */}
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                                                            <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                                <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                    4
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-sm font-semibold text-foreground">AI Drill</div>
+                                                                    <div className="text-[11px] text-gray-400 dark:text-white/40">Computer Lab • 1 Hour</div>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <div className="text-sm font-semibold text-foreground">AI Meme Competition</div>
-                                                                <div className="text-[11px] text-gray-400 dark:text-white/40 mt-0.5">Online Submission • Viral Hits</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
-                                                            <a href="/guidelines/Meme_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>
-                                                                Guidelines
-                                                            </a>
-                                                            <button onClick={() => setIsMemeFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>
-                                                                Apply
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* AI Drill & Debate (No guidelines/forms yet just info) */}
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-                                                        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                            <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                                                                4
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-sm font-semibold text-foreground">AI Drill</div>
-                                                                <div className="text-[11px] text-gray-400 dark:text-white/40">Computer Lab • 1 Hour</div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
-                                                            <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                                                                5
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-sm font-semibold text-foreground">AI Debate</div>
-                                                                <div className="text-[11px] text-gray-400 dark:text-white/40">Debate Hall • TBA</div>
+                                                            <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'hsl(var(--muted) / 0.5)', border: `1px solid ${BORDER}` }}>
+                                                                <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                                                    5
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-sm font-semibold text-foreground">AI Debate</div>
+                                                                    <div className="text-[11px] text-gray-400 dark:text-white/40">Debate Hall • TBA</div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
+                                        </motion.div>
+                                    </div>
                                 </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </section>
+                            </motion.div>
+                        )
+                    }
+                </AnimatePresence >
+            </section >
 
             {/* ═══════════════ AGENDA ═══════════════ */}
-            <section id="agenda" className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24">
+            < section id="agenda" className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24" >
                 {/* Section heading */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                < div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12" >
                     <div>
                         <p className="text-xs font-semibold tracking-[4px] uppercase mb-4" style={{ color: ACCENT }}>
                             Full Programme
@@ -970,91 +1005,95 @@ const AISymposium = () => {
                             </button>
                         ))}
                     </div>
-                </div>
+                </div >
 
                 {/* Event list — numbered accordion style */}
-                <div className="space-y-3">
-                    {filteredEvents.map((ev, idx) => (
-                        <motion.div
-                            key={ev.id}
-                            initial={{ opacity: 0, y: 15 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.05 }}
-                            onClick={() => setSelectedEvent(ev)}
-                            className="group flex items-center gap-6 p-5 md:p-6 rounded-2xl border cursor-pointer transition-all duration-300 hover:border-[#3b82f6]/40 hover:bg-[#3b82f6]/5"
-                            style={{ background: SURFACE, borderColor: BORDER }}
-                        >
-                            {/* Number */}
-                            <div
-                                className="hidden md:flex items-center justify-center w-12 h-12 rounded-xl text-sm font-bold flex-shrink-0"
-                                style={{ background: ACCENT_BG, color: ACCENT }}
+                < div className="space-y-3" >
+                    {
+                        filteredEvents.map((ev, idx) => (
+                            <motion.div
+                                key={ev.id}
+                                initial={{ opacity: 0, y: 15 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.05 }}
+                                onClick={() => setSelectedEvent(ev)}
+                                className="group flex items-center gap-6 p-5 md:p-6 rounded-2xl border cursor-pointer transition-all duration-300 hover:border-[#3b82f6]/40 hover:bg-[#3b82f6]/5"
+                                style={{ background: SURFACE, borderColor: BORDER }}
                             >
-                                {String(idx + 1).padStart(2, "0")}
-                            </div>
-
-                            {/* Image thumb */}
-                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0">
-                                <img
-                                    src={ev.image}
-                                    alt={ev.title}
-                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
-                                />
-                            </div>
-
-                            {/* Info */}
-                            <div className="flex-grow min-w-0">
-                                <div className="flex items-center gap-3 mb-1">
-                                    <span
-                                        className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                                        style={{ background: ACCENT_BG, color: ACCENT }}
-                                    >
-                                        {ev.category}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">{ev.date}</span>
+                                {/* Number */}
+                                <div
+                                    className="hidden md:flex items-center justify-center w-12 h-12 rounded-xl text-sm font-bold flex-shrink-0"
+                                    style={{ background: ACCENT_BG, color: ACCENT }}
+                                >
+                                    {String(idx + 1).padStart(2, "0")}
                                 </div>
-                                <h3 className="text-lg md:text-xl font-bold text-foreground truncate group-hover:text-[#3b82f6] transition-colors">
-                                    {ev.title}
-                                </h3>
-                                <div className="flex items-center gap-4 mt-1">
-                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                        <Clock className="w-3 h-3" /> {ev.time}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                        <MapPin className="w-3 h-3" /> {ev.location}
-                                    </span>
-                                </div>
-                            </div>
 
-                            {/* Speaker + Arrow */}
-                            <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
-                                <div className="flex items-center gap-3">
-                                    <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
-                                    <div>
-                                        <p className="text-sm font-semibold text-foreground">{ev.speaker}</p>
-                                        <p className="text-xs text-muted-foreground">{ev.speakerRole}</p>
+                                {/* Image thumb */}
+                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0">
+                                    <img
+                                        src={ev.image}
+                                        alt={ev.title}
+                                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
+                                    />
+                                </div>
+
+                                {/* Info */}
+                                <div className="flex-grow min-w-0">
+                                    <div className="flex items-center gap-3 mb-1">
+                                        <span
+                                            className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                                            style={{ background: ACCENT_BG, color: ACCENT }}
+                                        >
+                                            {ev.category}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">{ev.date}</span>
+                                    </div>
+                                    <h3 className="text-lg md:text-xl font-bold text-foreground truncate group-hover:text-[#3b82f6] transition-colors">
+                                        {ev.title}
+                                    </h3>
+                                    <div className="flex items-center gap-4 mt-1">
+                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                            <Clock className="w-3 h-3" /> {ev.time}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                            <MapPin className="w-3 h-3" /> {ev.location}
+                                        </span>
                                     </div>
                                 </div>
-                                <div
-                                    className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
-                                    style={{ borderColor: "#333", color: "#666" }}
-                                >
-                                    <ArrowUpRight className="w-4 h-4" />
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
 
-                {filteredEvents.length === 0 && (
-                    <div className="py-24 text-center">
-                        <p className="text-xl font-bold text-muted-foreground uppercase tracking-widest">No Events in This Track</p>
-                    </div>
-                )}
-            </section>
+                                {/* Speaker + Arrow */}
+                                <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
+                                    <div className="flex items-center gap-3">
+                                        <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
+                                        <div>
+                                            <p className="text-sm font-semibold text-foreground">{ev.speaker}</p>
+                                            <p className="text-xs text-muted-foreground">{ev.speakerRole}</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
+                                        style={{ borderColor: "#333", color: "#666" }}
+                                    >
+                                        <ArrowUpRight className="w-4 h-4" />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))
+                    }
+                </div >
+
+                {
+                    filteredEvents.length === 0 && (
+                        <div className="py-24 text-center">
+                            <p className="text-xl font-bold text-muted-foreground uppercase tracking-widest">No Events in This Track</p>
+                        </div>
+                    )
+                }
+            </section >
 
             {/* ═══════════════ SECOND MARQUEE ═══════════════ */}
-            <div className="border-y overflow-hidden py-5" style={{ borderColor: BORDER }}>
+            < div className="border-y overflow-hidden py-5" style={{ borderColor: BORDER }}>
                 <motion.div
                     animate={{ x: [-1400, 0] }}
                     transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
@@ -1067,10 +1106,10 @@ const AISymposium = () => {
                         </span>
                     ))}
                 </motion.div>
-            </div>
+            </div >
 
             {/* ═══════════════ VENUE SECTION ═══════════════ */}
-            <section className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24">
+            < section className="max-w-[1400px] mx-auto px-6 md:px-12 pb-24" >
                 <div className="flex flex-col lg:flex-row gap-0 rounded-3xl overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
                     {/* Map side */}
                     <div className="lg:w-1/2 relative min-h-[320px] lg:min-h-[480px]">
@@ -1130,10 +1169,10 @@ const AISymposium = () => {
                         </a>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* ═══════════════ CTA SECTION ═══════════════ */}
-            <section className="max-w-[1400px] mx-auto px-6 md:px-12 py-24">
+            < section className="max-w-[1400px] mx-auto px-6 md:px-12 py-24" >
                 <div className="rounded-3xl border p-12 md:p-20 text-center relative overflow-hidden" style={{ background: SURFACE, borderColor: BORDER }}>
                     {/* Decorative gradient */}
                     <div
@@ -1164,10 +1203,10 @@ const AISymposium = () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* ═══════════════ FOOTER BAR ═══════════════ */}
-            <footer className="border-t py-8 px-6 md:px-12" style={{ borderColor: BORDER }}>
+            < footer className="border-t py-8 px-6 md:px-12" style={{ borderColor: BORDER }}>
                 <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full" style={{ background: ACCENT }} />
@@ -1175,141 +1214,143 @@ const AISymposium = () => {
                     </div>
                     <p className="text-xs text-muted-foreground">© 2026 AI Symposium. Northwest School of Medicine, Peshawar.</p>
                 </div>
-            </footer>
+            </footer >
 
             {/* ═══════════════ DETAIL MODAL ═══════════════ */}
             <AnimatePresence>
-                {selectedEvent && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                    >
-                        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedEvent(null)} />
-
+                {
+                    selectedEvent && (
                         <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                            transition={{ type: "spring" as const, damping: 25, stiffness: 300 }}
-                            className="w-full max-w-[850px] max-h-[90vh] overflow-y-auto rounded-3xl relative z-10 scrollbar-hide"
-                            style={{ background: "#0e0e0e", border: `1px solid ${BORDER}` }}
-                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-50 flex items-center justify-center p-4"
                         >
-                            {/* Modal hero image */}
-                            <div className="h-56 md:h-72 w-full relative">
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent z-10" />
-                                <img src={selectedEvent.image} alt={selectedEvent.title} className="w-full h-full object-cover" />
-                                <button
-                                    className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full border flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-all"
-                                    style={{ borderColor: "#444", background: "rgba(0,0,0,0.5)" }}
-                                    onClick={() => setSelectedEvent(null)}
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
+                            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedEvent(null)} />
 
-                            <div className="px-8 md:px-12 pb-12 relative z-20 -mt-12">
-                                <span
-                                    className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-5"
-                                    style={{ background: ACCENT, color: "#000" }}
-                                >
-                                    {selectedEvent.category}
-                                </span>
-
-                                <h2 className="text-3xl md:text-5xl font-black text-white mb-8 leading-tight uppercase">
-                                    {selectedEvent.title}
-                                </h2>
-
-                                <div className="flex flex-col md:flex-row gap-10">
-                                    {/* Left: Details */}
-                                    <div className="flex-grow space-y-8">
-                                        <div>
-                                            <h3 className="text-xs font-bold uppercase tracking-[3px] mb-3" style={{ color: ACCENT }}>
-                                                Abstract
-                                            </h3>
-                                            <p className="text-white/50 leading-relaxed text-lg">{selectedEvent.description}</p>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {[
-                                                { icon: <MapPin className="w-4 h-4" />, label: "Location", value: selectedEvent.location },
-                                                { icon: <Clock className="w-4 h-4" />, label: "Time", value: selectedEvent.time },
-                                                { icon: <Calendar className="w-4 h-4" />, label: "Date", value: selectedEvent.date },
-                                                { icon: <Users className="w-4 h-4" />, label: "Capacity", value: selectedEvent.capacity },
-                                            ].map((item, i) => (
-                                                <div key={i} className="p-4 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                    <div className="flex items-center gap-2 mb-2" style={{ color: ACCENT }}>
-                                                        {item.icon}
-                                                        <span className="text-[10px] uppercase tracking-wider font-bold">{item.label}</span>
-                                                    </div>
-                                                    <div className="text-sm font-semibold text-white">{item.value}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Right: Speaker card */}
-                                    <div className="md:w-56 flex-shrink-0">
-                                        <div className="rounded-2xl p-6 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                            <h3 className="text-[10px] font-bold uppercase tracking-[3px] mb-5" style={{ color: ACCENT }}>Speaker</h3>
-                                            <img src={selectedEvent.speakerImage} alt={selectedEvent.speaker} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2" style={{ borderColor: BORDER }} />
-                                            <div className="text-white font-bold text-base">{selectedEvent.speaker}</div>
-                                            <div className="text-sm font-medium mt-1" style={{ color: ACCENT }}>{selectedEvent.speakerRole}</div>
-                                            <p className="text-[9px] text-white/15 mt-3 italic leading-relaxed">Speakers and schedule are subject to change based on availability.</p>
-                                        </div>
-
-                                        <div className="mt-4 rounded-xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                            <span className="block text-[10px] text-white/30 uppercase tracking-wider mb-1">Registration Fee</span>
-                                            <span className="text-sm font-bold" style={{ color: ACCENT }}>{selectedEvent.fee}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* CTA */}
-                                <div className="mt-10 pt-8 flex flex-col gap-3" style={{ borderTop: `1px solid ${BORDER}` }}>
-                                    <Button
-                                        className="w-full font-bold h-14 text-base uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]"
-                                        style={{ background: ACCENT, color: "#000" }}
-                                        onClick={() => {
-                                            setSelectedEvent(null);
-                                            setIsRegistrationOpen(true);
-                                        }}
+                            <motion.div
+                                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                                transition={{ type: "spring" as const, damping: 25, stiffness: 300 }}
+                                className="w-full max-w-[850px] max-h-[90vh] overflow-y-auto rounded-3xl relative z-10 scrollbar-hide"
+                                style={{ background: "#0e0e0e", border: `1px solid ${BORDER}` }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {/* Modal hero image */}
+                                <div className="h-56 md:h-72 w-full relative">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent z-10" />
+                                    <img src={selectedEvent.image} alt={selectedEvent.title} className="w-full h-full object-cover" />
+                                    <button
+                                        className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full border flex items-center justify-center text-white/60 hover:text-white hover:border-white transition-all"
+                                        style={{ borderColor: "#444", background: "rgba(0,0,0,0.5)" }}
+                                        onClick={() => setSelectedEvent(null)}
                                     >
-                                        Register for Event
-                                    </Button>
-
-                                    {/* Competition-specific buttons */}
-                                    {selectedEvent.id === "cmp-4" && (
-                                        <Button
-                                            variant="outline"
-                                            className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                                            onClick={() => {
-                                                setSelectedEvent(null);
-                                                setIsPitchFormOpen(true);
-                                            }}
-                                        >
-                                            <Lightbulb className="w-4 h-4 mr-2" /> Submit Your Pitch Idea
-                                        </Button>
-                                    )}
-                                    {selectedEvent.id === "cmp-1" && (
-                                        <Button
-                                            variant="outline"
-                                            className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                                            onClick={() => {
-                                                setSelectedEvent(null);
-                                                setIsPosterFormOpen(true);
-                                            }}
-                                        >
-                                            <Award className="w-4 h-4 mr-2" /> Register Your Poster Topic
-                                        </Button>
-                                    )}
+                                        <X className="w-5 h-5" />
+                                    </button>
                                 </div>
-                            </div>
+
+                                <div className="px-8 md:px-12 pb-12 relative z-20 -mt-12">
+                                    <span
+                                        className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest mb-5"
+                                        style={{ background: ACCENT, color: "#000" }}
+                                    >
+                                        {selectedEvent.category}
+                                    </span>
+
+                                    <h2 className="text-3xl md:text-5xl font-black text-white mb-8 leading-tight uppercase">
+                                        {selectedEvent.title}
+                                    </h2>
+
+                                    <div className="flex flex-col md:flex-row gap-10">
+                                        {/* Left: Details */}
+                                        <div className="flex-grow space-y-8">
+                                            <div>
+                                                <h3 className="text-xs font-bold uppercase tracking-[3px] mb-3" style={{ color: ACCENT }}>
+                                                    Abstract
+                                                </h3>
+                                                <p className="text-white/50 leading-relaxed text-lg">{selectedEvent.description}</p>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {[
+                                                    { icon: <MapPin className="w-4 h-4" />, label: "Location", value: selectedEvent.location },
+                                                    { icon: <Clock className="w-4 h-4" />, label: "Time", value: selectedEvent.time },
+                                                    { icon: <Calendar className="w-4 h-4" />, label: "Date", value: selectedEvent.date },
+                                                    { icon: <Users className="w-4 h-4" />, label: "Capacity", value: selectedEvent.capacity },
+                                                ].map((item, i) => (
+                                                    <div key={i} className="p-4 rounded-xl" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                        <div className="flex items-center gap-2 mb-2" style={{ color: ACCENT }}>
+                                                            {item.icon}
+                                                            <span className="text-[10px] uppercase tracking-wider font-bold">{item.label}</span>
+                                                        </div>
+                                                        <div className="text-sm font-semibold text-white">{item.value}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Right: Speaker card */}
+                                        <div className="md:w-56 flex-shrink-0">
+                                            <div className="rounded-2xl p-6 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                <h3 className="text-[10px] font-bold uppercase tracking-[3px] mb-5" style={{ color: ACCENT }}>Speaker</h3>
+                                                <img src={selectedEvent.speakerImage} alt={selectedEvent.speaker} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2" style={{ borderColor: BORDER }} />
+                                                <div className="text-white font-bold text-base">{selectedEvent.speaker}</div>
+                                                <div className="text-sm font-medium mt-1" style={{ color: ACCENT }}>{selectedEvent.speakerRole}</div>
+                                                <p className="text-[9px] text-white/15 mt-3 italic leading-relaxed">Speakers and schedule are subject to change based on availability.</p>
+                                            </div>
+
+                                            <div className="mt-4 rounded-xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                <span className="block text-[10px] text-white/30 uppercase tracking-wider mb-1">Registration Fee</span>
+                                                <span className="text-sm font-bold" style={{ color: ACCENT }}>{selectedEvent.fee}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* CTA */}
+                                    <div className="mt-10 pt-8 flex flex-col gap-3" style={{ borderTop: `1px solid ${BORDER}` }}>
+                                        <Button
+                                            className="w-full font-bold h-14 text-base uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]"
+                                            style={{ background: ACCENT, color: "#000" }}
+                                            onClick={() => {
+                                                setSelectedEvent(null);
+                                                setIsRegistrationOpen(true);
+                                            }}
+                                        >
+                                            Register for Event
+                                        </Button>
+
+                                        {/* Competition-specific buttons */}
+                                        {selectedEvent.id === "cmp-4" && (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                                onClick={() => {
+                                                    setSelectedEvent(null);
+                                                    setIsPitchFormOpen(true);
+                                                }}
+                                            >
+                                                <Lightbulb className="w-4 h-4 mr-2" /> Submit Your Pitch Idea
+                                            </Button>
+                                        )}
+                                        {selectedEvent.id === "cmp-1" && (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                                onClick={() => {
+                                                    setSelectedEvent(null);
+                                                    setIsPosterFormOpen(true);
+                                                }}
+                                            >
+                                                <Award className="w-4 h-4 mr-2" /> Register Your Poster Topic
+                                            </Button>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )
+                }
+            </AnimatePresence >
 
             <AnimatePresence>
                 {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} />}
@@ -1317,7 +1358,7 @@ const AISymposium = () => {
                 {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} />}
                 {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} />}
             </AnimatePresence>
-        </div>
+        </div >
     );
 };
 

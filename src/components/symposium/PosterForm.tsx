@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, CheckCircle, ArrowUpRight, Loader2, Lightbulb } from "lucide-react";
+import { X, CheckCircle, ArrowUpRight, Loader2, Lightbulb, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -95,12 +95,22 @@ export function PosterForm({ onClose }: PosterFormProps) {
                 style={{ background: "#0e0e0e", border: `1px solid ${BORDER}` }}
             >
                 {/* Header */}
-                <div className="p-6 flex justify-between items-center" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
                     <div>
                         <h2 className="text-xl font-black text-white uppercase tracking-widest">AI Poster Competition</h2>
                         <p className="text-xs text-white/30 mt-1">Present a poster + give a live demo of your chosen AI tool</p>
                     </div>
-                    <button onClick={onClose} className="text-white/30 hover:text-white transition-colors p-1"><X className="w-5 h-5" /></button>
+                    <div className="flex items-center gap-3">
+                        <a
+                            href="/guidelines/AI_Poster_Competition_Guidelines.pdf"
+                            download
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors hover:bg-white/5"
+                            style={{ border: `1px solid ${BORDER}`, color: ACCENT }}
+                        >
+                            <FileText className="w-4 h-4" /> Download Guidelines
+                        </a>
+                        <button onClick={onClose} className="text-white/30 hover:text-white transition-colors p-1 bg-white/5 rounded-md"><X className="w-5 h-5" /></button>
+                    </div>
                 </div>
 
                 <div className="p-6 md:p-8 overflow-y-auto flex-grow scrollbar-hide space-y-6">

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-import { Loader2, Mail, Lock, Chrome } from "lucide-react";
+import { Loader2, Mail, Lock, Chrome, User, Phone, Building2 } from "lucide-react";
 
 const emailSchema = z.string().email({ message: "Invalid email address" });
 const passwordSchema = z.string().min(6, { message: "Password must be at least 6 characters" });
@@ -16,6 +16,9 @@ const passwordSchema = z.string().min(6, { message: "Password must be at least 6
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [institution, setInstitution] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,6 +38,15 @@ export default function Auth() {
     // Validate inputs
     const emailValidation = emailSchema.safeParse(email);
     const passwordValidation = passwordSchema.safeParse(password);
+
+    if (!name.trim()) {
+      toast({ title: "Validation Error", description: "Name is required", variant: "destructive" });
+      return;
+    }
+    if (!phone.trim()) {
+      toast({ title: "Validation Error", description: "Phone number is required", variant: "destructive" });
+      return;
+    }
 
     if (!emailValidation.success) {
       toast({
@@ -62,6 +74,11 @@ export default function Auth() {
       password,
       options: {
         emailRedirectTo: redirectUrl,
+        data: {
+          full_name: name,
+          phone: phone,
+          institution: institution || "Not specified"
+        }
       },
     });
 
@@ -202,29 +219,90 @@ export default function Auth() {
                 <TabsContent value="signup">
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-email">Email</Label>
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
+                      <Label htmlFor="signup-name">Full Name *</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="signup-name"
+                          type="text"
+                          placeholder="Dr. John Doe"
+                          className="pl-10"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email">Email *</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            id="signup-email"
+                            type="email"
+                            placeholder="your@email.com"
+                            className="pl-10"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-phone">Phone *</Label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Input
+                            id="signup-phone"
+                            type="tel"
+                            placeholder="+92..."
+                            className="pl-10"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="At least 6 characters"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
+                      <Label htmlFor="signup-institution">Institution (Optional)</Label>
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="signup-institution"
+                          type="text"
+                          placeholder="Northwest School of Medicine"
+                          className="pl-10"
+                          value={institution}
+                          onChange={(e) => setInstitution(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password">Password *</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          id="signup-password"
+                          type="password"
+                          placeholder="••••••••"
+                          className="pl-10"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Creating account..." : "Sign Up"}
+                      {loading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        "Create Account"
+                      )}
                     </Button>
                   </form>
                 </TabsContent>
