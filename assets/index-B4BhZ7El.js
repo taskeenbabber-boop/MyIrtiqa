@@ -4565,23 +4565,23 @@ VALUES ('YOUR_USER_ID', 'super_admin');`})}),l.jsx("p",{className:"text-xs text-
                 /* Brand */
                 .launch-brand { display: flex; flex-direction: column; align-items: center; gap: 12px; }
                 .launch-logo-ring {
-                    width: 120px; height: 120px;
+                    width: 160px; height: 160px;
                     border-radius: 50%;
                     border: 2px solid rgba(59,130,246,0.3);
                     display: flex; align-items: center; justify-content: center;
                     background: rgba(59,130,246,0.05);
                     animation: launchRingSpin 12s linear infinite;
-                    box-shadow: 0 0 40px rgba(59,130,246,0.2), inset 0 0 20px rgba(59,130,246,0.05);
+                    box-shadow: 0 0 50px rgba(59,130,246,0.2), inset 0 0 30px rgba(59,130,246,0.05);
                 }
                 @keyframes launchRingSpin {
-                    0% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 40px rgba(59,130,246,0.2), 0 0 80px rgba(59,130,246,0.05); }
-                    50% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 40px rgba(139,92,246,0.2), 0 0 80px rgba(139,92,246,0.05); }
-                    100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 40px rgba(59,130,246,0.2), 0 0 80px rgba(59,130,246,0.05); }
+                    0% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 50px rgba(59,130,246,0.2), 0 0 100px rgba(59,130,246,0.05); }
+                    50% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 50px rgba(139,92,246,0.2), 0 0 100px rgba(139,92,246,0.05); }
+                    100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 50px rgba(59,130,246,0.2), 0 0 100px rgba(59,130,246,0.05); }
                 }
                 .launch-logo-img {
-                    width: 80px; height: 80px;
+                    width: 110px; height: 110px;
                     object-fit: contain;
-                    filter: drop-shadow(0 0 12px rgba(59,130,246,0.5)) brightness(1.1);
+                    filter: drop-shadow(0 0 15px rgba(59,130,246,0.6)) brightness(1.2);
                     animation: launchLogoGlow 3s ease-in-out infinite;
                 }
                 @keyframes launchLogoGlow {
