@@ -73,16 +73,26 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
             });
             if (error) throw error;
             if (data.user) {
-                const { data: roleData } = await (supabase as any)
+                const { data: roleData, error: roleError } = await (supabase as any)
                     .from("user_roles")
                     .select("role")
                     .eq("user_id", data.user.id)
-                    .single();
-                if (roleData && (roleData.role === "admin" || roleData.role === "superadmin" || roleData.role === "super_admin")) {
+                    .maybeSingle();
+
+                if (roleError) {
+                    setLoginError("Error checking permissions.");
+                    await supabase.auth.signOut();
+                    return;
+                }
+
+                if (!roleData) {
+                    setLoginError("Account exists, but has no role assigned in 'user_roles' table. Please run the SQL to make this email an admin.");
+                    await supabase.auth.signOut();
+                } else if (roleData.role === "admin" || roleData.role === "superadmin" || roleData.role === "super_admin") {
                     setIsAdmin(true);
                     setShowLogin(false);
                 } else {
-                    setLoginError("Access denied. Admin privileges required.");
+                    setLoginError(`Access denied. Your current role is '${roleData.role}', which does not have admin privileges.`);
                     await supabase.auth.signOut();
                 }
             }
