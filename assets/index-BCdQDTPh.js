@@ -4565,7 +4565,7 @@ VALUES ('YOUR_USER_ID', 'super_admin');`})}),l.jsx("p",{className:"text-xs text-
                 /* Brand */
                 .launch-brand { display: flex; flex-direction: column; align-items: center; gap: 12px; }
                 .launch-logo-ring {
-                    width: 90px; height: 90px;
+                    width: 120px; height: 120px;
                     border-radius: 50%;
                     border: 2px solid rgba(59,130,246,0.3);
                     display: flex; align-items: center; justify-content: center;
@@ -4579,7 +4579,7 @@ VALUES ('YOUR_USER_ID', 'super_admin');`})}),l.jsx("p",{className:"text-xs text-
                     100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 40px rgba(59,130,246,0.2), 0 0 80px rgba(59,130,246,0.05); }
                 }
                 .launch-logo-img {
-                    width: 52px; height: 52px;
+                    width: 80px; height: 80px;
                     object-fit: contain;
                     filter: drop-shadow(0 0 12px rgba(59,130,246,0.5)) brightness(1.1);
                     animation: launchLogoGlow 3s ease-in-out infinite;
