@@ -140,13 +140,31 @@ const SYMPOSIUM_EVENTS = [
         image: "/icons/AI-Pitch-Competition.png",
         description: "Propose original AI-based solutions to a medical/research problem. Must include problem statement, AI solution, feasibility, workflow, and impact.",
         fee: "Included in Conference Pass", capacity: "Limited Slots"
+    },
+    {
+        id: "cmp-5", category: "Competition", title: "AI Quiz",
+        speaker: "Participants", speakerRole: "Knowledge Challengers",
+        speakerImage: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=150",
+        location: "Quiz Hall", time: "TBA", date: "11 Apr 2026",
+        image: "/icons/AI-Drill.png",
+        description: "Test your knowledge of AI concepts, applications in healthcare, and cutting-edge research. Rapid-fire quiz rounds covering AI fundamentals, medical AI, and ethical considerations.",
+        fee: "Included in Conference Pass", capacity: "Open"
+    },
+    {
+        id: "cmp-6", category: "Competition", title: "AI Memes Competition",
+        speaker: "Participants", speakerRole: "Creative Minds",
+        speakerImage: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&q=80&w=150",
+        location: "Online + Venue", time: "TBA", date: "11 Apr 2026",
+        image: "/icons/AI-Debate.png",
+        description: "Create the funniest, most relatable AI-themed memes! Entries judged on creativity, humor, relevance to AI in healthcare, and originality. Submit online or in-person.",
+        fee: "Included in Conference Pass", capacity: "Unlimited"
     }
 ];
 
 const CATEGORIES = ["All", "Workshop", "Keynote", "Panel", "Competition"];
 
 const STATS = [
-    { value: "11+", label: "Sessions & Events" },
+    { value: "13+", label: "Sessions & Events" },
     { value: "4", label: "Hands-on Workshops" },
     { value: "2", label: "Days of Innovation" },
     { value: "500+", label: "Expected Delegates" },
