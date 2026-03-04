@@ -25,13 +25,24 @@ export function PitchForm({ onClose }: PitchFormProps) {
         rollNumber: "",
         pitchDescription: "",
         documentFile: null as File | null,
+        receiptFile: null as File | null,
     });
 
-    const canSubmit = formData.name.trim() && formData.email.trim() && formData.phone.trim() && formData.pitchDescription.trim();
+    const canSubmit = formData.name.trim() && formData.email.trim() && formData.phone.trim() && formData.pitchDescription.trim() && formData.receiptFile;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canSubmit) return;
+
+        if (formData.documentFile && formData.documentFile.size > 5 * 1024 * 1024) {
+            alert("Pitch document must be less than 5MB.");
+            return;
+        }
+        if (formData.receiptFile && formData.receiptFile.size > 5 * 1024 * 1024) {
+            alert("Payment receipt must be less than 5MB.");
+            return;
+        }
+
         setSubmitting(true);
         try {
             let documentUrl: string | null = null;
@@ -44,6 +55,16 @@ export function PitchForm({ onClose }: PitchFormProps) {
                 if (!uploadError) documentUrl = path;
             }
 
+            let receiptUrl: string | null = null;
+            if (formData.receiptFile) {
+                const ext = formData.receiptFile.name.split(".").pop();
+                const path = `receipts/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+                const { error: uploadError } = await supabase.storage
+                    .from("symposium-uploads")
+                    .upload(path, formData.receiptFile);
+                if (!uploadError) receiptUrl = path;
+            }
+
             const { error } = await (supabase as any).from("symposium_pitch_submissions").insert({
                 name: formData.name,
                 email: formData.email,
@@ -52,6 +73,7 @@ export function PitchForm({ onClose }: PitchFormProps) {
                 roll_number: formData.rollNumber || null,
                 pitch_description: formData.pitchDescription,
                 document_url: documentUrl,
+                receipt_url: receiptUrl,
                 status: "pending",
             });
 
@@ -183,7 +205,7 @@ export function PitchForm({ onClose }: PitchFormProps) {
                             <p className="text-sm text-white/30 group-hover:text-white/60 transition-colors">
                                 <span style={{ color: ACCENT }} className="font-semibold">Click to upload</span> or drag and drop
                             </p>
-                            <p className="text-xs text-white/20 mt-1">PDF, DOCX, PPTX (MAX 10MB)</p>
+                            <p className="text-xs text-white/20 mt-1">PDF, DOCX, PPTX (MAX 5MB)</p>
                             <input id="pitchDoc" type="file" className="hidden"
                                 accept=".pdf,.docx,.doc,.pptx,.ppt"
                                 onChange={e => setFormData({ ...formData, documentFile: e.target.files?.[0] || null })}
@@ -192,7 +214,48 @@ export function PitchForm({ onClose }: PitchFormProps) {
                         {formData.documentFile && (
                             <div className="flex items-center gap-2 text-xs text-white/40 mt-2">
                                 <CheckCircle className="w-3.5 h-3.5" style={{ color: "#22c55e" }} />
-                                <span>{formData.documentFile.name}</span>
+                                <span>{formData.documentFile.name} ({(formData.documentFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Payment Step */}
+                    <div className="rounded-xl p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: ACCENT_BG }}>
+                                <Upload className="w-4 h-4" style={{ color: ACCENT }} />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-white tracking-widest uppercase">Payment & Receipt</h3>
+                                <p className="text-xs text-white/30 mt-0.5">Registration Fee: <strong className="text-white/80">500 PKR</strong></p>
+                            </div>
+                        </div>
+
+                        <div className="rounded-lg p-3 mb-4 text-xs font-mono text-white/60 text-center" style={{ background: "#000", border: `1px dashed ${BORDER}` }}>
+                            Bank: Bank Islami<br />
+                            Account Title: NWSM NWSM<br />
+                            Account Number: 300900084530001
+                        </div>
+
+                        <label
+                            htmlFor="pitchReceipt"
+                            className="flex flex-col items-center justify-center w-full h-24 rounded-xl cursor-pointer group transition-all"
+                            style={{ border: `2px dashed ${BORDER}`, background: "#0a0a0a" }}
+                        >
+                            <p className="text-sm text-white/30 group-hover:text-white/60 transition-colors text-center px-4">
+                                <span style={{ color: ACCENT }} className="font-semibold">Upload Payment Receipt</span> *<br />
+                                <span className="text-[10px] uppercase mt-1 block">JPG, PNG, PDF (Max 5MB)</span>
+                            </p>
+                            <input id="pitchReceipt" type="file" required className="hidden"
+                                accept="image/*,.pdf"
+                                onChange={e => setFormData({ ...formData, receiptFile: e.target.files?.[0] || null })}
+                            />
+                        </label>
+
+                        {formData.receiptFile && (
+                            <div className="flex items-center gap-2 text-xs text-white/40 mt-3">
+                                <CheckCircle className="w-3.5 h-3.5" style={{ color: "#22c55e" }} />
+                                <span>{formData.receiptFile.name} ({(formData.receiptFile.size / 1024 / 1024).toFixed(2)} MB)</span>
                             </div>
                         )}
                     </div>

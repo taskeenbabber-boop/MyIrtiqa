@@ -22,24 +22,40 @@ export function MemeForm({ onClose }: MemeFormProps) {
         phone: "",
         institution: "",
         memeDescription: "",
+        memeFile: null as File | null,
     });
 
-    const canSubmit = formData.name.trim() && formData.email.trim() && formData.phone.trim() && formData.memeDescription.trim();
+    const canSubmit = formData.name.trim() && formData.email.trim() && formData.phone.trim() && (formData.memeDescription.trim() || formData.memeFile);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canSubmit) return;
+
+        if (formData.memeFile && formData.memeFile.size > 5 * 1024 * 1024) {
+            alert("Meme image must be less than 5MB.");
+            return;
+        }
+
         setSubmitting(true);
         try {
-            // Reusing the general registration table
-            const { error } = await (supabase as any).from("symposium_registrations").insert({
+            let memeUrl: string | null = null;
+            if (formData.memeFile) {
+                const ext = formData.memeFile.name.split(".").pop();
+                const path = `memes/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+                const { error: uploadError } = await supabase.storage
+                    .from("symposium-uploads")
+                    .upload(path, formData.memeFile);
+                if (!uploadError) memeUrl = path;
+            }
+
+            const { error } = await (supabase as any).from("symposium_meme_submissions").insert({
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
                 institution: formData.institution || null,
-                ticket_type: "Competition - Meme",
-                payment_status: "pending",
-                notes: `Meme idea/link: ${formData.memeDescription}`
+                meme_url: memeUrl,
+                description: formData.memeDescription,
+                status: "pending",
             });
             if (error) throw error;
             setSubmitted(true);
@@ -136,14 +152,37 @@ export function MemeForm({ onClose }: MemeFormProps) {
                         ))}
                     </div>
 
-                    {/* Meme Concept / Link */}
-                    <div className="space-y-2">
-                        <Label className="text-xs font-bold uppercase tracking-widest" style={{ color: ACCENT }}>Your Meme Concept or Link *</Label>
-                        <p className="text-[11px] text-muted-foreground -mt-1">Describe your meme concept below OR paste a public Google Drive/Imgur link to your meme.</p>
+                    {/* Meme Upload OR Link */}
+                    <div className="space-y-4">
+                        <Label className="text-xs font-bold uppercase tracking-widest" style={{ color: ACCENT }}>Upload Your Meme *</Label>
+                        <p className="text-[11px] text-muted-foreground -mt-1">Upload your image below OR paste a public link in the description.</p>
+
+                        <label
+                            htmlFor="memeUpload"
+                            className="flex flex-col items-center justify-center w-full h-32 rounded-xl cursor-pointer group transition-all"
+                            style={{ border: `2px dashed ${BORDER}`, background: "rgba(0,0,0,0.2)" }}
+                        >
+                            <ImageIcon className="w-8 h-8 mb-2 text-white/20 group-hover:text-white/40 transition-colors" />
+                            <p className="text-sm text-white/40 group-hover:text-white/70 transition-colors">
+                                <span style={{ color: ACCENT }} className="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p className="text-xs text-white/20 mt-1">JPG, PNG, GIF (MAX 5MB)</p>
+                            <input id="memeUpload" type="file" className="hidden"
+                                accept="image/*"
+                                onChange={e => setFormData({ ...formData, memeFile: e.target.files?.[0] || null })}
+                            />
+                        </label>
+
+                        {formData.memeFile && (
+                            <div className="flex items-center gap-2 text-xs text-white/60">
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                <span>{formData.memeFile.name} ({(formData.memeFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            </div>
+                        )}
+
                         <textarea
-                            required
-                            rows={4}
-                            placeholder="Link to meme: https://imgur.com/..."
+                            rows={3}
+                            placeholder="Optional: Provide context, a caption, or a link if you didn't upload..."
                             value={formData.memeDescription}
                             onChange={e => setFormData({ ...formData, memeDescription: e.target.value })}
                             className="w-full rounded-xl bg-muted/50 text-foreground placeholder-muted-foreground text-sm p-4 resize-none focus:outline-none focus:ring-1"

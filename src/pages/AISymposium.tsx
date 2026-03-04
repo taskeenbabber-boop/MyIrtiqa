@@ -6,6 +6,9 @@ import { RegistrationForm } from "@/components/symposium/RegistrationForm";
 import { PitchForm } from "@/components/symposium/PitchForm";
 import { PosterForm } from "@/components/symposium/PosterForm";
 import { MemeForm } from "@/components/symposium/MemeForm";
+import { QuizForm } from "@/components/symposium/QuizForm";
+import { DrillForm } from "@/components/symposium/DrillForm";
+import { DebateForm } from "@/components/symposium/DebateForm";
 import { supabase } from "@/integrations/supabase/client";
 import aiIconLogo from "@/assets/AI-icon.png";
 
@@ -181,6 +184,9 @@ const AISymposium = () => {
     const [isPitchFormOpen, setIsPitchFormOpen] = useState(false);
     const [isPosterFormOpen, setIsPosterFormOpen] = useState(false);
     const [isMemeFormOpen, setIsMemeFormOpen] = useState(false);
+    const [isQuizFormOpen, setIsQuizFormOpen] = useState(false);
+    const [isDrillFormOpen, setIsDrillFormOpen] = useState(false);
+    const [isDebateFormOpen, setIsDebateFormOpen] = useState(false);
 
     useEffect(() => {
         const fetchSpeakers = async () => {
@@ -816,6 +822,42 @@ const AISymposium = () => {
                                                                                 <button onClick={() => setIsMemeFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
                                                                             </>
                                                                         )}
+                                                                        {ev.title.includes('Quiz') && (
+                                                                            <>
+                                                                                <a href="/guidelines/AI_Quiz_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
+                                                                                <button onClick={() => setIsQuizFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
+                                                                            </>
+                                                                        )}
+                                                                        {ev.title.includes('Drill') && (
+                                                                            <>
+                                                                                <a href="/guidelines/AI_Drill_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
+                                                                                <button onClick={() => setIsDrillFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
+                                                                            </>
+                                                                        )}
+                                                                        {ev.title.includes('Debate') && (
+                                                                            <>
+                                                                                <a href="/guidelines/AI_Debate_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
+                                                                                <button onClick={() => setIsDebateFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
+                                                                            </>
+                                                                        )}
+                                                                        {ev.title.includes('Quiz') && (
+                                                                            <>
+                                                                                <a href="/guidelines/AI_Quiz_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
+                                                                                <button onClick={() => setIsQuizFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
+                                                                            </>
+                                                                        )}
+                                                                        {ev.title.includes('Drill') && (
+                                                                            <>
+                                                                                <a href="/guidelines/AI_Drill_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
+                                                                                <button onClick={() => setIsDrillFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
+                                                                            </>
+                                                                        )}
+                                                                        {ev.title.includes('Debate') && (
+                                                                            <>
+                                                                                <a href="/guidelines/AI_Debate_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
+                                                                                <button onClick={() => setIsDebateFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
+                                                                            </>
+                                                                        )}
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -1236,6 +1278,9 @@ const AISymposium = () => {
                 {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} />}
                 {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} />}
                 {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} />}
+                {isQuizFormOpen && <QuizForm onClose={() => setIsQuizFormOpen(false)} />}
+                {isDrillFormOpen && <DrillForm onClose={() => setIsDrillFormOpen(false)} />}
+                {isDebateFormOpen && <DebateForm onClose={() => setIsDebateFormOpen(false)} />}
             </AnimatePresence>
         </div >
     );

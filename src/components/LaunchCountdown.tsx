@@ -350,7 +350,7 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
                 /* Brand */
                 .launch-brand { display: flex; flex-direction: column; align-items: center; gap: 12px; }
                 .launch-logo-ring {
-                    width: 160px; height: 160px;
+                    width: 130px; height: 130px;
                     border-radius: 50%;
                     border: 2px solid rgba(59,130,246,0.3);
                     display: flex; align-items: center; justify-content: center;

@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "registrations" | "pitch" | "poster" | "quiz" | "meme" | "speakers";
+type Tab = "registrations" | "pitch" | "poster" | "quiz" | "drill" | "debate" | "meme" | "speakers";
 type Status = "pending" | "approved" | "rejected";
 
 interface Registration {
@@ -57,6 +57,33 @@ interface QuizSubmission {
     phone: string;
     institution: string | null;
     roll_number: string | null;
+    receipt_url: string | null;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
+interface DrillSubmission {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    roll_number: string | null;
+    receipt_url: string | null;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
+interface DebateSubmission {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    roll_number: string | null;
+    receipt_url: string | null;
     status: string;
     admin_notes: string | null;
     created_at: string;
@@ -113,6 +140,8 @@ export default function AdminSymposium() {
     const [pitchSubs, setPitchSubs] = useState<PitchSubmission[]>([]);
     const [posterSubs, setPosterSubs] = useState<PosterSubmission[]>([]);
     const [quizSubs, setQuizSubs] = useState<QuizSubmission[]>([]);
+    const [drillSubs, setDrillSubs] = useState<DrillSubmission[]>([]);
+    const [debateSubs, setDebateSubs] = useState<DebateSubmission[]>([]);
     const [memeSubs, setMemeSubs] = useState<MemeSubmission[]>([]);
     const [speakers, setSpeakers] = useState<Speaker[]>([]);
     const [loading, setLoading] = useState(true);
@@ -130,11 +159,13 @@ export default function AdminSymposium() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [regRes, pitchRes, posterRes, quizRes, memeRes, speakersRes] = await Promise.all([
+            const [regRes, pitchRes, posterRes, quizRes, drillRes, debateRes, memeRes, speakersRes] = await Promise.all([
                 (supabase as any).from("symposium_registrations").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_pitch_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_poster_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_quiz_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_drill_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_debate_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_meme_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_speakers").select("*").order("created_at", { ascending: false }),
             ]);
@@ -142,6 +173,8 @@ export default function AdminSymposium() {
             setPitchSubs(pitchRes.data || []);
             setPosterSubs(posterRes.data || []);
             setQuizSubs(quizRes.data || []);
+            setDrillSubs(drillRes.data || []);
+            setDebateSubs(debateRes.data || []);
             setMemeSubs(memeRes.data || []);
             setSpeakers(speakersRes.data || []);
         } catch (err) {
@@ -168,6 +201,8 @@ export default function AdminSymposium() {
                 else if (table === "symposium_pitch_submissions") item = pitchSubs.find(p => p.id === id);
                 else if (table === "symposium_poster_submissions") item = posterSubs.find(p => p.id === id);
                 else if (table === "symposium_quiz_submissions") item = quizSubs.find(p => p.id === id);
+                else if (table === "symposium_drill_submissions") item = drillSubs.find(p => p.id === id);
+                else if (table === "symposium_debate_submissions") item = debateSubs.find(p => p.id === id);
                 else if (table === "symposium_meme_submissions") item = memeSubs.find(p => p.id === id);
 
                 if (item && (newStatus === "approved" || newStatus === "rejected")) {
@@ -203,7 +238,7 @@ export default function AdminSymposium() {
         e.preventDefault();
         setUpdating("speaker-form");
         try {
-            const { error } = await supabase.from("symposium_speakers").insert(newSpeaker);
+            const { error } = await (supabase as any).from("symposium_speakers").insert(newSpeaker);
             if (error) throw error;
             setShowSpeakerForm(false);
             setNewSpeaker({ name: "", role: "", image_url: "", event_category: "Workshop", event_title: "", location: "", time: "", date: "", description: "", fee: "", capacity: "" });
@@ -220,7 +255,7 @@ export default function AdminSymposium() {
         if (!confirm("Are you sure you want to delete this speaker/event?")) return;
         setUpdating(id);
         try {
-            const { error } = await supabase.from("symposium_speakers").delete().eq("id", id);
+            const { error } = await (supabase as any).from("symposium_speakers").delete().eq("id", id);
             if (error) throw error;
             fetchData();
         } catch (err) {
@@ -236,6 +271,8 @@ export default function AdminSymposium() {
         { key: "pitch", label: "Pitch Submissions", count: pitchSubs.length },
         { key: "poster", label: "Poster Submissions", count: posterSubs.length },
         { key: "quiz", label: "Quiz Submissions", count: quizSubs.length },
+        { key: "drill", label: "Drill Submissions", count: drillSubs.length },
+        { key: "debate", label: "Debate Submissions", count: debateSubs.length },
         { key: "meme", label: "Meme Submissions", count: memeSubs.length },
         { key: "speakers", label: "Speakers & Tutors", count: speakers.length },
     ];
@@ -245,6 +282,8 @@ export default function AdminSymposium() {
         pitch: pitchSubs.filter(p => p.status === "pending").length,
         poster: posterSubs.filter(p => p.status === "pending").length,
         quiz: quizSubs.filter(p => p.status === "pending").length,
+        drill: drillSubs.filter(p => p.status === "pending").length,
+        debate: debateSubs.filter(p => p.status === "pending").length,
         meme: memeSubs.filter(p => p.status === "pending").length,
         speakers: 0
     };
@@ -462,6 +501,11 @@ export default function AdminSymposium() {
                                         <div><span className="text-muted-foreground block text-xs">Roll Number</span>{quiz.roll_number || "—"}</div>
                                         <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(quiz.created_at).toLocaleDateString()}</div>
                                     </div>
+                                    {quiz.receipt_url && (
+                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(quiz.receipt_url!)}>
+                                            <Download className="w-3.5 h-3.5 mr-1.5" /> View Payment Receipt
+                                        </Button>
+                                    )}
                                     <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
                                         <div className="flex-grow">
                                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
@@ -473,6 +517,92 @@ export default function AdminSymposium() {
                                             </Button>
                                             <Button size="sm" variant="destructive" disabled={updating === quiz.id} onClick={() => updateStatus("symposium_quiz_submissions", quiz.id, "rejected", noteText)}>
                                                 {updating === quiz.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "drill" && drillSubs.map(drill => (
+                        <div key={drill.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === drill.id ? null : drill.id)}>
+                                <div>
+                                    <div className="font-semibold">{drill.name}</div>
+                                    <div className="text-xs text-muted-foreground">{drill.email} • {drill.institution || "No institution"}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={drill.status} />
+                                    {expandedId === drill.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === drill.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{drill.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{drill.roll_number || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(drill.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    {drill.receipt_url && (
+                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(drill.receipt_url!)}>
+                                            <Download className="w-3.5 h-3.5 mr-1.5" /> View Payment Receipt
+                                        </Button>
+                                    )}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === drill.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === drill.id} onClick={() => updateStatus("symposium_drill_submissions", drill.id, "approved", noteText)}>
+                                                {updating === drill.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === drill.id} onClick={() => updateStatus("symposium_drill_submissions", drill.id, "rejected", noteText)}>
+                                                {updating === drill.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "debate" && debateSubs.map(debate => (
+                        <div key={debate.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === debate.id ? null : debate.id)}>
+                                <div>
+                                    <div className="font-semibold">{debate.name}</div>
+                                    <div className="text-xs text-muted-foreground">{debate.email} • {debate.institution || "No institution"}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={debate.status} />
+                                    {expandedId === debate.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === debate.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{debate.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{debate.roll_number || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(debate.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    {debate.receipt_url && (
+                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(debate.receipt_url!)}>
+                                            <Download className="w-3.5 h-3.5 mr-1.5" /> View Payment Receipt
+                                        </Button>
+                                    )}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === debate.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === debate.id} onClick={() => updateStatus("symposium_debate_submissions", debate.id, "approved", noteText)}>
+                                                {updating === debate.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === debate.id} onClick={() => updateStatus("symposium_debate_submissions", debate.id, "rejected", noteText)}>
+                                                {updating === debate.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
                                             </Button>
                                         </div>
                                     </div>
