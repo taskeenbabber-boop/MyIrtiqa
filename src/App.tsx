@@ -103,17 +103,26 @@ const AppContent = () => {
     );
 };
 
-const App = () => (
-    <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            {isBeforeLaunch() && <LaunchCountdown />}
-            <BrowserRouter>
-                <AppContent />
-            </BrowserRouter>
-        </TooltipProvider>
-    </QueryClientProvider>
-);
+const App = () => {
+    const [bypassed, setBypassed] = useState(false);
+    const showLaunch = isBeforeLaunch() && !bypassed;
+
+    return (
+        <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                {showLaunch ? (
+                    <LaunchCountdown onBypass={() => setBypassed(true)} />
+                ) : (
+                    <BrowserRouter>
+                        <AppContent />
+                    </BrowserRouter>
+                )}
+            </TooltipProvider>
+        </QueryClientProvider>
+    );
+};
 
 export default App;
+

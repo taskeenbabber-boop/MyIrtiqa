@@ -11,13 +11,20 @@ interface TimeLeft {
     seconds: number;
 }
 
-export function LaunchCountdown() {
-    const [timeLeft, setTimeLeft] = useState<TimeLeft>(getTimeLeft());
-    const [isLaunched, setIsLaunched] = useState(Date.now() >= LAUNCH_UTC);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [checkingAuth, setCheckingAuth] = useState(true);
+interface LaunchCountdownProps {
+    onBypass: () => void;
+}
 
-    // Check if current user is admin/superadmin
+export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
+    const [timeLeft, setTimeLeft] = useState<TimeLeft>(getTimeLeft());
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [loginEmail, setLoginEmail] = useState("");
+    const [loginPassword, setLoginPassword] = useState("");
+    const [loginError, setLoginError] = useState("");
+    const [loginLoading, setLoginLoading] = useState(false);
+
+    // Check if already logged in as admin on mount
     useEffect(() => {
         const checkAdmin = async () => {
             try {
@@ -33,31 +40,57 @@ export function LaunchCountdown() {
                     }
                 }
             } catch {
-                // Not logged in or no admin role — stay on countdown
-            } finally {
-                setCheckingAuth(false);
+                // Not logged in
             }
         };
         checkAdmin();
     }, []);
 
+    // Countdown timer
     useEffect(() => {
         const timer = setInterval(() => {
             const now = Date.now();
             if (now >= LAUNCH_UTC) {
-                setIsLaunched(true);
                 clearInterval(timer);
-                window.location.reload();
+                onBypass(); // Auto-launch when time arrives
             } else {
                 setTimeLeft(getTimeLeft());
             }
         }, 1000);
         return () => clearInterval(timer);
-    }, []);
+    }, [onBypass]);
 
-    // Don't show countdown while checking auth (prevents flash for admins)
-    if (checkingAuth) return null;
-    if (isLaunched || isAdmin) return null;
+    // Admin login handler
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoginLoading(true);
+        setLoginError("");
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: loginEmail,
+                password: loginPassword,
+            });
+            if (error) throw error;
+            if (data.user) {
+                const { data: roleData } = await (supabase as any)
+                    .from("user_roles")
+                    .select("role")
+                    .eq("user_id", data.user.id)
+                    .single();
+                if (roleData && (roleData.role === "admin" || roleData.role === "superadmin" || roleData.role === "super_admin")) {
+                    setIsAdmin(true);
+                    setShowLogin(false);
+                } else {
+                    setLoginError("Access denied. Admin privileges required.");
+                    await supabase.auth.signOut();
+                }
+            }
+        } catch (err: any) {
+            setLoginError(err.message || "Login failed");
+        } finally {
+            setLoginLoading(false);
+        }
+    };
 
     return (
         <div className="launch-screen">
@@ -126,6 +159,57 @@ export function LaunchCountdown() {
                 <p className="launch-tagline">
                     Something extraordinary is being crafted. Stay tuned.
                 </p>
+
+                {/* ═══ Admin Section ═══ */}
+                {isAdmin ? (
+                    /* Admin is authenticated — show "Visit Site" button */
+                    <button onClick={onBypass} className="launch-admin-btn launch-visit-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                            <polyline points="10 17 15 12 10 7" />
+                            <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        Visit Site
+                    </button>
+                ) : showLogin ? (
+                    /* Login form */
+                    <form onSubmit={handleLogin} className="launch-login-form">
+                        <div className="launch-login-header">
+                            <span>Admin Access</span>
+                            <button type="button" onClick={() => setShowLogin(false)} className="launch-login-close">✕</button>
+                        </div>
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={loginEmail}
+                            onChange={e => setLoginEmail(e.target.value)}
+                            className="launch-login-input"
+                            required
+                            autoFocus
+                        />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={loginPassword}
+                            onChange={e => setLoginPassword(e.target.value)}
+                            className="launch-login-input"
+                            required
+                        />
+                        {loginError && <div className="launch-login-error">{loginError}</div>}
+                        <button type="submit" disabled={loginLoading} className="launch-admin-btn launch-login-submit">
+                            {loginLoading ? "Signing in..." : "Sign In"}
+                        </button>
+                    </form>
+                ) : (
+                    /* Small admin login trigger */
+                    <button onClick={() => setShowLogin(true)} className="launch-admin-trigger">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Admin
+                    </button>
+                )}
             </div>
 
             <style>{`
@@ -364,6 +448,127 @@ export function LaunchCountdown() {
                     margin: 0;
                 }
 
+                /* ═══ Admin Controls ═══ */
+                .launch-admin-trigger {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 8px 16px;
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.04);
+                    border: 1px solid rgba(255,255,255,0.08);
+                    color: rgba(148,163,184,0.4);
+                    font-size: 11px;
+                    font-weight: 500;
+                    letter-spacing: 1px;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                }
+                .launch-admin-trigger:hover {
+                    background: rgba(59,130,246,0.08);
+                    border-color: rgba(59,130,246,0.2);
+                    color: rgba(148,163,184,0.7);
+                }
+
+                .launch-login-form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    width: 100%;
+                    max-width: 300px;
+                    padding: 20px;
+                    border-radius: 16px;
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid rgba(255,255,255,0.08);
+                    backdrop-filter: blur(20px);
+                    animation: launchFadeIn 0.3s ease-out;
+                }
+                .launch-login-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: rgba(148,163,184,0.6);
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin-bottom: 4px;
+                }
+                .launch-login-close {
+                    background: none;
+                    border: none;
+                    color: rgba(148,163,184,0.4);
+                    cursor: pointer;
+                    font-size: 14px;
+                    padding: 4px;
+                    transition: color 0.2s;
+                }
+                .launch-login-close:hover { color: #e2e8f0; }
+                .launch-login-input {
+                    width: 100%;
+                    padding: 10px 14px;
+                    border-radius: 10px;
+                    background: rgba(0,0,0,0.3);
+                    border: 1px solid rgba(59,130,246,0.15);
+                    color: #e2e8f0;
+                    font-size: 14px;
+                    outline: none;
+                    transition: border-color 0.2s;
+                    box-sizing: border-box;
+                }
+                .launch-login-input:focus {
+                    border-color: rgba(59,130,246,0.5);
+                }
+                .launch-login-input::placeholder {
+                    color: rgba(148,163,184,0.3);
+                }
+                .launch-login-error {
+                    font-size: 12px;
+                    color: #f87171;
+                    text-align: center;
+                }
+                .launch-login-submit {
+                    width: 100%;
+                }
+                .launch-admin-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 10px 24px;
+                    border-radius: 999px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    letter-spacing: 1px;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    border: none;
+                }
+                .launch-visit-btn {
+                    background: linear-gradient(135deg, #3b82f6, #2563eb);
+                    color: #fff;
+                    box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+                    animation: launchFadeIn 0.3s ease-out;
+                }
+                .launch-visit-btn:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 6px 30px rgba(59,130,246,0.4);
+                }
+                .launch-login-submit {
+                    background: rgba(59,130,246,0.15);
+                    color: #3b82f6;
+                    border: 1px solid rgba(59,130,246,0.3);
+                }
+                .launch-login-submit:hover {
+                    background: rgba(59,130,246,0.25);
+                }
+                .launch-login-submit:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
                 /* Responsive */
                 @media (max-width: 640px) {
                     .launch-title { font-size: 28px; letter-spacing: 8px; }
@@ -372,6 +577,7 @@ export function LaunchCountdown() {
                     .launch-countdown { gap: 6px; }
                     .launch-separator { font-size: 20px; padding-bottom: 16px; }
                     .launch-unit-label { font-size: 9px; letter-spacing: 2px; }
+                    .launch-login-form { max-width: 260px; padding: 16px; }
                 }
             `}</style>
         </div>
