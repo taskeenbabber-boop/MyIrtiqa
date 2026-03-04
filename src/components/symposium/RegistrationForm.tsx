@@ -129,6 +129,10 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
             // Workshop step — always can continue (workshops are optional)
             return true;
         }
+        // Payment step — receipt is MANDATORY
+        if (step === totalSteps) {
+            return !!formData.receiptFile;
+        }
         return true;
     };
 
@@ -146,6 +150,9 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                 if (!uploadError) receiptUrl = path;
             }
 
+            const totalAmount = calculateTotal();
+            const confFee = wantConference && category ? CONFERENCE_FEE[category] : 0;
+
             const { error } = await (supabase as any).from("symposium_registrations").insert({
                 ticket_type: category,
                 name: formData.name,
@@ -155,12 +162,14 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                 roll_number: formData.rollNumber || null,
                 team_members: isTeam ? formData.teamMembers.filter(m => m.trim()) : null,
                 selected_workshops: wantWorkshops && !isTeam ? formData.selectedWorkshops : [],
-                total_amount: calculateTotal(),
+                total_amount: totalAmount,
                 receipt_url: receiptUrl,
                 status: "pending",
                 is_nwsm_student: category === "NWSM_STUDENT",
                 wants_workshops: wantWorkshops && !isTeam,
                 wants_conference: wantConference,
+                workshop_fee_per: workshopFee,
+                conference_fee: confFee,
             });
 
             if (error) throw error;
@@ -717,7 +726,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                     ) : (
                         <button
                             onClick={handleSubmit}
-                            disabled={submitting}
+                            disabled={submitting || !formData.receiptFile}
                             className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest px-8 py-3 rounded-full text-black transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] disabled:opacity-50"
                             style={{ background: ACCENT }}
                         >
