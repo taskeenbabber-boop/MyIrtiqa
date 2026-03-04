@@ -80,7 +80,7 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
                     .maybeSingle();
 
                 if (roleError) {
-                    setLoginError("Error checking permissions.");
+                    setLoginError(`Error checking permissions: ${roleError.message || JSON.stringify(roleError)}`);
                     await supabase.auth.signOut();
                     return;
                 }
