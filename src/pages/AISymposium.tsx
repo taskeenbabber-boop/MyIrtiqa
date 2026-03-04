@@ -13,6 +13,28 @@ import aiIconLogo from "@/assets/AI-icon.png";
 const ACCENT = "#3b82f6";       // vibrant blue
 const ACCENT_LIGHT = "#60a5fa"; // lighter blue
 const ACCENT_BG = "rgba(59,130,246,0.08)";
+
+/* ——— icon mapping for event thumbnails ——— */
+function getEventIcon(title: string): string {
+    const map: Record<string, string> = {
+        "AI for Note Taking": "/icons/AI-Note-Taking.png",
+        "Prompt Engineering & AI in Design": "/icons/Prompt-Engineering.png",
+        "AI in Research": "/icons/AI-in-Research.png",
+        "Clinical Audit & AI in Clinical Use": "/icons/Clinical-Audit.png",
+        "AI and the Future of Global Surgery": "/icons/AI-and-the-Future-of-Global-Surgery.png",
+        "Thinking Like a Builder: AI Solutions in Healthcare": "/icons/Thinking-Like-a-Builder.png",
+        "Human Expertise vs AI Systems": "/icons/Human-Expertise-vs-AI-Systems.png",
+        "AI Poster Competition": "/icons/AI-Poster-Competition.png",
+        "AI Drill": "/icons/AI-Drill.png",
+        "AI Debate": "/icons/AI-Debate.png",
+        "AI Pitch Competition": "/icons/AI-Pitch-Competition.png",
+    };
+    // Fuzzy match: check if any key is contained in the title
+    for (const [key, val] of Object.entries(map)) {
+        if (title.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(title.toLowerCase())) return val;
+    }
+    return "/icons/AI-Note-Taking.png"; // fallback
+}
 /* Theme-aware surface tokens — use CSS variables from the design system */
 const SURFACE = "hsl(var(--card))";
 const SURFACE_2 = "hsl(var(--muted))";
@@ -25,7 +47,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Haroon", speakerRole: "AI Specialist",
         speakerImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
         location: "Workshop Room 1", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
-        image: "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-Note-Taking.png",
         description: "Learn how to leverage AI tools for efficient medical and academic note-taking. This workshop covers structure, synthesis, and retrieval of complex clinical information using cutting-edge NLP models.",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "45 Seats"
     },
@@ -34,7 +56,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Mr. Asad", speakerRole: "Design Lead",
         speakerImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150",
         location: "Workshop Room 2", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
-        image: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/Prompt-Engineering.png",
         description: "Master the art of prompt engineering for both text and visual generation. Essential for structuring research queries and creating academic/medical design materials securely.",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "50 Seats"
     },
@@ -43,7 +65,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Iftikhar", speakerRole: "Research Fellow",
         speakerImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150",
         location: "Workshop Room 1", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
-        image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-in-Research.png",
         description: "A comprehensive guide to utilizing AI in literature review, data synthesis, and manuscript structuring while maintaining absolute academic integrity and bias awareness.",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "40 Seats"
     },
@@ -52,7 +74,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Dr. Almas Fasih Khattak", speakerRole: "Clinical Director",
         speakerImage: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150",
         location: "Workshop Room 2", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
-        image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/Clinical-Audit.png",
         description: "Exploring the practical application of AI in clinical settings. Covering diagnostic support algorithms, patient data auditing, and the integration of AI models in secure hospital workflows.",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "60 Seats"
     },
@@ -61,7 +83,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Keynote Speaker", speakerRole: "Global Health Expert",
         speakerImage: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&q=80&w=150",
         location: "Main Auditorium", time: "Morning Session", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1551076805-e1869043e560?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-and-the-Future-of-Global-Surgery.png",
         description: "How AI supports surgical planning and intra-operative decisions. Role of AI in training and simulation. Use of AI tools in low-resource settings. How AI may reduce global surgical inequalities.",
         fee: "Included in Conference Pass", capacity: "500+ Seats"
     },
@@ -70,7 +92,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Keynote Speaker", speakerRole: "MedTech Innovator",
         speakerImage: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150",
         location: "Main Auditorium", time: "Midday Session", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/Thinking-Like-a-Builder.png",
         description: "How students can identify real problems in healthcare and turn them into AI-based ideas. Introduction to builder mindset: Iterate, test, improve. Simple prototyping approaches.",
         fee: "Included in Conference Pass", capacity: "500+ Seats"
     },
@@ -79,7 +101,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Expert Panelists", speakerRole: "Cross-disciplinary Board",
         speakerImage: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=150",
         location: "Main Auditorium", time: "60 Minutes", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/Human-Expertise-vs-AI-Systems.png",
         description: "A deep dive into where AI excels and where humans remain essential. Panelists will share insights on AI in diagnostics, its limits in reasoning and empathy, patient safety, and accountability.",
         fee: "Included in Conference Pass", capacity: "500+ Seats"
     },
@@ -88,7 +110,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Individual Participants", speakerRole: "Researchers",
         speakerImage: "https://images.unsplash.com/photo-1587614295999-6c1c13675117?auto=format&fit=crop&q=80&w=150",
         location: "Exhibition Hall", time: "TBA", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1587614295999-6c1c13675117?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-Poster-Competition.png",
         description: "Individual poster presentation with a live demonstration of a chosen AI tool. Covers background, medical applications, ethical concerns, and future possibilities.",
         fee: "Included in Conference Pass", capacity: "Variable"
     },
@@ -97,7 +119,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Participants", speakerRole: "Problem Solvers",
         speakerImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=150",
         location: "Computer Lab", time: "1 Hour", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-Drill.png",
         description: "Fast, structured problem-solving challenge. Participants receive a medical case or research problem and have one hour to work through it using AI tools.",
         fee: "Included in Conference Pass", capacity: "Variable"
     },
@@ -106,7 +128,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Debaters", speakerRole: "Orators",
         speakerImage: "https://images.unsplash.com/photo-1475721025505-11900531505c?auto=format&fit=crop&q=80&w=150",
         location: "Debate Hall", time: "TBA", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1475721025505-11900531505c?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-Debate.png",
         description: "Two-sided debate on motions like AI in clinical decisions, privacy threats, or role replacement. Judges evaluate structured reasoning and grounded understanding of healthcare AI.",
         fee: "Included in Conference Pass", capacity: "Structured Bracket"
     },
@@ -115,7 +137,7 @@ const SYMPOSIUM_EVENTS = [
         speaker: "Innovators", speakerRole: "Entrepreneurs",
         speakerImage: "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=150",
         location: "Pitch Room", time: "5m Pitch + 3m Q&A", date: "11 Apr 2026",
-        image: "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=600",
+        image: "/icons/AI-Pitch-Competition.png",
         description: "Propose original AI-based solutions to a medical/research problem. Must include problem statement, AI solution, feasibility, workflow, and impact.",
         fee: "Included in Conference Pass", capacity: "Limited Slots"
     }
@@ -161,7 +183,7 @@ const AISymposium = () => {
                     location: item.location,
                     time: item.time,
                     date: item.date,
-                    image: item.image_url, // Fallback to use the same image for the event mostly
+                    image: getEventIcon(item.event_title), // Use custom event icon
                     description: item.description,
                     fee: item.fee,
                     capacity: item.capacity
@@ -177,7 +199,7 @@ const AISymposium = () => {
     const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
     const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-    const filteredEvents = SYMPOSIUM_EVENTS.filter(ev =>
+    const filteredEvents = events.filter(ev =>
         filter === "All" || ev.category === filter
     );
 
@@ -234,7 +256,7 @@ const AISymposium = () => {
                             className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[5px] uppercase px-5 py-2.5 rounded-full border"
                             style={{ color: ACCENT, borderColor: 'rgba(59,130,246,0.3)', background: ACCENT_BG }}
                         >
-                            <Zap className="w-3 h-3" /> NWSM × GSRH
+                            <Zap className="w-3 h-3" /> GSRH × IRTIQA
                         </span>
                     </motion.div>
 
@@ -757,7 +779,7 @@ const AISymposium = () => {
                                                                     </div>
                                                                 </div>
                                                                 {ev.category === 'Competition' && (
-                                                                    <div className="flex items-center gap-2 w-full sm:w-auto ml-11 sm:ml-0">
+                                                                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                                                                         {ev.title.includes('Pitch') && (
                                                                             <>
                                                                                 <a href="/guidelines/AI_Pitch_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
@@ -1052,7 +1074,6 @@ const AISymposium = () => {
                         <div className="w-3 h-3 rounded-full" style={{ background: ACCENT }} />
                         <span className="text-sm font-bold uppercase tracking-widest">GSRH × IRTIQA</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">© 2026 AI Symposium. Northwest School of Medicine, Peshawar.</p>
                 </div>
             </footer >
 

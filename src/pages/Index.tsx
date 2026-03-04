@@ -215,7 +215,7 @@ const Index = () => {
                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white mb-1">NWSM × GSRH</div>
+                    <div className="text-2xl font-bold text-white mb-1">GSRH × IRTIQA</div>
                     <div className="text-sm text-white/40">Peshawar, Pakistan</div>
                   </div>
                 </div>

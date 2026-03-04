@@ -82,6 +82,16 @@ const Team = () => {
               <div className="flex justify-center items-center py-20">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
               </div>
+            ) : teamMembers.length === 0 ? (
+              <div className="py-20 text-center max-w-md mx-auto">
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                  <span className="text-4xl">👥</span>
+                </div>
+                <h2 className="text-3xl font-bold text-foreground mb-3">Team Profiles Updating</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  We're putting the finishing touches on our team profiles. Check back soon to meet the passionate individuals behind IRTIQA!
+                </p>
+              </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                 {teamMembers.map((member) => (

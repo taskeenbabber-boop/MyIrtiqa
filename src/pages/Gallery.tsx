@@ -46,10 +46,15 @@ export default function Gallery() {
 
   if (achievements.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-2">No Achievements Yet</h2>
-          <p className="text-muted-foreground">Check back soon for our latest accomplishments!</p>
+      <div className="min-h-screen flex items-center justify-center bg-background pt-20">
+        <div className="text-center max-w-md px-6">
+          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl">🏆</span>
+          </div>
+          <h2 className="text-3xl font-bold text-foreground mb-3">Gallery Coming Soon</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            We're curating our collection of milestones and achievements. Check back soon to explore our journey!
+          </p>
         </div>
       </div>
     );
