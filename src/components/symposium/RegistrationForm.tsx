@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, CheckCircle, Upload, CreditCard, Users, User, ArrowRight, ShieldCheck, ArrowUpRight, Sparkles, Loader2, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,7 @@ interface RegistrationFormProps {
 }
 
 export function RegistrationForm({ onClose }: RegistrationFormProps) {
+    // Step order: 1=Events, 2=Category, 3=Details, 4=Payment
     const [step, setStep] = useState(1);
     const [category, setCategory] = useState<Category | null>(null);
     const [submitting, setSubmitting] = useState(false);
@@ -82,17 +83,8 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
     const calculateTotal = () => {
         if (!category) return 0;
         let total = 0;
-
-        // Day 2: Conference fee (always included)
-        if (wantConference) {
-            total += CONFERENCE_FEE[category];
-        }
-
-        // Day 1: Workshop fees (NOT for team passes)
-        if (wantWorkshops && !isTeam) {
-            total += formData.selectedWorkshops.length * workshopFee;
-        }
-
+        if (wantConference) total += CONFERENCE_FEE[category];
+        if (wantWorkshops && !isTeam) total += formData.selectedWorkshops.length * workshopFee;
         return total;
     };
 
@@ -110,29 +102,27 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
         });
     };
 
-    const totalSteps = isTeam ? 3 : 4;
+    const totalSteps = 4;
     const handleNext = () => setStep(s => Math.min(totalSteps, s + 1));
     const handleBack = () => setStep(s => Math.max(1, s - 1));
 
-    const stepLabels = isTeam
-        ? ["Category", "Details", "Payment"]
-        : ["Category", "Details", "Workshops", "Payment"];
+    const stepLabels = ["Events", "Category", "Details", "Payment"];
 
     const canContinue = () => {
-        if (step === 1) return !!category;
-        if (step === 2) {
+        if (step === 1) return wantConference || wantWorkshops; // must pick at least one
+        if (step === 2) return !!category;
+        if (step === 3) {
             const baseValid = formData.name.trim() !== "" && formData.email.trim() !== "" && formData.phone.trim() !== "";
             if (category === "NWSM_STUDENT") return baseValid && formData.rollNumber.trim() !== "";
+            if (isTeam) {
+                const teamCount = category === "OUTSIDER_TEAM_3" ? 2 : 3;
+                const allTeamFilled = formData.teamMembers.slice(0, teamCount).every(m => m.trim() !== "");
+                return baseValid && allTeamFilled;
+            }
             return baseValid;
         }
-        if (step === 3 && !isTeam) {
-            // Workshop step — always can continue (workshops are optional)
-            return true;
-        }
         // Payment step — receipt is MANDATORY
-        if (step === totalSteps) {
-            return !!formData.receiptFile;
-        }
+        if (step === totalSteps) return !!formData.receiptFile;
         return true;
     };
 
@@ -201,17 +191,14 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                         <span className="text-xs text-white/25 mt-0.5 block">{ws.speaker}</span>
                         <span className="text-xs text-white/20 mt-0.5 block">{ws.time}</span>
                     </div>
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                        <div
-                            className="w-5 h-5 rounded-md flex items-center justify-center"
-                            style={{
-                                background: selected ? ACCENT : "transparent",
-                                border: `1px solid ${selected ? ACCENT : "#444"}`,
-                            }}
-                        >
-                            {selected && <CheckCircle className="w-3.5 h-3.5 text-black" />}
-                        </div>
-                        <span className="text-[10px] font-bold" style={{ color: ACCENT }}>{workshopFee.toLocaleString()} PKR</span>
+                    <div
+                        className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{
+                            background: selected ? ACCENT : "transparent",
+                            border: `1px solid ${selected ? ACCENT : "#444"}`,
+                        }}
+                    >
+                        {selected && <CheckCircle className="w-3.5 h-3.5 text-black" />}
                     </div>
                 </div>
             </div>
@@ -297,9 +284,102 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                 <div className="p-6 md:p-8 overflow-y-auto flex-grow scrollbar-hide">
                     <AnimatePresence mode="wait">
 
-                        {/* ────── STEP 1: Category Selection ────── */}
+                        {/* ────── STEP 1: What do you want to attend? ────── */}
                         {step === 1 && (
                             <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+
+                                <div>
+                                    <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-1">What would you like to attend?</h3>
+                                    <p className="text-sm text-white/30">Select the events you want to register for</p>
+                                </div>
+
+                                {/* Day 2: Conference */}
+                                <div
+                                    onClick={() => setWantConference(!wantConference)}
+                                    className="p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
+                                    style={{
+                                        background: wantConference
+                                            ? "linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.05) 100%)"
+                                            : SURFACE,
+                                        border: `${wantConference ? "2px" : "1px"} solid ${wantConference ? ACCENT : BORDER}`,
+                                    }}
+                                >
+                                    {wantConference && (
+                                        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] pointer-events-none" style={{ background: ACCENT, opacity: 0.1 }} />
+                                    )}
+                                    <div className="relative z-10 flex justify-between items-center">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: wantConference ? ACCENT : ACCENT_BG }}>
+                                                <Calendar className="w-5 h-5" style={{ color: wantConference ? "#000" : ACCENT }} />
+                                            </div>
+                                            <div>
+                                                <span className="font-bold text-white text-base block">Day 2: Main Conference</span>
+                                                <span className="text-xs text-white/40 block mt-0.5">April 11 — Keynotes, Panel Discussion, AI Poster, AI Drill, AI Debate, AI Quiz, AI Pitch, Memes</span>
+                                            </div>
+                                        </div>
+                                        {wantConference && <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: ACCENT }} />}
+                                    </div>
+                                </div>
+
+                                {/* Day 1: Workshops */}
+                                <div
+                                    onClick={() => setWantWorkshops(!wantWorkshops)}
+                                    className="p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
+                                    style={{
+                                        background: wantWorkshops
+                                            ? "linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0.05) 100%)"
+                                            : SURFACE,
+                                        border: `${wantWorkshops ? "2px" : "1px"} solid ${wantWorkshops ? ACCENT : BORDER}`,
+                                    }}
+                                >
+                                    {wantWorkshops && (
+                                        <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] pointer-events-none" style={{ background: ACCENT, opacity: 0.1 }} />
+                                    )}
+                                    <div className="relative z-10 flex justify-between items-center">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: wantWorkshops ? ACCENT : ACCENT_BG }}>
+                                                <Sparkles className="w-5 h-5" style={{ color: wantWorkshops ? "#000" : ACCENT }} />
+                                            </div>
+                                            <div>
+                                                <span className="font-bold text-white text-base block">Day 1: Pre-Conference Workshops</span>
+                                                <span className="text-xs text-white/40 block mt-0.5">April 10 — Select from 4 hands-on AI workshops (max 1 morning + 1 afternoon)</span>
+                                            </div>
+                                        </div>
+                                        {wantWorkshops && <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: ACCENT }} />}
+                                    </div>
+                                </div>
+
+                                {/* Workshop selection (shown inline if workshops enabled) */}
+                                {wantWorkshops && (
+                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-4 overflow-hidden">
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
+                                                Morning Session — Select 1
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {WORKSHOPS.filter(ws => ws.slot === "morning").map(ws => (
+                                                    <WorkshopCard key={ws.id} ws={ws} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
+                                                Afternoon Session — Select 1
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {WORKSHOPS.filter(ws => ws.slot === "afternoon").map(ws => (
+                                                    <WorkshopCard key={ws.id} ws={ws} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </motion.div>
+                        )}
+
+                        {/* ────── STEP 2: Category Selection ────── */}
+                        {step === 2 && (
+                            <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
 
                                 <div>
                                     <h3 className="text-lg font-bold text-white uppercase tracking-wider mb-1">Select Your Category</h3>
@@ -317,7 +397,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                             return (
                                                 <div
                                                     key={cat}
-                                                    onClick={() => { setCategory(cat); setWantConference(true); }}
+                                                    onClick={() => setCategory(cat)}
                                                     className="p-4 rounded-xl cursor-pointer transition-all duration-300"
                                                     style={{
                                                         background: isSelected ? ACCENT_BG : SURFACE,
@@ -332,17 +412,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                                                 <span className="text-[10px] text-white/20">{info.desc}</span>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="text-right hidden sm:block">
-                                                                <div className="text-xs font-bold" style={{ color: ACCENT }}>
-                                                                    Day 2: {CONFERENCE_FEE[cat].toLocaleString()} PKR
-                                                                </div>
-                                                                <div className="text-[10px] text-white/20">
-                                                                    Workshop: {cat === "FACULTY" ? "1,000" : "500"} PKR each
-                                                                </div>
-                                                            </div>
-                                                            {isSelected && <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT }} />}
-                                                        </div>
+                                                        {isSelected && <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT }} />}
                                                     </div>
                                                 </div>
                                             );
@@ -351,122 +421,89 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                 </div>
 
                                 {/* Divider */}
-                                <div className="flex items-center gap-3">
-                                    <div className="flex-grow h-px" style={{ background: BORDER }} />
-                                    <span className="text-[10px] font-bold text-white/15 uppercase tracking-widest">Team Discounts (Outsiders Only)</span>
-                                    <div className="flex-grow h-px" style={{ background: BORDER }} />
-                                </div>
+                                {wantConference && (
+                                    <>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex-grow h-px" style={{ background: BORDER }} />
+                                            <span className="text-[10px] font-bold text-white/15 uppercase tracking-widest">Team Discounts (Outsiders Only)</span>
+                                            <div className="flex-grow h-px" style={{ background: BORDER }} />
+                                        </div>
 
-                                {/* Team Categories */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {(["OUTSIDER_TEAM_3", "OUTSIDER_TEAM_4"] as Category[]).map(cat => {
-                                        const info = CATEGORY_INFO[cat];
-                                        const isSelected = category === cat;
-                                        return (
-                                            <div
-                                                key={cat}
-                                                onClick={() => { setCategory(cat); setWantConference(true); setWantWorkshops(false); }}
-                                                className="p-4 rounded-xl cursor-pointer transition-all duration-300"
-                                                style={{
-                                                    background: isSelected ? ACCENT_BG : SURFACE,
-                                                    border: `1px solid ${isSelected ? ACCENT : BORDER}`,
-                                                }}
-                                            >
-                                                <div className="flex justify-between items-center">
-                                                    <div className="flex items-center gap-3">
-                                                        <Users className="w-4 h-4 flex-shrink-0" style={{ color: isSelected ? ACCENT : "#444" }} />
-                                                        <div>
-                                                            <span className={`font-semibold text-sm block ${isSelected ? "text-white" : "text-white/50"}`}>{info.label}</span>
-                                                            <span className="text-[10px] text-white/20">{info.desc}</span>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            {(["OUTSIDER_TEAM_3", "OUTSIDER_TEAM_4"] as Category[]).map(cat => {
+                                                const info = CATEGORY_INFO[cat];
+                                                const isSelected = category === cat;
+                                                return (
+                                                    <div
+                                                        key={cat}
+                                                        onClick={() => { setCategory(cat); setWantWorkshops(false); }}
+                                                        className="p-4 rounded-xl cursor-pointer transition-all duration-300"
+                                                        style={{
+                                                            background: isSelected ? ACCENT_BG : SURFACE,
+                                                            border: `1px solid ${isSelected ? ACCENT : BORDER}`,
+                                                        }}
+                                                    >
+                                                        <div className="flex justify-between items-center">
+                                                            <div className="flex items-center gap-3">
+                                                                <Users className="w-4 h-4 flex-shrink-0" style={{ color: isSelected ? ACCENT : "#444" }} />
+                                                                <div>
+                                                                    <span className={`font-semibold text-sm block ${isSelected ? "text-white" : "text-white/50"}`}>{info.label}</span>
+                                                                    <span className="text-[10px] text-white/20">{info.desc}</span>
+                                                                </div>
+                                                            </div>
+                                                            {isSelected && <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT }} />}
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <div className="text-sm font-bold" style={{ color: ACCENT }}>{CONFERENCE_FEE[cat].toLocaleString()}</div>
-                                                        <div className="text-[10px] text-white/20">PKR Total</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </>
+                                )}
 
-                                {/* Fee summary info box */}
-                                <div className="p-4 rounded-xl text-xs text-white/30 leading-relaxed" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                    <div className="font-bold text-white/50 mb-2 uppercase tracking-wider text-[10px]">Fee Structure Overview</div>
-                                    <div className="space-y-1">
-                                        <div><strong className="text-white/50">Day 1</strong> (Pre-Conference Workshops): Students Rs. 500/workshop, Faculty Rs. 1,000/workshop — max 1 morning + 1 afternoon</div>
-                                        <div><strong className="text-white/50">Day 2</strong> (Main Conference): Covers all keynotes, panels & competitions (AI Poster, AI Drill, AI Debate, AI Quiz, AI Pitch, Memes)</div>
-                                        <div><strong className="text-white/50">Team passes</strong>: Conference day only, no workshops</div>
-                                    </div>
-                                </div>
+                                {/* Fee breakdown — shown AFTER category is selected */}
+                                {category && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="rounded-2xl p-5 relative overflow-hidden"
+                                        style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(59,130,246,0.04) 100%)", border: `1px solid rgba(59,130,246,0.2)` }}
+                                    >
+                                        <div className="absolute top-0 right-0 w-24 h-24 rounded-full blur-[50px] pointer-events-none" style={{ background: ACCENT, opacity: 0.08 }} />
+                                        <div className="relative z-10">
+                                            <div className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-3">Your Fee Breakdown</div>
+                                            <div className="space-y-2 text-sm">
+                                                {wantConference && (
+                                                    <div className="flex justify-between text-white/50">
+                                                        <span>Conference Day Pass</span>
+                                                        <span className="font-bold" style={{ color: ACCENT }}>{CONFERENCE_FEE[category].toLocaleString()} PKR</span>
+                                                    </div>
+                                                )}
+                                                {wantWorkshops && !isTeam && formData.selectedWorkshops.length > 0 && (
+                                                    <div className="flex justify-between text-white/50">
+                                                        <span>{formData.selectedWorkshops.length} Workshop{formData.selectedWorkshops.length > 1 ? "s" : ""}</span>
+                                                        <span className="font-bold" style={{ color: ACCENT }}>{(formData.selectedWorkshops.length * workshopFee).toLocaleString()} PKR</span>
+                                                    </div>
+                                                )}
+                                                {wantWorkshops && !isTeam && formData.selectedWorkshops.length === 0 && (
+                                                    <div className="flex justify-between text-white/40 text-xs">
+                                                        <span>Workshop fee</span>
+                                                        <span>{workshopFee.toLocaleString()} PKR each</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex justify-between items-end pt-3 mt-3" style={{ borderTop: "1px solid rgba(59,130,246,0.15)" }}>
+                                                <span className="text-white/60 font-semibold text-sm">Total</span>
+                                                <span className="text-2xl font-black" style={{ color: ACCENT }}>{calculateTotal().toLocaleString()} <span className="text-sm">PKR</span></span>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
                             </motion.div>
                         )}
 
-                        {/* ────── STEP 2: Participant Details ────── */}
-                        {step === 2 && (
-                            <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-
-                                {/* Price reveal banner */}
-                                <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(59,130,246,0.04) 100%)", border: `1px solid rgba(59,130,246,0.2)` }}>
-                                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full blur-[50px] pointer-events-none" style={{ background: ACCENT, opacity: 0.08 }} />
-                                    <div className="relative z-10 flex justify-between items-center flex-wrap gap-3">
-                                        <div>
-                                            <div className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-1">Your Category</div>
-                                            <div className="text-white font-bold text-lg">
-                                                {category ? CATEGORY_INFO[category].label : ""}
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-3xl font-black" style={{ color: ACCENT }}>{calculateTotal().toLocaleString()}</div>
-                                            <div className="text-[10px] text-white/30 uppercase tracking-wider">PKR</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Day selection (non-team only) */}
-                                {!isTeam && (
-                                    <div>
-                                        <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-3">What are you registering for?</div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            <div
-                                                onClick={() => setWantConference(true)}
-                                                className="p-3.5 rounded-xl cursor-pointer transition-all duration-300"
-                                                style={{
-                                                    background: wantConference ? ACCENT_BG : SURFACE,
-                                                    border: `1px solid ${wantConference ? ACCENT : BORDER}`,
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="w-3.5 h-3.5" style={{ color: wantConference ? ACCENT : "#444" }} />
-                                                    <div>
-                                                        <span className={`font-semibold text-sm block ${wantConference ? "text-white" : "text-white/50"}`}>Day 2: Main Conference</span>
-                                                        <span className="text-[10px] text-white/20">
-                                                            {category ? `${CONFERENCE_FEE[category].toLocaleString()} PKR` : ""}
-                                                        </span>
-                                                    </div>
-                                                    {wantConference && <CheckCircle className="w-4 h-4 ml-auto" style={{ color: ACCENT }} />}
-                                                </div>
-                                            </div>
-                                            <div
-                                                onClick={() => setWantWorkshops(!wantWorkshops)}
-                                                className="p-3.5 rounded-xl cursor-pointer transition-all duration-300"
-                                                style={{
-                                                    background: wantWorkshops ? ACCENT_BG : SURFACE,
-                                                    border: `1px solid ${wantWorkshops ? ACCENT : BORDER}`,
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Sparkles className="w-3.5 h-3.5" style={{ color: wantWorkshops ? ACCENT : "#444" }} />
-                                                    <div>
-                                                        <span className={`font-semibold text-sm block ${wantWorkshops ? "text-white" : "text-white/50"}`}>Day 1: Workshops</span>
-                                                        <span className="text-[10px] text-white/20">{workshopFee.toLocaleString()} PKR per workshop</span>
-                                                    </div>
-                                                    {wantWorkshops && <CheckCircle className="w-4 h-4 ml-auto" style={{ color: ACCENT }} />}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                        {/* ────── STEP 3: Participant Details ────── */}
+                        {step === 3 && (
+                            <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
 
                                 <h3 className="text-lg font-bold text-white uppercase tracking-wider">Participant Details</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -525,7 +562,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                 {isTeam && (
                                     <div className="space-y-4 pt-4" style={{ borderTop: `1px solid ${BORDER}` }}>
                                         <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: ACCENT }}>Team Members</h4>
-                                        <p className="text-[10px] text-white/25">Enter (the registering person) + {category === "OUTSIDER_TEAM_3" ? 2 : 3} team members below</p>
+                                        <p className="text-[10px] text-white/25">You (the registering person) + {category === "OUTSIDER_TEAM_3" ? 2 : 3} team members below</p>
                                         {Array.from({ length: category === "OUTSIDER_TEAM_3" ? 2 : 3 }).map((_, i) => (
                                             <div key={i} className="space-y-2">
                                                 <Label className="text-xs text-white/30">Member {i + 2} Name</Label>
@@ -547,63 +584,8 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                             </motion.div>
                         )}
 
-                        {/* ────── STEP 3: Workshop Selection (non-team only) ────── */}
-                        {step === 3 && !isTeam && (
-                            <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white uppercase tracking-wider">
-                                        {wantWorkshops ? "Select Your Workshops" : "Workshop Add-ons (Optional)"}
-                                    </h3>
-                                    <p className="text-sm text-white/30 mt-1">
-                                        Day 1, April 10 — Select one per time slot (morning & afternoon). Two workshops run in parallel per slot.
-                                    </p>
-                                    <div className="mt-3 p-3 rounded-xl flex items-center gap-2 text-sm" style={{ background: ACCENT_BG, border: `1px solid rgba(59,130,246,0.15)`, color: ACCENT }}>
-                                        <ShieldCheck className="w-4 h-4 flex-shrink-0" />
-                                        <span>Rate: {workshopFee.toLocaleString()} PKR per workshop</span>
-                                    </div>
-                                </div>
-
-                                {/* Morning slot */}
-                                <div>
-                                    <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
-                                        Morning Session — Select 1
-                                    </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {WORKSHOPS.filter(ws => ws.slot === "morning").map(ws => (
-                                            <WorkshopCard key={ws.id} ws={ws} />
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Afternoon slot */}
-                                <div>
-                                    <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
-                                        Afternoon Session — Select 1
-                                    </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {WORKSHOPS.filter(ws => ws.slot === "afternoon").map(ws => (
-                                            <WorkshopCard key={ws.id} ws={ws} />
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Running total */}
-                                <div className="p-4 rounded-xl flex justify-between items-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                    <div>
-                                        <span className="text-xs text-white/30 uppercase tracking-wider">Running Total</span>
-                                        <div className="text-white/40 text-[10px] mt-0.5">
-                                            {wantConference ? `Conference: ${category ? CONFERENCE_FEE[category].toLocaleString() : 0} PKR` : ""}
-                                            {wantConference && formData.selectedWorkshops.length > 0 ? " + " : ""}
-                                            {formData.selectedWorkshops.length > 0 ? `${formData.selectedWorkshops.length} workshop(s): ${(formData.selectedWorkshops.length * workshopFee).toLocaleString()} PKR` : ""}
-                                        </div>
-                                    </div>
-                                    <span className="text-2xl font-black" style={{ color: ACCENT }}>{calculateTotal().toLocaleString()} PKR</span>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {/* ────── FINAL STEP: Payment ────── */}
-                        {step === totalSteps && (
+                        {/* ────── STEP 4: Payment ────── */}
+                        {step === 4 && (
                             <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
                                 <div className="rounded-2xl p-6" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
                                     <h3 className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-4">Order Summary</h3>
@@ -612,10 +594,10 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                             <span>{category ? CATEGORY_INFO[category].label : ""}</span>
                                         </div>
 
-                                        {wantConference && (
+                                        {wantConference && category && (
                                             <div className="flex justify-between text-white/40 text-xs">
-                                                <span>Day 2: Main Conference (Keynotes, Panels, Competitions)</span>
-                                                <span className="font-bold" style={{ color: ACCENT }}>{category ? CONFERENCE_FEE[category].toLocaleString() : 0} PKR</span>
+                                                <span>Day 2: Main Conference</span>
+                                                <span className="font-bold" style={{ color: ACCENT }}>{CONFERENCE_FEE[category].toLocaleString()} PKR</span>
                                             </div>
                                         )}
 
@@ -665,13 +647,13 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold uppercase tracking-wider text-white/30">Receipt Upload</Label>
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-white/30">Receipt Upload <span className="text-red-400">*</span></Label>
                                     <label
                                         htmlFor="receipt"
                                         className="flex flex-col items-center justify-center w-full h-32 rounded-xl cursor-pointer group transition-all duration-300"
-                                        style={{ border: `2px dashed ${BORDER}`, background: SURFACE }}
+                                        style={{ border: `2px dashed ${formData.receiptFile ? ACCENT : BORDER}`, background: SURFACE }}
                                     >
-                                        <Upload className="w-6 h-6 mb-2 transition-colors" style={{ color: "#444" }} />
+                                        <Upload className="w-6 h-6 mb-2 transition-colors" style={{ color: formData.receiptFile ? ACCENT : "#444" }} />
                                         <p className="text-sm text-white/30 group-hover:text-white/60 transition-colors">
                                             <span style={{ color: ACCENT }} className="font-semibold">Click to upload</span> or drag and drop
                                         </p>
@@ -689,6 +671,9 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                             <CheckCircle className="w-3.5 h-3.5" style={{ color: "#22c55e" }} />
                                             <span>{formData.receiptFile.name}</span>
                                         </div>
+                                    )}
+                                    {!formData.receiptFile && (
+                                        <p className="text-[10px] text-red-400/60 mt-1">Payment receipt is required to complete registration</p>
                                     )}
                                 </div>
                             </motion.div>

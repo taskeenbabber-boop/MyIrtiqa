@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import logoIcon from "@/assets/logo-icon.png";
 
 // Launch: March 5, 2026 12:00 AM PKT = March 4, 2026 19:00:00 UTC
 const LAUNCH_UTC = new Date("2026-03-05T00:00:00+05:00").getTime();
@@ -132,7 +133,7 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
                 {/* Logo and brand */}
                 <div className="launch-brand">
                     <div className="launch-logo-ring">
-                        <span className="launch-logo-text">IR</span>
+                        <img src={logoIcon} alt="IRTIQA" className="launch-logo-img" />
                     </div>
                     <h1 className="launch-title">IRTIQA</h1>
                     <p className="launch-subtitle">Advancing Research Culture in Medical Education</p>
@@ -159,6 +160,11 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
                 <p className="launch-tagline">
                     Something extraordinary is being crafted. Stay tuned.
                 </p>
+
+                {/* Developer credit */}
+                <div className="launch-credit">
+                    Designed & Developed by <span className="launch-credit-name">Taskeen</span>
+                </div>
 
                 {/* ═══ Admin Section ═══ */}
                 {isAdmin ? (
@@ -334,27 +340,28 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
                 /* Brand */
                 .launch-brand { display: flex; flex-direction: column; align-items: center; gap: 12px; }
                 .launch-logo-ring {
-                    width: 72px; height: 72px;
+                    width: 90px; height: 90px;
                     border-radius: 50%;
                     border: 2px solid rgba(59,130,246,0.3);
                     display: flex; align-items: center; justify-content: center;
                     background: rgba(59,130,246,0.05);
                     animation: launchRingSpin 12s linear infinite;
-                    box-shadow: 0 0 30px rgba(59,130,246,0.15), inset 0 0 20px rgba(59,130,246,0.05);
+                    box-shadow: 0 0 40px rgba(59,130,246,0.2), inset 0 0 20px rgba(59,130,246,0.05);
                 }
                 @keyframes launchRingSpin {
-                    0% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 30px rgba(59,130,246,0.15); }
-                    50% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 30px rgba(139,92,246,0.15); }
-                    100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 30px rgba(59,130,246,0.15); }
+                    0% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 40px rgba(59,130,246,0.2), 0 0 80px rgba(59,130,246,0.05); }
+                    50% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 40px rgba(139,92,246,0.2), 0 0 80px rgba(139,92,246,0.05); }
+                    100% { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 40px rgba(59,130,246,0.2), 0 0 80px rgba(59,130,246,0.05); }
                 }
-                .launch-logo-text {
-                    font-size: 22px;
-                    font-weight: 800;
-                    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    letter-spacing: 2px;
+                .launch-logo-img {
+                    width: 52px; height: 52px;
+                    object-fit: contain;
+                    filter: drop-shadow(0 0 12px rgba(59,130,246,0.5)) brightness(1.1);
+                    animation: launchLogoGlow 3s ease-in-out infinite;
+                }
+                @keyframes launchLogoGlow {
+                    0%, 100% { filter: drop-shadow(0 0 12px rgba(59,130,246,0.5)) brightness(1.1); }
+                    50% { filter: drop-shadow(0 0 20px rgba(59,130,246,0.8)) brightness(1.3); }
                 }
                 .launch-title {
                     font-size: 40px;
@@ -446,6 +453,19 @@ export function LaunchCountdown({ onBypass }: LaunchCountdownProps) {
                     color: rgba(148, 163, 184, 0.35);
                     font-style: italic;
                     margin: 0;
+                }
+
+                /* Developer Credit */
+                .launch-credit {
+                    font-size: 10px;
+                    color: rgba(148, 163, 184, 0.2);
+                    letter-spacing: 1.5px;
+                    text-transform: uppercase;
+                    font-weight: 400;
+                }
+                .launch-credit-name {
+                    color: rgba(59, 130, 246, 0.4);
+                    font-weight: 600;
                 }
 
                 /* ═══ Admin Controls ═══ */
