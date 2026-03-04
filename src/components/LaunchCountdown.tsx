@@ -28,7 +28,7 @@ export function LaunchCountdown() {
                         .select("role")
                         .eq("user_id", user.id)
                         .single();
-                    if (data && (data.role === "admin" || data.role === "superadmin")) {
+                    if (data && (data.role === "admin" || data.role === "superadmin" || data.role === "super_admin")) {
                         setIsAdmin(true);
                     }
                 }
@@ -55,6 +55,8 @@ export function LaunchCountdown() {
         return () => clearInterval(timer);
     }, []);
 
+    // Don't show countdown while checking auth (prevents flash for admins)
+    if (checkingAuth) return null;
     if (isLaunched || isAdmin) return null;
 
     return (
