@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "registrations" | "pitch" | "poster" | "speakers";
+type Tab = "registrations" | "pitch" | "poster" | "quiz" | "meme" | "speakers";
 type Status = "pending" | "approved" | "rejected";
 
 interface Registration {
@@ -50,6 +50,31 @@ interface PosterSubmission {
     created_at: string;
 }
 
+interface QuizSubmission {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    roll_number: string | null;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
+interface MemeSubmission {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    institution: string | null;
+    meme_url: string | null;
+    description: string | null;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
 interface Speaker {
     id: string;
     name: string;
@@ -87,6 +112,8 @@ export default function AdminSymposium() {
     const [registrations, setRegistrations] = useState<Registration[]>([]);
     const [pitchSubs, setPitchSubs] = useState<PitchSubmission[]>([]);
     const [posterSubs, setPosterSubs] = useState<PosterSubmission[]>([]);
+    const [quizSubs, setQuizSubs] = useState<QuizSubmission[]>([]);
+    const [memeSubs, setMemeSubs] = useState<MemeSubmission[]>([]);
     const [speakers, setSpeakers] = useState<Speaker[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -103,15 +130,19 @@ export default function AdminSymposium() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [regRes, pitchRes, posterRes, speakersRes] = await Promise.all([
+            const [regRes, pitchRes, posterRes, quizRes, memeRes, speakersRes] = await Promise.all([
                 (supabase as any).from("symposium_registrations").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_pitch_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_poster_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_quiz_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_meme_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_speakers").select("*").order("created_at", { ascending: false }),
             ]);
             setRegistrations(regRes.data || []);
             setPitchSubs(pitchRes.data || []);
             setPosterSubs(posterRes.data || []);
+            setQuizSubs(quizRes.data || []);
+            setMemeSubs(memeRes.data || []);
             setSpeakers(speakersRes.data || []);
         } catch (err) {
             console.error("Failed to fetch symposium data:", err);
@@ -132,11 +163,12 @@ export default function AdminSymposium() {
             await (supabase as any).from(table).update(updatePayload).eq("id", id);
 
             try {
-                const item = table === "symposium_registrations"
-                    ? registrations.find(r => r.id === id)
-                    : table === "symposium_pitch_submissions"
-                        ? pitchSubs.find(p => p.id === id)
-                        : posterSubs.find(p => p.id === id);
+                let item;
+                if (table === "symposium_registrations") item = registrations.find(r => r.id === id);
+                else if (table === "symposium_pitch_submissions") item = pitchSubs.find(p => p.id === id);
+                else if (table === "symposium_poster_submissions") item = posterSubs.find(p => p.id === id);
+                else if (table === "symposium_quiz_submissions") item = quizSubs.find(p => p.id === id);
+                else if (table === "symposium_meme_submissions") item = memeSubs.find(p => p.id === id);
 
                 if (item && (newStatus === "approved" || newStatus === "rejected")) {
                     await supabase.functions.invoke("send-symposium-email", {
@@ -203,6 +235,8 @@ export default function AdminSymposium() {
         { key: "registrations", label: "Registrations", count: registrations.length },
         { key: "pitch", label: "Pitch Submissions", count: pitchSubs.length },
         { key: "poster", label: "Poster Submissions", count: posterSubs.length },
+        { key: "quiz", label: "Quiz Submissions", count: quizSubs.length },
+        { key: "meme", label: "Meme Submissions", count: memeSubs.length },
         { key: "speakers", label: "Speakers & Tutors", count: speakers.length },
     ];
 
@@ -210,6 +244,9 @@ export default function AdminSymposium() {
         registrations: registrations.filter(r => r.status === "pending").length,
         pitch: pitchSubs.filter(p => p.status === "pending").length,
         poster: posterSubs.filter(p => p.status === "pending").length,
+        quiz: quizSubs.filter(p => p.status === "pending").length,
+        meme: memeSubs.filter(p => p.status === "pending").length,
+        speakers: 0
     };
 
     return (
@@ -398,6 +435,90 @@ export default function AdminSymposium() {
                                             </Button>
                                             <Button size="sm" variant="destructive" disabled={updating === poster.id} onClick={() => updateStatus("symposium_poster_submissions", poster.id, "rejected", noteText)}>
                                                 {updating === poster.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "quiz" && quizSubs.map(quiz => (
+                        <div key={quiz.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === quiz.id ? null : quiz.id)}>
+                                <div>
+                                    <div className="font-semibold">{quiz.name}</div>
+                                    <div className="text-xs text-muted-foreground">{quiz.email} • {quiz.institution || "No institution"}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={quiz.status} />
+                                    {expandedId === quiz.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === quiz.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{quiz.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{quiz.roll_number || "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(quiz.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === quiz.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === quiz.id} onClick={() => updateStatus("symposium_quiz_submissions", quiz.id, "approved", noteText)}>
+                                                {updating === quiz.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === quiz.id} onClick={() => updateStatus("symposium_quiz_submissions", quiz.id, "rejected", noteText)}>
+                                                {updating === quiz.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {tab === "meme" && memeSubs.map(meme => (
+                        <div key={meme.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === meme.id ? null : meme.id)}>
+                                <div>
+                                    <div className="font-semibold">{meme.name}</div>
+                                    <div className="text-xs text-muted-foreground">{meme.email} • {meme.institution || "No institution"}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={meme.status} />
+                                    {expandedId === meme.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === meme.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{meme.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Submitted</span>{new Date(meme.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-muted-foreground block mb-1">Meme Description</span>
+                                        <div className="text-sm bg-muted/30 rounded-lg p-3 whitespace-pre-wrap">{meme.description || "No description provided"}</div>
+                                    </div>
+                                    {meme.meme_url && (
+                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(meme.meme_url!)}>
+                                            <Download className="w-3.5 h-3.5 mr-1.5" /> View Meme Upload
+                                        </Button>
+                                    )}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === meme.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === meme.id} onClick={() => updateStatus("symposium_meme_submissions", meme.id, "approved", noteText)}>
+                                                {updating === meme.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === meme.id} onClick={() => updateStatus("symposium_meme_submissions", meme.id, "rejected", noteText)}>
+                                                {updating === meme.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
                                             </Button>
                                         </div>
                                     </div>

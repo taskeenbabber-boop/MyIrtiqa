@@ -43,9 +43,9 @@ const WORKSHOP_FEE_STUDENT = 500;
 const WORKSHOP_FEE_FACULTY = 1000;
 
 const CONFERENCE_FEE: Record<Category, number> = {
-    NWSM_STUDENT: 1000,
-    OUTSIDER_STUDENT: 1500,
-    FACULTY: 2500,
+    NWSM_STUDENT: 500,
+    OUTSIDER_STUDENT: 1000,
+    FACULTY: 1500,
     OUTSIDER_TEAM_3: 3000,
     OUTSIDER_TEAM_4: 4000,
 };
@@ -84,7 +84,13 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
         if (!category) return 0;
         let total = 0;
         if (wantConference) total += CONFERENCE_FEE[category];
-        if (wantWorkshops && !isTeam) total += formData.selectedWorkshops.length * workshopFee;
+        if (wantWorkshops && !isTeam) {
+            total += formData.selectedWorkshops.length * workshopFee;
+            // Faculty gets a 1000 PKR discount if they pick both workshops + conference (Full Event Pass = 2500)
+            if (wantConference && formData.selectedWorkshops.length === 2 && category === "FACULTY") {
+                total -= 1000;
+            }
+        }
         return total;
     };
 
@@ -295,7 +301,13 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
 
                                 {/* Day 2: Conference */}
                                 <div
-                                    onClick={() => setWantConference(!wantConference)}
+                                    onClick={() => {
+                                        const newVal = !wantConference;
+                                        setWantConference(newVal);
+                                        if (!newVal && (category === "OUTSIDER_TEAM_3" || category === "OUTSIDER_TEAM_4")) {
+                                            setCategory(null);
+                                        }
+                                    }}
                                     className="p-5 rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden"
                                     style={{
                                         background: wantConference
@@ -484,6 +496,12 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                                         <span className="font-bold" style={{ color: ACCENT }}>{(formData.selectedWorkshops.length * workshopFee).toLocaleString()} PKR</span>
                                                     </div>
                                                 )}
+                                                {wantConference && wantWorkshops && formData.selectedWorkshops.length === 2 && category === "FACULTY" && (
+                                                    <div className="flex justify-between text-green-400 text-xs text-green-400/90 pt-1">
+                                                        <span>Full Event Pass Discount</span>
+                                                        <span className="font-bold">-1,000 PKR</span>
+                                                    </div>
+                                                )}
                                                 {wantWorkshops && !isTeam && formData.selectedWorkshops.length === 0 && (
                                                     <div className="flex justify-between text-white/40 text-xs">
                                                         <span>Workshop fee</span>
@@ -616,6 +634,15 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                                         </div>
                                                     ) : null;
                                                 })}
+                                                {wantConference && formData.selectedWorkshops.length === 2 && category === "FACULTY" && (
+                                                    <div className="flex justify-between items-center text-green-400/90 pt-1">
+                                                        <span className="flex items-center gap-2">
+                                                            <CheckCircle className="w-3 h-3" style={{ color: "#4ade80" }} />
+                                                            Full Event Pass Discount
+                                                        </span>
+                                                        <span className="font-bold">-1,000 PKR</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
