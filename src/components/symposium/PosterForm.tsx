@@ -213,10 +213,15 @@ export function PosterForm({ onClose }: PosterFormProps) {
                             </div>
                         </div>
 
-                        <div className="rounded-lg p-3 mb-4 text-xs font-mono text-white/60 text-center" style={{ background: "#000", border: `1px dashed ${BORDER}` }}>
-                            Bank: Bank Islami<br />
-                            Account Title: NWSM NWSM<br />
-                            Account Number: 300900084530001
+                        <div className="rounded-lg p-3 mb-4 text-xs font-mono text-white/60 text-center leading-relaxed" style={{ background: "#000", border: `1px dashed ${BORDER}` }}>
+                            <strong className="text-white">🏦 Meezan Bank Limited</strong><br />
+                            Account Title: Zahoor Ahmed Khan<br />
+                            Account No: 00300113953149<br />
+                            IBAN: PK56MEZN0000300113953149<br /><br />
+                            <strong className="text-white">📱 Easypaisa</strong><br />
+                            Number: 03139802668<br />
+                            Account Title: Zahoor Ahmad Khan<br />
+                            IBAN: PK47TMFB0000000043652207
                         </div>
 
                         <label

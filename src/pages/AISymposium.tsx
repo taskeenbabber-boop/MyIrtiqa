@@ -840,24 +840,7 @@ const AISymposium = () => {
                                                                                 <button onClick={() => setIsDebateFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
                                                                             </>
                                                                         )}
-                                                                        {ev.title.includes('Quiz') && (
-                                                                            <>
-                                                                                <a href="/guidelines/AI_Quiz_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
-                                                                                <button onClick={() => setIsQuizFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
-                                                                            </>
-                                                                        )}
-                                                                        {ev.title.includes('Drill') && (
-                                                                            <>
-                                                                                <a href="/guidelines/AI_Drill_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
-                                                                                <button onClick={() => setIsDrillFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
-                                                                            </>
-                                                                        )}
-                                                                        {ev.title.includes('Debate') && (
-                                                                            <>
-                                                                                <a href="/guidelines/AI_Debate_Competition_Guidelines.pdf" download className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg text-xs font-semibold text-foreground transition-colors hover:bg-muted" style={{ border: `1px solid ${BORDER}` }}>Guidelines</a>
-                                                                                <button onClick={() => setIsDebateFormOpen(true)} className="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90" style={{ background: ACCENT }}>Apply</button>
-                                                                            </>
-                                                                        )}
+
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -1241,7 +1224,7 @@ const AISymposium = () => {
                                         </Button>
 
                                         {/* Competition-specific buttons */}
-                                        {selectedEvent.id === "cmp-4" && (
+                                        {selectedEvent.title.includes('Pitch') && (
                                             <Button
                                                 variant="outline"
                                                 className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
@@ -1253,7 +1236,7 @@ const AISymposium = () => {
                                                 <Lightbulb className="w-4 h-4 mr-2" /> Submit Your Pitch Idea
                                             </Button>
                                         )}
-                                        {selectedEvent.id === "cmp-1" && (
+                                        {selectedEvent.title.includes('Poster') && (
                                             <Button
                                                 variant="outline"
                                                 className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
@@ -1263,6 +1246,54 @@ const AISymposium = () => {
                                                 }}
                                             >
                                                 <Award className="w-4 h-4 mr-2" /> Register Your Poster Topic
+                                            </Button>
+                                        )}
+                                        {selectedEvent.title.includes('Meme') && (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                                onClick={() => {
+                                                    setSelectedEvent(null);
+                                                    setIsMemeFormOpen(true);
+                                                }}
+                                            >
+                                                <Award className="w-4 h-4 mr-2" /> Submit Your Best Meme
+                                            </Button>
+                                        )}
+                                        {selectedEvent.title.includes('Quiz') && (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                                onClick={() => {
+                                                    setSelectedEvent(null);
+                                                    setIsQuizFormOpen(true);
+                                                }}
+                                            >
+                                                <Lightbulb className="w-4 h-4 mr-2" /> Register for AI Quiz
+                                            </Button>
+                                        )}
+                                        {selectedEvent.title.includes('Drill') && (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                                onClick={() => {
+                                                    setSelectedEvent(null);
+                                                    setIsDrillFormOpen(true);
+                                                }}
+                                            >
+                                                <Zap className="w-4 h-4 mr-2" /> Join the AI Drill
+                                            </Button>
+                                        )}
+                                        {selectedEvent.title.includes('Debate') && (
+                                            <Button
+                                                variant="outline"
+                                                className="w-full font-bold h-12 text-sm uppercase tracking-widest rounded-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                                                onClick={() => {
+                                                    setSelectedEvent(null);
+                                                    setIsDebateFormOpen(true);
+                                                }}
+                                            >
+                                                <Users className="w-4 h-4 mr-2" /> Register for AI Debate
                                             </Button>
                                         )}
                                     </div>
