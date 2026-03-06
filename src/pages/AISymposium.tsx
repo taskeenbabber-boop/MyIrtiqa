@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X, MapPin, Clock, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb, ShieldCheck } from "lucide-react";
+import { X, MapPin, Clock, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb, ShieldCheck, FileDown, Sparkles, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { RegistrationForm } from "@/components/symposium/RegistrationForm";
@@ -47,26 +47,26 @@ const BORDER = "hsl(var(--border))";
 const SYMPOSIUM_EVENTS = [
     {
         id: "ws-1", category: "Workshop", title: "AI for Note Taking",
-        speaker: "Haroon", speakerRole: "AI Specialist",
-        speakerImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
+        speaker: "Muhammad Haroon", speakerRole: "AI Specialist & App Developer",
+        speakerImage: "https://media.discordapp.net/attachments/1430237872471932928/1479312599358247216/Haroon-Head-SHot.png?ex=69ab94b7&is=69aa4337&hm=a580dc09cbd79f66317e9f197ffde943e39655423e28ebbf08b380afef5cd3da",
         location: "Workshop Room 1", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-Note-Taking.png",
-        description: "Learn how to leverage AI tools for efficient medical and academic note-taking. This workshop covers structure, synthesis, and retrieval of complex clinical information using cutting-edge NLP models.",
+        description: "Led by Muhammad Haroon — a final-year MBBS student at Saidu Medical College with a deep passion for technology and AI. To simplify exam preparation for medical students, he created two powerful apps: MedMaster and ProffMaster, along with comprehensive study notes that help students study smarter and perform better. In this workshop, you'll learn how to leverage AI tools for efficient medical and academic note-taking, covering structure, synthesis, and retrieval of complex clinical information using cutting-edge NLP models.",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "45 Seats"
     },
     {
         id: "ws-2", category: "Workshop", title: "Prompt Engineering & AI in Design",
-        speaker: "Mr. Asad", speakerRole: "Design Lead",
-        speakerImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150",
+        speaker: "Mr. Asad", speakerRole: "Visual Artist",
+        speakerImage: "https://media.discordapp.net/attachments/1430237872471932928/1479312598603399369/Asad-Head-SHot.png?ex=69ab94b7&is=69aa4337&hm=b808aadaa9357766d3084ad14deb370e0b3c29783cb1c855bb132b12238c1b47",
         location: "Workshop Room 2", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/Prompt-Engineering.png",
-        description: "Master the art of prompt engineering for both text and visual generation. Essential for structuring research queries and creating academic/medical design materials securely.",
+        description: "Session Topics: (1) What is Prompt & Prompt Engineering? (2) How to Talk to AI in Design Language (3) Generative AI Tools for Designers — ChatGPT, Nano Banana, Canva AI (4) Building a Brand from Scratch Using AI. Fun Activities & Ice Breakers: (1) AI Prompt Battle — Live Challenge (2) Prompt Build & Break — Practical Activity (3) Sell the Duck: The Quack Pitch — an engaging team game. Important: Bring your laptop, a pen, and a diary… because, why not?",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "50 Seats"
     },
     {
         id: "ws-3", category: "Workshop", title: "AI in Research",
-        speaker: "Iftikhar", speakerRole: "Research Fellow",
-        speakerImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150",
+        speaker: "Iftikhar", speakerRole: "Member NASA Astrology | MS5 FMH Lahore | 61 Publications | Founder IRC",
+        speakerImage: "https://media.discordapp.net/attachments/1430237872471932928/1479312600037589184/Iftikhar-khan-Head-SHot.png?ex=69ab94b8&is=69aa4338&hm=37629f02004320011d8bf970780236de85b8e55b110d93cffc887df4baace67c",
         location: "Workshop Room 1", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-in-Research.png",
         description: "A comprehensive guide to utilizing AI in literature review, data synthesis, and manuscript structuring while maintaining absolute academic integrity and bias awareness.",
@@ -112,10 +112,11 @@ const SYMPOSIUM_EVENTS = [
         id: "cmp-1", category: "Competition", title: "AI Poster Competition",
         speaker: "Individual Participants", speakerRole: "Researchers",
         speakerImage: "https://images.unsplash.com/photo-1587614295999-6c1c13675117?auto=format&fit=crop&q=80&w=150",
-        location: "Exhibition Hall", time: "TBA", date: "11 Apr 2026",
+        location: "Front Lobby", time: "TBA", date: "11 Apr 2026",
         image: "/icons/AI-Poster-Competition.png",
         description: "Individual poster presentation with a live demonstration of a chosen AI tool. Covers background, medical applications, ethical concerns, and future possibilities.",
-        fee: "Included in Conference Pass", capacity: "Variable"
+        fee: "Included in Conference Pass", capacity: "Variable",
+        guidelinesUrl: "/guidelines/AI_Poster_Competition_Guidelines.pdf"
     },
     {
         id: "cmp-2", category: "Competition", title: "AI Drill",
@@ -124,7 +125,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Computer Lab", time: "1 Hour", date: "11 Apr 2026",
         image: "/icons/AI-Drill.png",
         description: "Fast, structured problem-solving challenge. Participants receive a medical case or research problem and have one hour to work through it using AI tools.",
-        fee: "Included in Conference Pass", capacity: "Variable"
+        fee: "Included in Conference Pass", capacity: "Variable",
+        guidelinesUrl: "/guidelines/AI_Drill_Competition_Guidelines.pdf"
     },
     {
         id: "cmp-3", category: "Competition", title: "AI Debate",
@@ -133,7 +135,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Debate Hall", time: "TBA", date: "11 Apr 2026",
         image: "/icons/AI-Debate.png",
         description: "Two-sided debate on motions like AI in clinical decisions, privacy threats, or role replacement. Judges evaluate structured reasoning and grounded understanding of healthcare AI.",
-        fee: "Included in Conference Pass", capacity: "Structured Bracket"
+        fee: "Included in Conference Pass", capacity: "Structured Bracket",
+        guidelinesUrl: "/guidelines/AI_Debate_Competition_Guidelines.pdf"
     },
     {
         id: "cmp-4", category: "Competition", title: "AI Pitch Competition",
@@ -142,7 +145,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Pitch Room", time: "5m Pitch + 3m Q&A", date: "11 Apr 2026",
         image: "/icons/AI-Pitch-Competition.png",
         description: "Propose original AI-based solutions to a medical/research problem. Must include problem statement, AI solution, feasibility, workflow, and impact.",
-        fee: "Included in Conference Pass", capacity: "Limited Slots"
+        fee: "Included in Conference Pass", capacity: "Limited Slots",
+        guidelinesUrl: "/guidelines/AI_Pitch_Guidelines.pdf"
     },
     {
         id: "cmp-5", category: "Competition", title: "AI Quiz",
@@ -151,7 +155,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Quiz Hall", time: "TBA", date: "11 Apr 2026",
         image: "/icons/AI-Drill.png",
         description: "Test your knowledge of AI concepts, applications in healthcare, and cutting-edge research. Rapid-fire quiz rounds covering AI fundamentals, medical AI, and ethical considerations.",
-        fee: "Included in Conference Pass", capacity: "Open"
+        fee: "Included in Conference Pass", capacity: "Open",
+        guidelinesUrl: "/guidelines/AI_Quiz_Competition_Guidelines.pdf"
     },
     {
         id: "cmp-6", category: "Competition", title: "AI Memes Competition",
@@ -160,7 +165,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Online + Venue", time: "TBA", date: "11 Apr 2026",
         image: "/icons/AI-Debate.png",
         description: "Create the funniest, most relatable AI-themed memes! Entries judged on creativity, humor, relevance to AI in healthcare, and originality. Submit online or in-person.",
-        fee: "Included in Conference Pass", capacity: "Unlimited"
+        fee: "Included in Conference Pass", capacity: "Unlimited",
+        guidelinesUrl: "/guidelines/Meme_Competition_Guidelines.pdf"
     }
 ];
 
@@ -170,7 +176,7 @@ const STATS = [
     { value: "13+", label: "Sessions & Events" },
     { value: "4", label: "Hands-on Workshops" },
     { value: "2", label: "Days of Innovation" },
-    { value: "500+", label: "Expected Delegates" },
+    { value: "1500+", label: "Expected Delegates" },
 ];
 
 const MARQUEE_ITEMS = ["Artificial Intelligence", "Neurosurgery", "Clinical Diagnostics", "Prompt Engineering", "Research Innovation", "Global Surgery", "Healthcare AI"];
@@ -674,6 +680,74 @@ const AISymposium = () => {
                         ))}
                     </div>
                 </div>
+
+                {/* ══ PRICING BANNER ══ */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="mt-16 relative overflow-hidden rounded-3xl"
+                    style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1e1b4b 100%)', border: `1px solid rgba(59,130,246,0.2)` }}
+                >
+                    {/* Decorative elements */}
+                    <div className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent)', transform: 'translate(30%, -30%)' }} />
+                    <div className="absolute bottom-0 left-0 w-60 h-60 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, rgba(168,85,247,0.4), transparent)', transform: 'translate(-20%, 30%)' }} />
+                    <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+                    <div className="relative z-10 p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                        {/* Left: Text */}
+                        <div className="flex-1 text-center lg:text-left">
+                            <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[4px] uppercase px-4 py-2 rounded-full mb-6" style={{ background: 'rgba(59,130,246,0.15)', color: ACCENT_LIGHT, border: '1px solid rgba(59,130,246,0.2)' }}>
+                                <Sparkles className="w-3 h-3" /> Unbeatable Value
+                            </div>
+                            <h3 className="text-3xl md:text-4xl font-black text-white uppercase leading-tight mb-3">
+                                Full 2-Day <span style={{ color: ACCENT_LIGHT }}>Conference Pass</span>
+                            </h3>
+                            <p className="text-white/40 leading-relaxed max-w-md">
+                                Access all keynotes, panels, competitions, networking sessions, and a verifiable digital certificate — two full days of innovation for an incredibly affordable price.
+                            </p>
+                        </div>
+
+                        {/* Right: Price cards */}
+                        <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
+                            {/* General Price */}
+                            <div className="rounded-2xl p-6 text-center min-w-[200px] relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
+                                <Tag className="w-5 h-5 mx-auto mb-3" style={{ color: ACCENT_LIGHT }} />
+                                <div className="text-xs font-bold uppercase tracking-wider text-white/40 mb-2">General Admission</div>
+                                <div className="flex items-baseline justify-center gap-1">
+                                    <span className="text-sm text-white/40 font-medium">Rs.</span>
+                                    <span className="text-5xl font-black text-white">2,000</span>
+                                </div>
+                                <div className="text-[10px] text-white/30 mt-2 uppercase tracking-wider">Per Person</div>
+                            </div>
+
+                            {/* Student Price */}
+                            <div className="rounded-2xl p-6 text-center min-w-[200px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(168,85,247,0.15))', border: `1px solid ${ACCENT}`, backdropFilter: 'blur(10px)' }}>
+                                <div className="absolute -top-1 -right-1 px-3 py-1 rounded-bl-xl rounded-tr-xl text-[9px] font-bold uppercase tracking-wider" style={{ background: ACCENT, color: '#000' }}>Save 25%</div>
+                                <Award className="w-5 h-5 mx-auto mb-3" style={{ color: ACCENT_LIGHT }} />
+                                <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: ACCENT_LIGHT }}>NWS Students</div>
+                                <div className="flex items-baseline justify-center gap-1">
+                                    <span className="text-sm font-medium" style={{ color: ACCENT_LIGHT }}>Rs.</span>
+                                    <span className="text-5xl font-black text-white">1,500</span>
+                                </div>
+                                <div className="text-[10px] text-white/30 mt-2 uppercase tracking-wider">With Valid Student ID</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="relative z-10 px-8 md:px-12 lg:px-16 pb-8 md:pb-12 flex justify-center lg:justify-start">
+                        <button
+                            onClick={() => setIsRegistrationOpen(true)}
+                            className="group inline-flex items-center gap-3 text-black font-bold text-sm uppercase tracking-widest px-8 py-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]"
+                            style={{ background: `linear-gradient(135deg, ${ACCENT_LIGHT}, ${ACCENT})` }}
+                        >
+                            Secure Your Pass Now
+                            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+                    </div>
+                </motion.div>
             </section>
 
             {/* ═══════════════ EVENT SCHEDULE TIMELINE ═══════════════ */}
@@ -967,21 +1041,52 @@ const AISymposium = () => {
                                     </div>
                                 </div>
 
-                                {/* Speaker + Arrow */}
+                                {/* Speaker / Competition Actions */}
                                 <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
-                                    <div className="flex items-center gap-3">
-                                        <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
-                                        <div>
-                                            <p className="text-sm font-semibold text-foreground">{ev.speaker}</p>
-                                            <p className="text-xs text-muted-foreground">{ev.speakerRole}</p>
+                                    {ev.category === 'Competition' ? (
+                                        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                            {(ev as any).guidelinesUrl && (
+                                                <a
+                                                    href={(ev as any).guidelinesUrl}
+                                                    download
+                                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-foreground transition-all duration-200 hover:bg-muted"
+                                                    style={{ border: `1px solid ${BORDER}` }}
+                                                >
+                                                    <FileDown className="w-3.5 h-3.5" /> Guidelines
+                                                </a>
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    if (ev.title.includes('Pitch')) setIsPitchFormOpen(true);
+                                                    else if (ev.title.includes('Poster')) setIsPosterFormOpen(true);
+                                                    else if (ev.title.includes('Meme')) setIsMemeFormOpen(true);
+                                                    else if (ev.title.includes('Quiz')) setIsQuizFormOpen(true);
+                                                    else if (ev.title.includes('Drill')) setIsDrillFormOpen(true);
+                                                    else if (ev.title.includes('Debate')) setIsDebateFormOpen(true);
+                                                }}
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:opacity-90 hover:scale-105 hover:shadow-lg"
+                                                style={{ background: ACCENT, boxShadow: '0 4px 15px rgba(59,130,246,0.3)' }}
+                                            >
+                                                Apply Now
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div
-                                        className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
-                                        style={{ borderColor: "#333", color: "#666" }}
-                                    >
-                                        <ArrowUpRight className="w-4 h-4" />
-                                    </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center gap-3">
+                                                <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
+                                                <div>
+                                                    <p className="text-sm font-semibold text-foreground">{ev.speaker}</p>
+                                                    <p className="text-xs text-muted-foreground max-w-[180px] truncate">{ev.speakerRole}</p>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
+                                                style={{ borderColor: "#333", color: "#666" }}
+                                            >
+                                                <ArrowUpRight className="w-4 h-4" />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </motion.div>
                         ))
