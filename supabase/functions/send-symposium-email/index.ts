@@ -29,17 +29,8 @@ const statusColors = {
 function buildConfirmationHtml(
   name: string,
   type: string,
-  extras: { registrationCode?: string; whatsappLink?: string } = {}
+  extras: { whatsappLink?: string } = {}
 ): string {
-  const codeBlock = extras.registrationCode
-    ? `
-      <div style="margin:24px 0;padding:20px;background:#0a0a0a;border:2px dashed rgba(59,130,246,0.3);border-radius:16px;text-align:center;">
-        <p style="color:rgba(255,255,255,0.3);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;font-weight:700;">Your Registration Code</p>
-        <p style="color:#3b82f6;font-size:32px;font-weight:900;margin:0;letter-spacing:6px;font-family:monospace;">${extras.registrationCode}</p>
-        <p style="color:rgba(255,255,255,0.25);font-size:11px;margin:8px 0 0;">Present this code at the registration desk</p>
-      </div>`
-    : "";
-
   const whatsappBlock = extras.whatsappLink
     ? `
       <div style="margin-top:24px;text-align:center;">
