@@ -335,6 +335,35 @@ const Ambassadors = () => {
                                 Results Coming Soon
                             </div>
                         </motion.div>
+                    ) : !isLive ? (
+                        <motion.div
+                            key="not-live"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="max-w-2xl mx-auto rounded-3xl p-12 md:p-16 text-center"
+                            style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+                        >
+                            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: 'rgba(168,85,247,0.1)' }}>
+                                <Clock className="w-10 h-10 text-purple-400" />
+                            </div>
+                            <h3 className="text-2xl md:text-3xl font-black text-foreground mb-4 uppercase">Applications Opening Soon</h3>
+                            <p className="text-gray-500 dark:text-white/40 leading-relaxed text-lg mb-8">
+                                The Campus Ambassador Program applications will officially go live at <strong>10:00 PM PKT tonight</strong>! Get ready to represent the IRTIQA AI Symposium at your college.
+                            </p>
+
+                            <div className="flex gap-4 justify-center">
+                                {[{ v: launch.hours, l: 'Hrs' }, { v: launch.minutes, l: 'Min' }, { v: launch.seconds, l: 'Sec' }].map(u => (
+                                    <div key={u.l} className="text-center">
+                                        <div className="rounded-2xl p-4 md:p-6 mb-2" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(10px)" }}>
+                                            <span className="text-3xl md:text-5xl font-black text-white tabular-nums">
+                                                {String(u.v).padStart(2, '0')}
+                                            </span>
+                                        </div>
+                                        <span className="text-[10px] uppercase tracking-[3px] text-white/30 font-bold">{u.l}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
                     ) : submitted ? (
                         <motion.div
                             key="success"

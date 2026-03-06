@@ -56,11 +56,11 @@ const SYMPOSIUM_EVENTS = [
     },
     {
         id: "ws-2", category: "Workshop", title: "Prompt Engineering & AI in Design",
-        speaker: "Mr. Asad", speakerRole: "Visual Artist",
+        speaker: "Asad Raziq", speakerRole: "Visual Artist",
         speakerImage: "https://i.ibb.co/FkGZRYpd/Asad-Head-SHot.png",
         location: "Workshop Room 2", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/Prompt-Engineering.png",
-        description: "Session Topics: (1) What is Prompt & Prompt Engineering? (2) How to Talk to AI in Design Language (3) Generative AI Tools for Designers — ChatGPT, Nano Banana, Canva AI (4) Building a Brand from Scratch Using AI. Fun Activities & Ice Breakers: (1) AI Prompt Battle — Live Challenge (2) Prompt Build & Break — Practical Activity (3) Sell the Duck: The Quack Pitch — an engaging team game. Important: Bring your laptop, a pen, and a diary… because, why not?",
+        description: "Discover how to think, design, and build with AI. This session explores the power of prompt engineering, how to communicate with AI in a designer’s language, and how tools like ChatGPT, Nano Banana, and Canva AI can transform ideas into visuals and personal brands. With interactive fun sessions like AI Prompt Battle, Prompt Build & Break, and Sell the Duck: The Quack Pitch, participants will learn, experiment, and compete while unlocking new ways to create with AI. Important: Bring your laptop, a pen, and a diary… because, why not?",
         fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
     },
     {

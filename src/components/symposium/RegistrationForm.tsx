@@ -73,7 +73,6 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
         teamMembers: ["", "", ""],
         selectedWorkshops: [] as string[],
         receiptFile: null as File | null,
-        registrationCode: "",
     });
 
     const isTeam = category === "OUTSIDER_TEAM_3" || category === "OUTSIDER_TEAM_4";
@@ -150,9 +149,6 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
             const totalAmount = calculateTotal();
             const confFee = wantConference && category ? CONFERENCE_FEE[category] : 0;
 
-            // Generate unique registration code
-            const regCode = "IRTIQA-" + Math.random().toString(36).substring(2, 6).toUpperCase();
-
             const { error } = await (supabase as any).from("symposium_registrations").insert({
                 ticket_type: category,
                 name: formData.name,
@@ -170,12 +166,10 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                 wants_conference: wantConference,
                 workshop_fee_per: workshopFee,
                 conference_fee: confFee,
-                registration_code: regCode,
             });
 
             if (error) throw error;
             setSubmitted(true);
-            setFormData(prev => ({ ...prev, registrationCode: regCode }));
 
             // Send confirmation email (fire-and-forget)
             supabase.functions.invoke("send-symposium-email", {
@@ -184,7 +178,6 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                     to: formData.email,
                     name: formData.name,
                     type: "registration",
-                    registrationCode: regCode,
                 },
             }).catch(console.error);
         } catch (err: any) {
@@ -242,13 +235,6 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                         <CheckCircle className="w-8 h-8 text-emerald-400" />
                     </div>
                     <h2 className="text-2xl font-black text-white uppercase tracking-wide mb-3">Registration Received!</h2>
-                    {formData.registrationCode && (
-                        <div className="mb-5 p-4 rounded-xl" style={{ background: '#0a0a0a', border: '2px dashed rgba(59,130,246,0.3)' }}>
-                            <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2 font-bold">Your Registration Code</p>
-                            <p className="text-2xl font-black tracking-[4px] font-mono" style={{ color: ACCENT }}>{formData.registrationCode}</p>
-                            <p className="text-[10px] text-white/20 mt-2">Present this code at the registration desk</p>
-                        </div>
-                    )}
                     <p className="text-white/40 text-sm leading-relaxed mb-6">
                         Thank you for registering. Our team will verify your payment and send a confirmation email to <strong className="text-white/60">{formData.email}</strong> within 24–48 hours.
                     </p>

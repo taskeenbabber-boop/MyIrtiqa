@@ -80,7 +80,6 @@ function buildConfirmationHtml(
         Your <strong style="color:rgba(255,255,255,0.7);">${type === "registration" ? "Symposium Registration" : type === "ambassador" ? "Campus Ambassador Application" : type.charAt(0).toUpperCase() + type.slice(1) + " Competition Registration"}</strong> has been received successfully.
         Our team will review your submission and get back to you shortly.
       </p>
-      ${codeBlock}
       ${whatsappBlock}
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid #222;">
         <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0 0 16px;">Event Details</p>
