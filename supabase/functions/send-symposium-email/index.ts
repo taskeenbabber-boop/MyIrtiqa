@@ -96,8 +96,17 @@ function buildConfirmationHtml(
 }
 
 /* ═══════ Status update email HTML (existing) ═══════ */
-function buildStatusHtml(name: string, status: string, type: string, notes: string): string {
+function buildStatusHtml(name: string, status: string, type: string, notes: string, registrationCode?: string): string {
   const s = statusColors[status as keyof typeof statusColors] || statusColors.approved;
+
+  const codeSection = registrationCode && status === "approved"
+    ? `
+      <div style="margin:24px 0;padding:20px;background:#0a0a0a;border:2px dashed rgba(59,130,246,0.3);border-radius:16px;text-align:center;">
+        <p style="color:rgba(255,255,255,0.3);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px;font-weight:700;">Your Unique Registration Code</p>
+        <p style="color:#3b82f6;font-size:32px;font-weight:900;margin:0;letter-spacing:6px;font-family:monospace;">${registrationCode}</p>
+        <p style="color:rgba(255,255,255,0.25);font-size:11px;margin:8px 0 0;">Please present this code at the registration desk on the day of the event.</p>
+      </div>`
+    : "";
 
   return `
 <!DOCTYPE html>
@@ -135,6 +144,7 @@ function buildStatusHtml(name: string, status: string, type: string, notes: stri
       ? "has been reviewed and approved. We look forward to seeing you at the AI Symposium!"
       : "has been reviewed. Unfortunately, we were unable to accept your application at this time."}
       </p>
+      ${codeSection}
       ${notes ? `
       <div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid #222;">
         <p style="color:rgba(255,255,255,0.3);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;font-weight:700;">Note from organizers</p>
@@ -213,11 +223,11 @@ Deno.serve(async (req: Request) => {
     let fromAddr: string;
 
     if (mode === "confirmation") {
-      html = buildConfirmationHtml(name, type, { registrationCode, whatsappLink });
-      subject = getConfirmationSubject(type, registrationCode);
+      html = buildConfirmationHtml(name, type, { whatsappLink });
+      subject = getConfirmationSubject(type);
       fromAddr = FROM_ADDRESSES[type] || FROM_ADDRESSES.default;
     } else {
-      html = buildStatusHtml(name, status, type, notes || "");
+      html = buildStatusHtml(name, status, type, notes || "", registrationCode);
       subject = status === "approved"
         ? `✓ Your ${type} has been approved — AI Symposium 2026`
         : `Update on your ${type} — AI Symposium 2026`;

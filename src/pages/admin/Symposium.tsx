@@ -209,7 +209,15 @@ export default function AdminSymposium() {
         try {
             const updatePayload: any = { status: newStatus };
             if (notes !== undefined) updatePayload.admin_notes = notes;
-            if (table === "symposium_registrations") updatePayload.updated_at = new Date().toISOString();
+
+            let regCode: string | undefined = undefined;
+            if (table === "symposium_registrations") {
+                updatePayload.updated_at = new Date().toISOString();
+                if (newStatus === "approved") {
+                    regCode = "IRTIQA-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+                    updatePayload.registration_code = regCode;
+                }
+            }
 
             await (supabase as any).from(table).update(updatePayload).eq("id", id);
 
@@ -235,6 +243,7 @@ export default function AdminSymposium() {
                             status: newStatus,
                             type: table.replace("symposium_", "").replace("_submissions", "").replace("_", " "),
                             notes: notes || "",
+                            registrationCode: regCode,
                         },
                     });
                 }
@@ -252,7 +261,7 @@ export default function AdminSymposium() {
     };
 
     const getDownloadUrl = async (path: string) => {
-        const { data } = await supabase.storage.from("symposium-uploads").createSignedUrl(path, 3600);
+        const { data } = await supabase.storage.from("symposium-uploads").createSignedUrl(path, 3600, { download: false });
         if (data?.signedUrl) window.open(data.signedUrl, "_blank");
     };
 
@@ -360,7 +369,7 @@ export default function AdminSymposium() {
                                 <div className="flex items-center gap-4">
                                     <div>
                                         <div className="font-semibold">{reg.name}</div>
-                                        <div className="text-xs text-muted-foreground">{reg.email} • {reg.ticket_type.replace(/_/g, " ")}</div>
+                                        <div className="text-xs text-muted-foreground">{reg.email} • {reg.ticket_type?.replace(/_/g, " ") || "No Ticket Type"}</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
