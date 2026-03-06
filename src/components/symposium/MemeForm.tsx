@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, CheckCircle, ArrowUpRight, Loader2, Image as ImageIcon, FileText } from "lucide-react";
+import { X, CheckCircle, ArrowUpRight, Loader2, Instagram, Mail, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,38 +22,22 @@ export function MemeForm({ onClose }: MemeFormProps) {
         phone: "",
         institution: "",
         memeDescription: "",
-        memeFile: null as File | null,
     });
 
-    const canSubmit = formData.name.trim() && formData.email.trim() && formData.phone.trim() && (formData.memeDescription.trim() || formData.memeFile);
+    const canSubmit = formData.name.trim() && formData.email.trim() && formData.phone.trim() && formData.memeDescription.trim();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!canSubmit) return;
 
-        if (formData.memeFile && formData.memeFile.size > 5 * 1024 * 1024) {
-            alert("Meme image must be less than 5MB.");
-            return;
-        }
-
         setSubmitting(true);
         try {
-            let memeUrl: string | null = null;
-            if (formData.memeFile) {
-                const ext = formData.memeFile.name.split(".").pop();
-                const path = `memes/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-                const { error: uploadError } = await supabase.storage
-                    .from("symposium-uploads")
-                    .upload(path, formData.memeFile);
-                if (!uploadError) memeUrl = path;
-            }
-
             const { error } = await (supabase as any).from("symposium_meme_submissions").insert({
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
                 institution: formData.institution || null,
-                meme_url: memeUrl,
+                meme_url: null,
                 description: formData.memeDescription,
                 status: "pending",
             });
@@ -80,9 +64,9 @@ export function MemeForm({ onClose }: MemeFormProps) {
                     <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "rgba(34,197,94,0.1)" }}>
                         <CheckCircle className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
                     </div>
-                    <h2 className="text-2xl font-black text-foreground uppercase tracking-wide mb-3">Meme Submitted!</h2>
+                    <h2 className="text-2xl font-black text-foreground uppercase tracking-wide mb-3">Registration Received!</h2>
                     <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                        Your meme entry has been received. We'll consult the meme lords and notify you at <strong className="text-foreground">{formData.email}</strong>.
+                        You're registered for the Meme Competition. Don't forget to post your meme and email it to us! We'll contact you at <strong className="text-foreground">{formData.email}</strong>.
                     </p>
                     <button onClick={onClose} className="text-sm font-bold uppercase tracking-widest px-8 py-3 rounded-full text-white" style={{ background: ACCENT }}>Done</button>
                 </motion.div>
@@ -102,7 +86,7 @@ export function MemeForm({ onClose }: MemeFormProps) {
                 <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
                     <div>
                         <h2 className="text-xl font-black text-foreground uppercase tracking-widest">Medical AI Meme Competition</h2>
-                        <p className="text-xs text-muted-foreground mt-1">Submit your dankest, most relatable medical AI memes.</p>
+                        <p className="text-xs text-muted-foreground mt-1">Post your meme, email it to us, and register below!</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <a
@@ -119,26 +103,47 @@ export function MemeForm({ onClose }: MemeFormProps) {
 
                 <div className="p-6 md:p-8 overflow-y-auto flex-grow scrollbar-hide space-y-6">
 
-                    {/* Idea Section */}
-                    <div className="rounded-xl p-4 bg-blue-50/50 dark:bg-blue-900/10" style={{ border: `1px solid ${BORDER}` }}>
-                        <h4 className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2 text-blue-600 dark:text-blue-400">
-                            <ImageIcon className="w-3.5 h-3.5" /> What we're looking for
+                    {/* How It Works */}
+                    <div className="rounded-xl p-5 bg-gradient-to-br from-pink-500/5 to-purple-500/5" style={{ border: `1px solid ${BORDER}` }}>
+                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2" style={{ color: ACCENT }}>
+                            How to Participate
                         </h4>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                            Create a meme that hilariously captures the intersection of Artificial Intelligence and Medicine. Whether it's ChatGPT diagnosing a cold as cancer, or doctors arguing with WebMD algorithms, make us laugh.
-                            <br /><br />
-                            <strong>Formats:</strong> Public link to image/post.
-                            <br />
-                            <strong>Rules:</strong> Keep it clean, keep it relevant to AI in Healthcare/Medical student life.
-                        </p>
+                        <div className="space-y-3">
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: ACCENT, color: '#000' }}>1</div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    <strong className="text-foreground">Create your meme</strong> — Make a hilarious meme about AI in Medicine or Medical Student life. Keep it clean and relevant!
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: ACCENT, color: '#000' }}>2</div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    <strong className="text-foreground">Post on Instagram</strong> — Share your meme as a collaboration post with{" "}
+                                    <a href="https://www.instagram.com/irtiqa_research/" target="_blank" rel="noopener noreferrer" className="font-bold hover:underline" style={{ color: ACCENT }}>@irtiqa_research</a>
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: ACCENT, color: '#000' }}>3</div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    <strong className="text-foreground">Email your meme</strong> — Send the same meme image to{" "}
+                                    <a href="mailto:info.irtiqa@gmail.com" className="font-bold hover:underline" style={{ color: ACCENT }}>info.irtiqa@gmail.com</a>
+                                </p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold" style={{ background: ACCENT, color: '#000' }}>4</div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    <strong className="text-foreground">Register below</strong> — Fill in your details and mention your Instagram post link in the description.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Personal details */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                            { id: "m-name", label: "Full Name", placeholder: "Meme Lord Name", value: formData.name, key: "name" as const },
-                            { id: "m-email", label: "Email", placeholder: "your@email.com", value: formData.email, key: "email" as const },
-                            { id: "m-phone", label: "Phone / WhatsApp", placeholder: "+92 ...", value: formData.phone, key: "phone" as const },
+                            { id: "m-name", label: "Full Name *", placeholder: "Your full name", value: formData.name, key: "name" as const },
+                            { id: "m-email", label: "Email *", placeholder: "your@email.com", value: formData.email, key: "email" as const },
+                            { id: "m-phone", label: "Phone / WhatsApp *", placeholder: "+92 ...", value: formData.phone, key: "phone" as const },
                             { id: "m-inst", label: "Institution", placeholder: "Your institution", value: formData.institution, key: "institution" as const },
                         ].map(f => (
                             <div key={f.id} className="space-y-2">
@@ -152,37 +157,13 @@ export function MemeForm({ onClose }: MemeFormProps) {
                         ))}
                     </div>
 
-                    {/* Meme Upload OR Link */}
-                    <div className="space-y-4">
-                        <Label className="text-xs font-bold uppercase tracking-widest" style={{ color: ACCENT }}>Upload Your Meme *</Label>
-                        <p className="text-[11px] text-muted-foreground -mt-1">Upload your image below OR paste a public link in the description.</p>
-
-                        <label
-                            htmlFor="memeUpload"
-                            className="flex flex-col items-center justify-center w-full h-32 rounded-xl cursor-pointer group transition-all"
-                            style={{ border: `2px dashed ${BORDER}`, background: "rgba(0,0,0,0.2)" }}
-                        >
-                            <ImageIcon className="w-8 h-8 mb-2 text-white/20 group-hover:text-white/40 transition-colors" />
-                            <p className="text-sm text-white/40 group-hover:text-white/70 transition-colors">
-                                <span style={{ color: ACCENT }} className="font-semibold">Click to upload</span> or drag and drop
-                            </p>
-                            <p className="text-xs text-white/20 mt-1">JPG, PNG, GIF (MAX 5MB)</p>
-                            <input id="memeUpload" type="file" className="hidden"
-                                accept="image/*"
-                                onChange={e => setFormData({ ...formData, memeFile: e.target.files?.[0] || null })}
-                            />
-                        </label>
-
-                        {formData.memeFile && (
-                            <div className="flex items-center gap-2 text-xs text-white/60">
-                                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                                <span>{formData.memeFile.name} ({(formData.memeFile.size / 1024 / 1024).toFixed(2)} MB)</span>
-                            </div>
-                        )}
-
+                    {/* Meme Link / Description */}
+                    <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase tracking-widest" style={{ color: ACCENT }}>Instagram Post Link & Description *</Label>
+                        <p className="text-[11px] text-muted-foreground">Paste your Instagram collaboration post link and any additional caption or context.</p>
                         <textarea
                             rows={3}
-                            placeholder="Optional: Provide context, a caption, or a link if you didn't upload..."
+                            placeholder="e.g. https://www.instagram.com/p/... — My meme about AI diagnosing a cold as cancer 😂"
                             value={formData.memeDescription}
                             onChange={e => setFormData({ ...formData, memeDescription: e.target.value })}
                             className="w-full rounded-xl bg-muted/50 text-foreground placeholder-muted-foreground text-sm p-4 resize-none focus:outline-none focus:ring-1"
@@ -199,7 +180,7 @@ export function MemeForm({ onClose }: MemeFormProps) {
                         className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest px-8 py-3 rounded-full text-white transition-all hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
                         style={{ background: ACCENT }}
                     >
-                        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <>Submit Meme <ArrowUpRight className="w-4 h-4" /></>}
+                        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <>Register <ArrowUpRight className="w-4 h-4" /></>}
                     </button>
                 </div>
             </motion.div>

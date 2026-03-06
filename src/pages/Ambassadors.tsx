@@ -166,14 +166,20 @@ const Ambassadors = () => {
                     </div>
 
                     <div className="flex flex-wrap justify-center gap-4">
-                        <button
-                            onClick={scrollToForm}
-                            className="group flex items-center gap-3 text-black font-bold text-sm uppercase tracking-widest px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
-                            style={{ background: ACCENT }}
-                        >
-                            Apply Now
-                            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                        </button>
+                        {!expired ? (
+                            <button
+                                onClick={scrollToForm}
+                                className="group flex items-center gap-3 text-black font-bold text-sm uppercase tracking-widest px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)]"
+                                style={{ background: ACCENT }}
+                            >
+                                Apply Now
+                                <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                            </button>
+                        ) : (
+                            <div className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-bold uppercase tracking-widest" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                Applications Closed
+                            </div>
+                        )}
                     </div>
                 </motion.div>
 
@@ -283,7 +289,30 @@ const Ambassadors = () => {
                 </div>
 
                 <AnimatePresence mode="wait">
-                    {submitted ? (
+                    {expired ? (
+                        <motion.div
+                            key="closed"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="max-w-2xl mx-auto rounded-3xl p-12 md:p-16 text-center"
+                            style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+                        >
+                            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: ACCENT_BG }}>
+                                <CheckCircle className="w-10 h-10" style={{ color: ACCENT }} />
+                            </div>
+                            <h3 className="text-2xl md:text-3xl font-black text-foreground mb-4 uppercase">Applications Closed</h3>
+                            <p className="text-gray-500 dark:text-white/40 leading-relaxed text-lg mb-4">
+                                We received a <strong className="text-foreground">tremendous response</strong> from medical colleges across the country.
+                            </p>
+                            <p className="text-gray-500 dark:text-white/40 leading-relaxed mb-8">
+                                Our team is currently evaluating all applications. Selected ambassadors will be contacted via WhatsApp and email within the next few days. Stay tuned!
+                            </p>
+                            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold" style={{ background: ACCENT_BG, color: ACCENT, border: `1px solid rgba(59,130,246,0.2)` }}>
+                                <Sparkles className="w-4 h-4" />
+                                Results Coming Soon
+                            </div>
+                        </motion.div>
+                    ) : submitted ? (
                         <motion.div
                             key="success"
                             initial={{ opacity: 0, scale: 0.95 }}

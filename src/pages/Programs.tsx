@@ -60,7 +60,68 @@ const Programs = () => {
     <div className="min-h-screen flex flex-col">
 
       <main className="flex-1 pt-16">
-        {/* Hero Section */}
+
+        {/* ═══════════ AI SYMPOSIUM FEATURED EVENT (FIRST) ═══════════ */}
+        <section className="py-20 bg-gradient-to-b from-background to-secondary/50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <div className="inline-flex items-center bg-blue-500/10 text-blue-500 rounded-full px-4 py-2 text-sm font-semibold mb-4">
+                  🔥 Upcoming Event
+                </div>
+                <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-4">
+                  AI Symposium <span className="text-gradient">2026</span>
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  A landmark two-day event exploring the intersection of Artificial Intelligence and Healthcare — featuring workshops, keynotes, panel discussions, and exciting competitions.
+                </p>
+              </div>
+
+              <Card className="overflow-hidden bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20 shadow-xl hover:shadow-2xl transition-shadow">
+                <CardContent className="p-8 md:p-12">
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-6">
+                      <div className="flex flex-wrap gap-3">
+                        <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold">Workshops</span>
+                        <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 text-xs font-semibold">Keynotes</span>
+                        <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-semibold">Competitions</span>
+                        <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold">Panels</span>
+                      </div>
+                      <div className="space-y-3 text-muted-foreground">
+                        <div className="flex items-center gap-3">
+                          <Clock className="h-5 w-5 text-primary flex-shrink-0" />
+                          <span>April 10–11, 2026 — Two full days</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Users className="h-5 w-5 text-primary flex-shrink-0" />
+                          <span>Industry experts, researchers & professionals</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Award className="h-5 w-5 text-primary flex-shrink-0" />
+                          <span>Verifiable digital certificates for all participants</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center md:items-end gap-4 text-center md:text-right">
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Starting from</div>
+                        <div className="text-5xl font-heading font-bold text-primary">Rs. 500</div>
+                        <div className="text-sm text-muted-foreground mt-1">NWSM Student Conference Pass</div>
+                      </div>
+                      <Button asChild size="lg" className="shadow-lg hover:shadow-xl transition-all w-full sm:w-auto">
+                        <Link to="/ai-symposium">
+                          Explore AI Symposium <ArrowRight className="ml-2 h-5 w-5" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════ HERO — 15 Day Series ═══════════ */}
         <section className="bg-gradient-to-br from-primary to-primary-dark text-primary-foreground py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center space-y-6 animate-fade-in">
@@ -258,65 +319,6 @@ const Programs = () => {
           </div>
         </section>
 
-        {/* AI Symposium Featured Event */}
-        <section className="py-20 bg-gradient-to-b from-background to-secondary/50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center bg-blue-500/10 text-blue-500 rounded-full px-4 py-2 text-sm font-semibold mb-4">
-                  🔥 Upcoming Event
-                </div>
-                <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground mb-4">
-                  AI Symposium <span className="text-gradient">2026</span>
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  A landmark two-day event exploring the intersection of Artificial Intelligence and Healthcare — featuring workshops, keynotes, panel discussions, and exciting competitions.
-                </p>
-              </div>
-
-              <Card className="overflow-hidden bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20 shadow-xl hover:shadow-2xl transition-shadow">
-                <CardContent className="p-8 md:p-12">
-                  <div className="grid md:grid-cols-2 gap-8 items-center">
-                    <div className="space-y-6">
-                      <div className="flex flex-wrap gap-3">
-                        <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold">Workshops</span>
-                        <span className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 text-xs font-semibold">Keynotes</span>
-                        <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-semibold">Competitions</span>
-                        <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold">Panels</span>
-                      </div>
-                      <div className="space-y-3 text-muted-foreground">
-                        <div className="flex items-center gap-3">
-                          <Clock className="h-5 w-5 text-primary flex-shrink-0" />
-                          <span>April 10–11, 2026 — Two full days</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Users className="h-5 w-5 text-primary flex-shrink-0" />
-                          <span>Industry experts, researchers & professionals</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Award className="h-5 w-5 text-primary flex-shrink-0" />
-                          <span>Verifiable digital certificates for all participants</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center md:items-end gap-4 text-center md:text-right">
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Starting from</div>
-                        <div className="text-5xl font-heading font-bold text-primary">Rs. 500</div>
-                        <div className="text-sm text-muted-foreground mt-1">NWSM Student Conference Pass</div>
-                      </div>
-                      <Button asChild size="lg" className="shadow-lg hover:shadow-xl transition-all w-full sm:w-auto">
-                        <Link to="/ai-symposium">
-                          Explore AI Symposium <ArrowRight className="ml-2 h-5 w-5" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
       </main>
     </div>
   );

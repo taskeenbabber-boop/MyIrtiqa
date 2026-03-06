@@ -48,7 +48,7 @@ const SYMPOSIUM_EVENTS = [
     {
         id: "ws-1", category: "Workshop", title: "AI for Note Taking",
         speaker: "Muhammad Haroon", speakerRole: "AI Specialist & App Developer",
-        speakerImage: "https://media.discordapp.net/attachments/1430237872471932928/1479312599358247216/Haroon-Head-SHot.png?ex=69ab94b7&is=69aa4337&hm=a580dc09cbd79f66317e9f197ffde943e39655423e28ebbf08b380afef5cd3da",
+        speakerImage: "https://i.ibb.co/LdhCMhkb/Haroon-Head-SHot.png",
         location: "Workshop Room 1", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-Note-Taking.png",
         description: "Led by Muhammad Haroon — a final-year MBBS student at Saidu Medical College with a deep passion for technology and AI. To simplify exam preparation for medical students, he created two powerful apps: MedMaster and ProffMaster, along with comprehensive study notes that help students study smarter and perform better. In this workshop, you'll learn how to leverage AI tools for efficient medical and academic note-taking, covering structure, synthesis, and retrieval of complex clinical information using cutting-edge NLP models.",
@@ -57,7 +57,7 @@ const SYMPOSIUM_EVENTS = [
     {
         id: "ws-2", category: "Workshop", title: "Prompt Engineering & AI in Design",
         speaker: "Mr. Asad", speakerRole: "Visual Artist",
-        speakerImage: "https://media.discordapp.net/attachments/1430237872471932928/1479312598603399369/Asad-Head-SHot.png?ex=69ab94b7&is=69aa4337&hm=b808aadaa9357766d3084ad14deb370e0b3c29783cb1c855bb132b12238c1b47",
+        speakerImage: "https://i.ibb.co/FkGZRYpd/Asad-Head-SHot.png",
         location: "Workshop Room 2", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/Prompt-Engineering.png",
         description: "Session Topics: (1) What is Prompt & Prompt Engineering? (2) How to Talk to AI in Design Language (3) Generative AI Tools for Designers — ChatGPT, Nano Banana, Canva AI (4) Building a Brand from Scratch Using AI. Fun Activities & Ice Breakers: (1) AI Prompt Battle — Live Challenge (2) Prompt Build & Break — Practical Activity (3) Sell the Duck: The Quack Pitch — an engaging team game. Important: Bring your laptop, a pen, and a diary… because, why not?",
@@ -66,7 +66,7 @@ const SYMPOSIUM_EVENTS = [
     {
         id: "ws-3", category: "Workshop", title: "AI in Research",
         speaker: "Iftikhar", speakerRole: "Member NASA Astrology | MS5 FMH Lahore | 61 Publications | Founder IRC",
-        speakerImage: "https://media.discordapp.net/attachments/1430237872471932928/1479312600037589184/Iftikhar-khan-Head-SHot.png?ex=69ab94b8&is=69aa4338&hm=37629f02004320011d8bf970780236de85b8e55b110d93cffc887df4baace67c",
+        speakerImage: "https://i.ibb.co/Y70W3nx6/Iftikhar-khan-Head-SHot.png",
         location: "Workshop Room 1", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-in-Research.png",
         description: "A comprehensive guide to utilizing AI in literature review, data synthesis, and manuscript structuring while maintaining absolute academic integrity and bias awareness.",
@@ -75,7 +75,7 @@ const SYMPOSIUM_EVENTS = [
     {
         id: "ws-4", category: "Workshop", title: "Clinical Audit & AI in Clinical Use",
         speaker: "Dr. Almas Fasih Khattak", speakerRole: "Asst. Director GSRH | Director Research HMC",
-        speakerImage: "https://media.discordapp.net/attachments/1028403543364870157/1479338537923907625/Almas_Fasih_Khattak.jpg?ex=69abace0&is=69aa5b60&hm=bce0da4e6b4c242fa4938c2522e8da7aacea5acc1a9ace490e770f42bb807adf",
+        speakerImage: "https://i.ibb.co/gbhNLhWy/Almas-Fasih-Khattak.jpg",
         location: "Workshop Room 2", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/Clinical-Audit.png",
         description: "Exploring the practical application of AI in clinical settings. Covering diagnostic support algorithms, patient data auditing, and the integration of AI models in secure hospital workflows.",
@@ -1073,15 +1073,15 @@ const AISymposium = () => {
                                         </div>
                                     ) : (
                                         <div className="hidden lg:flex items-center gap-4">
-                                            <div className="flex items-center gap-3">
-                                                <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
-                                                <div>
-                                                    <p className="text-sm font-semibold text-foreground">{ev.speaker}</p>
-                                                    <p className="text-xs text-muted-foreground max-w-[180px] truncate">{ev.speakerRole}</p>
+                                            <div className="flex items-center gap-3 w-[220px]">
+                                                <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: BORDER }} />
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-semibold text-foreground truncate">{ev.speaker}</p>
+                                                    <p className="text-xs text-muted-foreground truncate">{ev.speakerRole}</p>
                                                 </div>
                                             </div>
                                             <div
-                                                className="w-10 h-10 rounded-full border flex items-center justify-center group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
+                                                className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
                                                 style={{ borderColor: "#333", color: "#666" }}
                                             >
                                                 <ArrowUpRight className="w-4 h-4" />

@@ -59,7 +59,7 @@ export function Header() {
 
         {/* CTA Button */}
         <div className="hidden lg:flex items-center space-x-4">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
           {user ? <>
             <Button asChild variant="ghost" size="sm">
               <Link to="/library">My Library</Link>
@@ -107,7 +107,7 @@ export function Header() {
           </Link>)}
           <div className="px-4 pt-4 space-y-2">
             <div className="flex justify-center pb-2">
-              <ThemeToggle />
+              {/* <ThemeToggle /> */}
             </div>
             {user ? <>
               <Button asChild variant="outline" className="w-full mb-2">
