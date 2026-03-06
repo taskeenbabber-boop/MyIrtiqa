@@ -38,6 +38,10 @@ const AppContent = () => {
     const [showWhatsApp, setShowWhatsApp] = useState(false);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
+    useEffect(() => {
         const handleScroll = () => {
             const scrolled = window.scrollY;
             const halfPage = document.documentElement.scrollHeight * 0.3;
