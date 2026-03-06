@@ -681,6 +681,35 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
+                    {tab === "ambassadors" && ambassadorApps.length > 0 && (
+                        <div className="flex justify-between items-center mb-4">
+                            <p className="text-sm text-muted-foreground">{ambassadorApps.length} application(s)</p>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                    const headers = ["Full Name", "Email", "WhatsApp", "Social URL", "Institution", "Year of Study", "Leadership Experience", "Promotional Strategy", "Status", "Admin Notes", "Applied On"];
+                                    const rows = ambassadorApps.map(a => [
+                                        a.full_name, a.email, a.whatsapp, a.social_url || "", a.institution, a.year_of_study,
+                                        `"${(a.leadership_experience || "").replace(/"/g, '""')}"`,
+                                        `"${(a.promotional_strategy || "").replace(/"/g, '""')}"`,
+                                        a.status, a.admin_notes || "", new Date(a.created_at).toLocaleDateString()
+                                    ]);
+                                    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+                                    const blob = new Blob([csv], { type: "text/csv" });
+                                    const url = URL.createObjectURL(blob);
+                                    const link = document.createElement("a");
+                                    link.href = url;
+                                    link.download = `ambassador_applications_${new Date().toISOString().slice(0, 10)}.csv`;
+                                    link.click();
+                                    URL.revokeObjectURL(url);
+                                }}
+                            >
+                                <Download className="w-3.5 h-3.5 mr-1.5" /> Export CSV
+                            </Button>
+                        </div>
+                    )}
+
                     {tab === "ambassadors" && ambassadorApps.map(app => (
                         <div key={app.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}>
