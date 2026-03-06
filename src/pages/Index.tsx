@@ -249,6 +249,12 @@ const Index = () => {
                       Register Now <ArrowRight className="w-4 h-4" />
                     </Link>
                     <Link
+                      to="/ambassadors"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-full transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(245,158,11,0.3)]"
+                    >
+                      <Users className="w-4 h-4" /> Become an Ambassador
+                    </Link>
+                    <Link
                       to="/ai-symposium"
                       className="inline-flex items-center gap-2 text-white/70 hover:text-white font-semibold text-sm uppercase tracking-wider px-6 py-3 rounded-full border border-white/20 hover:border-white/40 transition-all"
                     >

@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "registrations" | "pitch" | "poster" | "quiz" | "drill" | "debate" | "meme" | "speakers";
+type Tab = "registrations" | "pitch" | "poster" | "quiz" | "drill" | "debate" | "meme" | "ambassadors" | "speakers";
 type Status = "pending" | "approved" | "rejected";
 
 interface Registration {
@@ -102,6 +102,21 @@ interface MemeSubmission {
     created_at: string;
 }
 
+interface AmbassadorApplication {
+    id: string;
+    full_name: string;
+    email: string;
+    whatsapp: string;
+    social_url: string | null;
+    institution: string;
+    year_of_study: string;
+    leadership_experience: string;
+    promotional_strategy: string;
+    status: string;
+    admin_notes: string | null;
+    created_at: string;
+}
+
 interface Speaker {
     id: string;
     name: string;
@@ -143,6 +158,7 @@ export default function AdminSymposium() {
     const [drillSubs, setDrillSubs] = useState<DrillSubmission[]>([]);
     const [debateSubs, setDebateSubs] = useState<DebateSubmission[]>([]);
     const [memeSubs, setMemeSubs] = useState<MemeSubmission[]>([]);
+    const [ambassadorApps, setAmbassadorApps] = useState<AmbassadorApplication[]>([]);
     const [speakers, setSpeakers] = useState<Speaker[]>([]);
     const [loading, setLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -159,7 +175,7 @@ export default function AdminSymposium() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [regRes, pitchRes, posterRes, quizRes, drillRes, debateRes, memeRes, speakersRes] = await Promise.all([
+            const [regRes, pitchRes, posterRes, quizRes, drillRes, debateRes, memeRes, ambassadorRes, speakersRes] = await Promise.all([
                 (supabase as any).from("symposium_registrations").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_pitch_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_poster_submissions").select("*").order("created_at", { ascending: false }),
@@ -167,6 +183,7 @@ export default function AdminSymposium() {
                 (supabase as any).from("symposium_drill_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_debate_submissions").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_meme_submissions").select("*").order("created_at", { ascending: false }),
+                (supabase as any).from("symposium_ambassador_applications").select("*").order("created_at", { ascending: false }),
                 (supabase as any).from("symposium_speakers").select("*").order("created_at", { ascending: false }),
             ]);
             setRegistrations(regRes.data || []);
@@ -176,6 +193,7 @@ export default function AdminSymposium() {
             setDrillSubs(drillRes.data || []);
             setDebateSubs(debateRes.data || []);
             setMemeSubs(memeRes.data || []);
+            setAmbassadorApps(ambassadorRes.data || []);
             setSpeakers(speakersRes.data || []);
         } catch (err) {
             console.error("Failed to fetch symposium data:", err);
@@ -204,6 +222,10 @@ export default function AdminSymposium() {
                 else if (table === "symposium_drill_submissions") item = drillSubs.find(p => p.id === id);
                 else if (table === "symposium_debate_submissions") item = debateSubs.find(p => p.id === id);
                 else if (table === "symposium_meme_submissions") item = memeSubs.find(p => p.id === id);
+                else if (table === "symposium_ambassador_applications") {
+                    const app = ambassadorApps.find(a => a.id === id);
+                    if (app) item = { ...app, name: app.full_name } as any;
+                }
 
                 if (item && (newStatus === "approved" || newStatus === "rejected")) {
                     await supabase.functions.invoke("send-symposium-email", {
@@ -274,6 +296,7 @@ export default function AdminSymposium() {
         { key: "drill", label: "Drill Submissions", count: drillSubs.length },
         { key: "debate", label: "Debate Submissions", count: debateSubs.length },
         { key: "meme", label: "Meme Submissions", count: memeSubs.length },
+        { key: "ambassadors", label: "Ambassadors", count: ambassadorApps.length },
         { key: "speakers", label: "Speakers & Tutors", count: speakers.length },
     ];
 
@@ -285,6 +308,7 @@ export default function AdminSymposium() {
         drill: drillSubs.filter(p => p.status === "pending").length,
         debate: debateSubs.filter(p => p.status === "pending").length,
         meme: memeSubs.filter(p => p.status === "pending").length,
+        ambassadors: ambassadorApps.filter(a => a.status === "pending").length,
         speakers: 0
     };
 
@@ -657,6 +681,53 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
+                    {tab === "ambassadors" && ambassadorApps.map(app => (
+                        <div key={app.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}>
+                                <div>
+                                    <div className="font-semibold">{app.full_name}</div>
+                                    <div className="text-xs text-muted-foreground">{app.email} • {app.institution} • {app.year_of_study}</div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <StatusBadge status={app.status} />
+                                    {expandedId === app.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                </div>
+                            </div>
+                            {expandedId === app.id && (
+                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                        <div><span className="text-muted-foreground block text-xs">WhatsApp</span>{app.whatsapp}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Social</span>{app.social_url ? <a href={app.social_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{app.social_url.substring(0, 30)}...</a> : "—"}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Institution</span>{app.institution}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Applied</span>{new Date(app.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-muted-foreground block mb-1">Leadership / PR Experience</span>
+                                        <div className="text-sm bg-muted/30 rounded-lg p-3 whitespace-pre-wrap">{app.leadership_experience}</div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-muted-foreground block mb-1">Promotional Strategy</span>
+                                        <div className="text-sm bg-muted/30 rounded-lg p-3 whitespace-pre-wrap">{app.promotional_strategy}</div>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                        <div className="flex-grow">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === app.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                        </div>
+                                        <div className="flex gap-2 items-end">
+                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === app.id} onClick={() => updateStatus("symposium_ambassador_applications", app.id, "approved", noteText)}>
+                                                {updating === app.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Accept
+                                            </Button>
+                                            <Button size="sm" variant="destructive" disabled={updating === app.id} onClick={() => updateStatus("symposium_ambassador_applications", app.id, "rejected", noteText)}>
+                                                {updating === app.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
                     {tab === "speakers" && (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
@@ -735,6 +806,12 @@ export default function AdminSymposium() {
                         <div className="text-center py-16 text-muted-foreground">
                             <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
                             <p className="font-medium">No poster submissions yet</p>
+                        </div>
+                    )}
+                    {tab === "ambassadors" && ambassadorApps.length === 0 && (
+                        <div className="text-center py-16 text-muted-foreground">
+                            <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                            <p className="font-medium">No ambassador applications yet</p>
                         </div>
                     )}
                 </div>

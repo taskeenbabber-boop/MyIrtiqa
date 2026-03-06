@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Library from "./pages/Library";
 import Checkout from "./pages/Checkout";
 import AISymposium from "./pages/AISymposium";
+import Ambassadors from "./pages/Ambassadors";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminOverview from "./pages/admin/Overview";
 import AdminOrders from "./pages/admin/Orders";
@@ -62,6 +63,7 @@ const AppContent = () => {
                 <Route path="/library" element={<Library />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/ai-symposium" element={<AISymposium />} />
+                <Route path="/ambassadors" element={<Ambassadors />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminDashboard />}>

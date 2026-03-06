@@ -52,7 +52,7 @@ const SYMPOSIUM_EVENTS = [
         location: "Workshop Room 1", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-Note-Taking.png",
         description: "Led by Muhammad Haroon — a final-year MBBS student at Saidu Medical College with a deep passion for technology and AI. To simplify exam preparation for medical students, he created two powerful apps: MedMaster and ProffMaster, along with comprehensive study notes that help students study smarter and perform better. In this workshop, you'll learn how to leverage AI tools for efficient medical and academic note-taking, covering structure, synthesis, and retrieval of complex clinical information using cutting-edge NLP models.",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "45 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
     },
     {
         id: "ws-2", category: "Workshop", title: "Prompt Engineering & AI in Design",
@@ -61,7 +61,7 @@ const SYMPOSIUM_EVENTS = [
         location: "Workshop Room 2", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/Prompt-Engineering.png",
         description: "Session Topics: (1) What is Prompt & Prompt Engineering? (2) How to Talk to AI in Design Language (3) Generative AI Tools for Designers — ChatGPT, Nano Banana, Canva AI (4) Building a Brand from Scratch Using AI. Fun Activities & Ice Breakers: (1) AI Prompt Battle — Live Challenge (2) Prompt Build & Break — Practical Activity (3) Sell the Duck: The Quack Pitch — an engaging team game. Important: Bring your laptop, a pen, and a diary… because, why not?",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "50 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
     },
     {
         id: "ws-3", category: "Workshop", title: "AI in Research",
@@ -70,16 +70,16 @@ const SYMPOSIUM_EVENTS = [
         location: "Workshop Room 1", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-in-Research.png",
         description: "A comprehensive guide to utilizing AI in literature review, data synthesis, and manuscript structuring while maintaining absolute academic integrity and bias awareness.",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "40 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
     },
     {
         id: "ws-4", category: "Workshop", title: "Clinical Audit & AI in Clinical Use",
-        speaker: "Dr. Almas Fasih Khattak", speakerRole: "Clinical Director",
-        speakerImage: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150",
+        speaker: "Dr. Almas Fasih Khattak", speakerRole: "Asst. Director GSRH | Director Research HMC",
+        speakerImage: "https://media.discordapp.net/attachments/1028403543364870157/1479338537923907625/Almas_Fasih_Khattak.jpg?ex=69abace0&is=69aa5b60&hm=bce0da4e6b4c242fa4938c2522e8da7aacea5acc1a9ace490e770f42bb807adf",
         location: "Workshop Room 2", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/Clinical-Audit.png",
         description: "Exploring the practical application of AI in clinical settings. Covering diagnostic support algorithms, patient data auditing, and the integration of AI models in secure hospital workflows.",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "60 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
     },
     {
         id: "kn-1", category: "Keynote", title: "AI and the Future of Global Surgery",
@@ -726,7 +726,7 @@ const AISymposium = () => {
                             <div className="rounded-2xl p-6 text-center min-w-[200px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(168,85,247,0.15))', border: `1px solid ${ACCENT}`, backdropFilter: 'blur(10px)' }}>
                                 <div className="absolute -top-1 -right-1 px-3 py-1 rounded-bl-xl rounded-tr-xl text-[9px] font-bold uppercase tracking-wider" style={{ background: ACCENT, color: '#000' }}>Save 25%</div>
                                 <Award className="w-5 h-5 mx-auto mb-3" style={{ color: ACCENT_LIGHT }} />
-                                <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: ACCENT_LIGHT }}>NWS Students</div>
+                                <div className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: ACCENT_LIGHT }}>NWSM Students</div>
                                 <div className="flex items-baseline justify-center gap-1">
                                     <span className="text-sm font-medium" style={{ color: ACCENT_LIGHT }}>Rs.</span>
                                     <span className="text-5xl font-black text-white">1,500</span>
@@ -1042,21 +1042,22 @@ const AISymposium = () => {
                                 </div>
 
                                 {/* Speaker / Competition Actions */}
-                                <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
+                                <div className="flex items-center gap-4 flex-shrink-0">
                                     {ev.category === 'Competition' ? (
                                         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                                             {(ev as any).guidelinesUrl && (
                                                 <a
                                                     href={(ev as any).guidelinesUrl}
                                                     download
-                                                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-foreground transition-all duration-200 hover:bg-muted"
+                                                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-foreground transition-all duration-200 hover:bg-muted"
                                                     style={{ border: `1px solid ${BORDER}` }}
                                                 >
                                                     <FileDown className="w-3.5 h-3.5" /> Guidelines
                                                 </a>
                                             )}
                                             <button
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     if (ev.title.includes('Pitch')) setIsPitchFormOpen(true);
                                                     else if (ev.title.includes('Poster')) setIsPosterFormOpen(true);
                                                     else if (ev.title.includes('Meme')) setIsMemeFormOpen(true);
@@ -1064,14 +1065,14 @@ const AISymposium = () => {
                                                     else if (ev.title.includes('Drill')) setIsDrillFormOpen(true);
                                                     else if (ev.title.includes('Debate')) setIsDebateFormOpen(true);
                                                 }}
-                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:opacity-90 hover:scale-105 hover:shadow-lg"
+                                                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold text-white transition-all duration-200 hover:opacity-90 hover:scale-105 hover:shadow-lg"
                                                 style={{ background: ACCENT, boxShadow: '0 4px 15px rgba(59,130,246,0.3)' }}
                                             >
                                                 Apply Now
                                             </button>
                                         </div>
                                     ) : (
-                                        <>
+                                        <div className="hidden lg:flex items-center gap-4">
                                             <div className="flex items-center gap-3">
                                                 <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2" style={{ borderColor: BORDER }} />
                                                 <div>
@@ -1085,7 +1086,7 @@ const AISymposium = () => {
                                             >
                                                 <ArrowUpRight className="w-4 h-4" />
                                             </div>
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             </motion.div>
@@ -1298,20 +1299,44 @@ const AISymposium = () => {
                                             </div>
                                         </div>
 
-                                        {/* Right: Speaker card */}
+                                        {/* Right: Speaker or Competition actions */}
                                         <div className="md:w-56 flex-shrink-0">
-                                            <div className="rounded-2xl p-6 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <h3 className="text-[10px] font-bold uppercase tracking-[3px] mb-5" style={{ color: ACCENT }}>Speaker</h3>
-                                                <img src={selectedEvent.speakerImage} alt={selectedEvent.speaker} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2" style={{ borderColor: BORDER }} />
-                                                <div className="text-white font-bold text-base">{selectedEvent.speaker}</div>
-                                                <div className="text-sm font-medium mt-1" style={{ color: ACCENT }}>{selectedEvent.speakerRole}</div>
-                                                <p className="text-[9px] text-white/15 mt-3 italic leading-relaxed">Speakers and schedule are subject to change based on availability.</p>
-                                            </div>
+                                            {selectedEvent.category === 'Competition' ? (
+                                                <>
+                                                    {/* Guidelines PDF */}
+                                                    {(selectedEvent as any).guidelinesUrl && (
+                                                        <a
+                                                            href={(selectedEvent as any).guidelinesUrl}
+                                                            download
+                                                            className="flex items-center justify-center gap-2 w-full rounded-2xl p-5 text-sm font-bold text-foreground transition-all duration-200 hover:bg-white/5 mb-4"
+                                                            style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+                                                        >
+                                                            <FileDown className="w-5 h-5" style={{ color: ACCENT }} />
+                                                            <span>Download Guidelines</span>
+                                                        </a>
+                                                    )}
 
-                                            <div className="mt-4 rounded-xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
-                                                <span className="block text-[10px] text-white/30 uppercase tracking-wider mb-1">Registration Fee</span>
-                                                <span className="text-sm font-bold" style={{ color: ACCENT }}>{selectedEvent.fee}</span>
-                                            </div>
+                                                    <div className="rounded-xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                        <span className="block text-[10px] text-white/30 uppercase tracking-wider mb-1">Registration Fee</span>
+                                                        <span className="text-sm font-bold" style={{ color: ACCENT }}>{selectedEvent.fee}</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="rounded-2xl p-6 text-center" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                        <h3 className="text-[10px] font-bold uppercase tracking-[3px] mb-5" style={{ color: ACCENT }}>Speaker</h3>
+                                                        <img src={selectedEvent.speakerImage} alt={selectedEvent.speaker} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2" style={{ borderColor: BORDER }} />
+                                                        <div className="text-white font-bold text-base">{selectedEvent.speaker}</div>
+                                                        <div className="text-sm font-medium mt-1" style={{ color: ACCENT }}>{selectedEvent.speakerRole}</div>
+                                                        <p className="text-[9px] text-white/15 mt-3 italic leading-relaxed">Speakers and schedule are subject to change based on availability.</p>
+                                                    </div>
+
+                                                    <div className="mt-4 rounded-xl p-4" style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+                                                        <span className="block text-[10px] text-white/30 uppercase tracking-wider mb-1">Registration Fee</span>
+                                                        <span className="text-sm font-bold" style={{ color: ACCENT }}>{selectedEvent.fee}</span>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
