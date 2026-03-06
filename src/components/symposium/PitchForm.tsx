@@ -79,6 +79,10 @@ export function PitchForm({ onClose }: PitchFormProps) {
 
             if (error) throw error;
             setSubmitted(true);
+            // Send confirmation email (fire-and-forget)
+            supabase.functions.invoke("send-symposium-email", {
+                body: { mode: "confirmation", to: formData.email, name: formData.name, type: "pitch" },
+            }).catch(console.error);
         } catch (err) {
             console.error("Pitch submission error:", err);
             alert("Your pitch has been submitted! We'll review it shortly.");

@@ -60,6 +60,10 @@ export function DebateForm({ onClose }: DebateFormProps) {
             });
             if (error) throw error;
             setSubmitted(true);
+            // Send confirmation email (fire-and-forget)
+            supabase.functions.invoke("send-symposium-email", {
+                body: { mode: "confirmation", to: formData.email, name: formData.name, type: "debate" },
+            }).catch(console.error);
         } catch (err) {
             console.error("Debate submission error:", err);
             alert("Your debate registration has been received! We'll review it shortly.");

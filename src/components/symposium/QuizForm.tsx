@@ -60,6 +60,10 @@ export function QuizForm({ onClose }: QuizFormProps) {
             });
             if (error) throw error;
             setSubmitted(true);
+            // Send confirmation email (fire-and-forget)
+            supabase.functions.invoke("send-symposium-email", {
+                body: { mode: "confirmation", to: formData.email, name: formData.name, type: "quiz" },
+            }).catch(console.error);
         } catch (err) {
             console.error("Quiz submission error:", err);
             alert("Your quiz registration has been received! We'll review it shortly.");

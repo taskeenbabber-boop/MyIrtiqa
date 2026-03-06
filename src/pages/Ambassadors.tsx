@@ -18,6 +18,9 @@ const ACCENT_BG = "rgba(59,130,246,0.08)";
 /* ═══════ deadline: 8 March 2026, 11:59 PM PKT (UTC+5) ═══════ */
 const DEADLINE = new Date("2026-03-08T23:59:00+05:00").getTime();
 
+/* ═══════ launch gate: 6 March 2026, 10:00 PM PKT ═══════ */
+const LAUNCH_TIME = new Date("2026-03-06T22:00:00+05:00").getTime();
+
 /* ═══════ perks data ═══════ */
 const PERKS = [
     {
@@ -58,6 +61,11 @@ const YEAR_OPTIONS = [
     "4th Year (MBBS/BDS)",
     "Final Year (MBBS/BDS)",
     "House Officer / Intern",
+    "Nursing Student",
+    "Pharmacy / Pharm-D",
+    "DPT (Physiotherapy)",
+    "Allied Health Sciences",
+    "Other Program",
 ];
 
 /* ═══════ countdown hook ═══════ */
@@ -80,6 +88,8 @@ const Ambassadors = () => {
     const { toast } = useToast();
     const formRef = useRef<HTMLDivElement>(null);
     const { days, hours, minutes, seconds, expired } = useCountdown(DEADLINE);
+    const launch = useCountdown(LAUNCH_TIME);
+    const isLive = !launch.expired ? false : true;
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
@@ -118,6 +128,17 @@ const Ambassadors = () => {
             setSubmitted(true);
             toast({ title: "Application Submitted!", description: "We'll review your application and get back to you soon." });
             setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+
+            // Send confirmation email with WhatsApp group link (fire-and-forget)
+            supabase.functions.invoke("send-symposium-email", {
+                body: {
+                    mode: "confirmation",
+                    to: form.email,
+                    name: form.full_name,
+                    type: "ambassador",
+                    whatsappLink: "https://chat.whatsapp.com/FCrFhpcEZqI1TvoyHi8cLX?mode=gi_t",
+                },
+            }).catch(console.error);
         } catch (err: any) {
             console.error("Ambassador form error:", err);
             toast({ title: "Submission Failed", description: err.message || "Please try again.", variant: "destructive" });
@@ -157,17 +178,31 @@ const Ambassadors = () => {
                     </h1>
 
                     <p className="text-sm sm:text-base md:text-lg text-white/50 max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
-                        Represent the <strong className="text-white/80">AI Symposium 2026</strong> at your medical college.
+                        Represent the <strong className="text-white/80">AI Symposium 2026</strong> at your college or university.
                         Build your professional network and unlock exclusive rewards.
                     </p>
 
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-medium mb-8 sm:mb-10" style={{ background: "rgba(239,68,68,0.08)", color: "#f87171", border: "1px solid rgba(239,68,68,0.15)" }}>
                         <Shield className="w-3.5 h-3.5" />
-                        Only 2 Ambassadors per Medical College
+                        Only 2 Ambassadors per College
                     </div>
 
                     <div className="flex flex-wrap justify-center gap-3">
-                        {!expired ? (
+                        {!isLive ? (
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-xs sm:text-sm font-medium uppercase tracking-wider" style={{ background: 'rgba(168,85,247,0.08)', color: '#a78bfa', border: '1px solid rgba(168,85,247,0.15)' }}>
+                                    <Clock className="w-3.5 h-3.5" /> Launching Tonight at 10:00 PM PKT
+                                </div>
+                                <div className="flex gap-3">
+                                    {[{ v: launch.hours, l: 'Hrs' }, { v: launch.minutes, l: 'Min' }, { v: launch.seconds, l: 'Sec' }].map(u => (
+                                        <div key={u.l} className="text-center">
+                                            <div className="text-2xl sm:text-3xl font-bold text-white tabular-nums">{String(u.v).padStart(2, '0')}</div>
+                                            <div className="text-[9px] uppercase tracking-widest text-white/20">{u.l}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : !expired ? (
                             <button
                                 onClick={scrollToForm}
                                 className="group flex items-center gap-2 text-white font-semibold text-sm uppercase tracking-wider px-8 sm:px-10 py-3.5 sm:py-4 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(59,130,246,0.25)]"
@@ -290,7 +325,7 @@ const Ambassadors = () => {
                             </div>
                             <h3 className="text-2xl md:text-3xl font-black text-foreground mb-4 uppercase">Applications Closed</h3>
                             <p className="text-gray-500 dark:text-white/40 leading-relaxed text-lg mb-4">
-                                We received a <strong className="text-foreground">tremendous response</strong> from medical colleges across the country.
+                                We received a <strong className="text-foreground">tremendous response</strong> from colleges across the country.
                             </p>
                             <p className="text-gray-500 dark:text-white/40 leading-relaxed mb-8">
                                 Our team is currently evaluating all applications. Selected ambassadors will be contacted via WhatsApp and email within the next few days. Stay tuned!
@@ -400,7 +435,7 @@ const Ambassadors = () => {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
-                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-white/30 mb-2">Medical College / Institution *</label>
+                                        <label className="block text-[10px] font-bold uppercase tracking-wider text-white/30 mb-2">College / University / Institution *</label>
                                         <input
                                             required
                                             value={form.institution}
