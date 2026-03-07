@@ -283,7 +283,7 @@ Deno.serve(async (req: Request) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY} `,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
         from: fromAddr,
@@ -294,7 +294,14 @@ Deno.serve(async (req: Request) => {
     });
 
     const data = await res.json();
-    return new Response(JSON.stringify({ success: true, ...data }), { headers: corsHeaders });
+
+    if (!res.ok) {
+      console.error("[EMAIL ERROR] Resend API failed:", data);
+    } else {
+      console.log(`[EMAIL SUCCESS] Sent to ${to}`);
+    }
+
+    return new Response(JSON.stringify({ success: res.ok, ...data }), { headers: corsHeaders });
   } catch (error: any) {
     return new Response(
       JSON.stringify({ error: error.message }),
