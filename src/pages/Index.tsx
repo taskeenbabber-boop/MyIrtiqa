@@ -61,7 +61,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
 
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section className="relative pt-16 overflow-hidden min-h-[60vh] md:min-h-[85vh]">
+      <section className="relative py-16 lg:py-24 overflow-hidden min-h-[60vh] lg:min-h-[85vh] flex flex-col justify-center">
         <ScientificBackground />
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/30 via-background/60 to-background pointer-events-none" />
 
@@ -243,7 +243,7 @@ const Index = () => {
                     </div>
                     <div className="flex items-center gap-3 text-white/70">
                       <Users className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                      <span className="text-sm">150+ Expected Attendees</span>
+                      <span className="text-sm">1500+ Expected Attendees</span>
                     </div>
                   </div>
 

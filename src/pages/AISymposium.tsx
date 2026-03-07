@@ -237,7 +237,7 @@ const AISymposium = () => {
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
 
             {/* ═══════════════ HERO ═══════════════ */}
-            <header ref={heroRef} className="relative min-h-[85svh] md:min-h-screen pt-24 pb-16 md:py-0 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50/80 via-white to-white dark:from-[#0a0a0a] dark:via-[#0a0a0a] dark:to-[#0a0a0a]">
+            <header ref={heroRef} className="relative min-h-[80vh] py-24 lg:min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50/80 via-white to-white dark:from-[#0a0a0a] dark:via-[#0a0a0a] dark:to-[#0a0a0a]">
                 {/* Grid background */}
                 <div className="absolute inset-0 z-0" style={{
                     backgroundImage: 'linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px)',
@@ -403,7 +403,7 @@ const AISymposium = () => {
                     </motion.div>
 
                     {/* ═══ MOBILE CARDS (Below CTAs, fills empty space) ═══ */}
-                    <div className="flex lg:hidden flex-wrap justify-center gap-4 mt-12 w-full max-w-2xl px-2">
+                    <div className="flex lg:hidden flex-wrap justify-center gap-4 mt-8 w-full max-w-2xl px-2 z-20">
                         {/* Event Date */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="rounded-2xl border border-blue-100 dark:border-white/10 p-4 w-[160px] bg-white/80 dark:bg-slate-900/60 shadow-lg text-left" style={{ backdropFilter: 'blur(10px)' }}>
                             <div className="flex items-center gap-2 mb-2">
@@ -430,7 +430,7 @@ const AISymposium = () => {
                             <div className="grid grid-cols-4 gap-2 text-center">
                                 <div><div className="text-sm font-black text-gray-900 dark:text-white">6</div><div className="text-[8px] text-gray-400 uppercase">Workshops</div></div>
                                 <div><div className="text-sm font-black text-gray-900 dark:text-white">3</div><div className="text-[8px] text-gray-400 uppercase">Keynotes</div></div>
-                                <div><div className="text-sm font-black text-gray-900 dark:text-white">2</div><div className="text-[8px] text-gray-400 uppercase">Competitions</div></div>
+                                <div><div className="text-sm font-black text-gray-900 dark:text-white">6</div><div className="text-[8px] text-gray-400 uppercase">Competitions</div></div>
                                 <div><div className="text-sm font-black text-gray-900 dark:text-white">4</div><div className="text-[8px] text-gray-400 uppercase">Panels</div></div>
                             </div>
                         </motion.div>
@@ -617,7 +617,7 @@ const AISymposium = () => {
                                     <div className="text-[9px] text-gray-400 dark:text-white/30">Keynotes</div>
                                 </div>
                                 <div>
-                                    <div className="text-lg font-black text-gray-900 dark:text-white">2</div>
+                                    <div className="text-lg font-black text-gray-900 dark:text-white">6</div>
                                     <div className="text-[9px] text-gray-400 dark:text-white/30">Competitions</div>
                                 </div>
                                 <div>
