@@ -374,17 +374,17 @@ export default function AdminSymposium() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <StatusBadge status={reg.status} />
-                                    <span className="font-bold text-primary">{reg.total_amount.toLocaleString()} PKR</span>
+                                    <span className="font-bold text-primary">{(reg.total_amount || 0).toLocaleString()} PKR</span>
                                     {expandedId === reg.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                 </div>
                             </div>
                             {expandedId === reg.id && (
                                 <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{reg.phone}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{reg.phone || "—"}</div>
                                         <div><span className="text-muted-foreground block text-xs">Institution</span>{reg.institution || "—"}</div>
                                         <div><span className="text-muted-foreground block text-xs">Roll Number</span>{reg.roll_number || "—"}</div>
-                                        <div><span className="text-muted-foreground block text-xs">Registered</span>{new Date(reg.created_at).toLocaleDateString()}</div>
+                                        <div><span className="text-muted-foreground block text-xs">Registered</span>{reg.created_at ? new Date(reg.created_at).toLocaleDateString() : "—"}</div>
                                     </div>
                                     {reg.selected_workshops?.length > 0 && (
                                         <div>

@@ -52,7 +52,7 @@ const fadeUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.6, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] as any },
   }),
 };
 
@@ -117,25 +117,35 @@ const Index = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-2"
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
             >
-              <Button asChild size="lg" className="w-full sm:w-auto shadow-medium hover:shadow-large transition-smooth group">
-                <Link to="/ai-symposium">
-                  <Zap className="mr-2 h-5 w-5" />
-                  AI Symposium 2026
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto shadow-soft hover:shadow-medium transition-smooth">
-                <Link to="/programs">
-                  Explore Programs
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" size="lg" className="w-full sm:w-auto transition-smooth">
-                <Link to="/verify">
-                  Verify Certificate
-                </Link>
-              </Button>
+              <Link
+                to="/ai-symposium"
+                className="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold text-white transition-all duration-300 rounded-full shadow-[0_0_40px_rgba(59,130,246,0.3)] hover:shadow-[0_0_60px_rgba(59,130,246,0.5)] hover:-translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #2563eb, #3b82f6)" }}
+              >
+                <Zap className="mr-2 h-4 w-4" />
+                AI Symposium 2026
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <Link
+                to="/ambassadors"
+                className="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold text-white transition-all duration-300 rounded-full hover:-translate-y-0.5 shadow-lg border border-purple-500/30 hover:border-purple-400/50"
+                style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.8), rgba(99,102,241,0.8))", backdropFilter: "blur(10px)" }}
+              >
+                <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Sparkles className="w-4 h-4 mr-2" />
+                Become an Ambassador
+              </Link>
+
+              <Link
+                to="/verify"
+                className="w-full sm:w-auto group inline-flex items-center justify-center px-8 py-3.5 text-sm font-semibold transition-all duration-300 rounded-full border border-foreground/10 bg-foreground/5 backdrop-blur-md hover:bg-foreground/10 hover:border-foreground/20 text-foreground"
+              >
+                <Award className="w-4 h-4 mr-2 text-muted-foreground group-hover:text-primary transition-colors" />
+                Verify Certificate
+              </Link>
             </motion.div>
           </div>
 
