@@ -363,68 +363,76 @@ export default function AdminSymposium() {
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {tab === "registrations" && registrations.map(reg => (
-                        <div key={reg.id} className="rounded-xl border border-border bg-card overflow-hidden">
-                            <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === reg.id ? null : reg.id)}>
-                                <div className="flex items-center gap-4">
-                                    <div>
-                                        <div className="font-semibold">{reg.name}</div>
-                                        <div className="text-xs text-muted-foreground">{reg.email} • {reg.ticket_type?.replace(/_/g, " ") || "No Ticket Type"}</div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <StatusBadge status={reg.status} />
-                                    <span className="font-bold text-primary">{(reg.total_amount || 0).toLocaleString()} PKR</span>
-                                    {expandedId === reg.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-                                </div>
-                            </div>
-                            {expandedId === reg.id && (
-                                <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                        <div><span className="text-muted-foreground block text-xs">Phone</span>{reg.phone || "—"}</div>
-                                        <div><span className="text-muted-foreground block text-xs">Institution</span>{reg.institution || "—"}</div>
-                                        <div><span className="text-muted-foreground block text-xs">Roll Number</span>{reg.roll_number || "—"}</div>
-                                        <div><span className="text-muted-foreground block text-xs">Registered</span>{reg.created_at ? new Date(reg.created_at).toLocaleDateString() : "—"}</div>
-                                    </div>
-                                    {reg.selected_workshops?.length > 0 && (
+                    {tab === "registrations" && registrations.map(reg => {
+                        let workshops: string[] = [];
+                        try { workshops = Array.isArray(reg.selected_workshops) ? reg.selected_workshops : JSON.parse(reg.selected_workshops || "[]"); } catch { }
+
+                        let teamMembers: string[] = [];
+                        try { teamMembers = Array.isArray(reg.team_members) ? reg.team_members : JSON.parse(reg.team_members || "[]"); } catch { }
+
+                        return (
+                            <div key={reg.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                                <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === reg.id ? null : reg.id)}>
+                                    <div className="flex items-center gap-4">
                                         <div>
-                                            <span className="text-xs text-muted-foreground block mb-1">Workshops</span>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {reg.selected_workshops.map(ws => (
-                                                    <span key={ws} className="px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-medium">{ws}</span>
-                                                ))}
+                                            <div className="font-semibold">{reg.name}</div>
+                                            <div className="text-xs text-muted-foreground">{reg.email} • {reg.ticket_type?.replace(/_/g, " ") || "No Ticket Type"}</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <StatusBadge status={reg.status} />
+                                        <span className="font-bold text-primary">{(reg.total_amount || 0).toLocaleString()} PKR</span>
+                                        {expandedId === reg.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                    </div>
+                                </div>
+                                {expandedId === reg.id && (
+                                    <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                            <div><span className="text-muted-foreground block text-xs">Phone</span>{reg.phone || "—"}</div>
+                                            <div><span className="text-muted-foreground block text-xs">Institution</span>{reg.institution || "—"}</div>
+                                            <div><span className="text-muted-foreground block text-xs">Roll Number</span>{reg.roll_number || "—"}</div>
+                                            <div><span className="text-muted-foreground block text-xs">Registered</span>{reg.created_at ? new Date(reg.created_at).toLocaleDateString() : "—"}</div>
+                                        </div>
+                                        {workshops.length > 0 && (
+                                            <div>
+                                                <span className="text-xs text-muted-foreground block mb-1">Workshops</span>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {workshops.map(ws => (
+                                                        <span key={ws} className="px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-medium">{ws}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        {teamMembers.length > 0 && (
+                                            <div>
+                                                <span className="text-xs text-muted-foreground block mb-1">Team Members</span>
+                                                <div className="text-sm">{teamMembers.join(", ")}</div>
+                                            </div>
+                                        )}
+                                        {reg.receipt_url && (
+                                            <Button variant="outline" size="sm" onClick={() => getDownloadUrl(reg.receipt_url!)}>
+                                                <Download className="w-3.5 h-3.5 mr-1.5" /> View Receipt
+                                            </Button>
+                                        )}
+                                        <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
+                                            <div className="flex-grow">
+                                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
+                                                <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === reg.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
+                                            </div>
+                                            <div className="flex gap-2 items-end">
+                                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === reg.id} onClick={() => updateStatus("symposium_registrations", reg.id, "approved", noteText)}>
+                                                    {updating === reg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Approve
+                                                </Button>
+                                                <Button size="sm" variant="destructive" disabled={updating === reg.id} onClick={() => updateStatus("symposium_registrations", reg.id, "rejected", noteText)}>
+                                                    {updating === reg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
+                                                </Button>
                                             </div>
                                         </div>
-                                    )}
-                                    {reg.team_members && (
-                                        <div>
-                                            <span className="text-xs text-muted-foreground block mb-1">Team Members</span>
-                                            <div className="text-sm">{(reg.team_members as string[]).join(", ")}</div>
-                                        </div>
-                                    )}
-                                    {reg.receipt_url && (
-                                        <Button variant="outline" size="sm" onClick={() => getDownloadUrl(reg.receipt_url!)}>
-                                            <Download className="w-3.5 h-3.5 mr-1.5" /> View Receipt
-                                        </Button>
-                                    )}
-                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-border">
-                                        <div className="flex-grow">
-                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5"><MessageSquare className="w-3 h-3" /> Admin Notes</div>
-                                            <textarea rows={2} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none" placeholder="Optional notes..." value={expandedId === reg.id ? noteText : ""} onChange={e => setNoteText(e.target.value)} />
-                                        </div>
-                                        <div className="flex gap-2 items-end">
-                                            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" disabled={updating === reg.id} onClick={() => updateStatus("symposium_registrations", reg.id, "approved", noteText)}>
-                                                {updating === reg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 mr-1" />} Approve
-                                            </Button>
-                                            <Button size="sm" variant="destructive" disabled={updating === reg.id} onClick={() => updateStatus("symposium_registrations", reg.id, "rejected", noteText)}>
-                                                {updating === reg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3.5 h-3.5 mr-1" />} Reject
-                                            </Button>
-                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                                )}
+                            </div>
+                        )
+                    })}
 
                     {tab === "pitch" && pitchSubs.map(pitch => (
                         <div key={pitch.id} className="rounded-xl border border-border bg-card overflow-hidden">

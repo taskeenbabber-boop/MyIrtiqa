@@ -237,7 +237,7 @@ const AISymposium = () => {
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
 
             {/* ═══════════════ HERO ═══════════════ */}
-            <header ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50/80 via-white to-white dark:from-[#0a0a0a] dark:via-[#0a0a0a] dark:to-[#0a0a0a]">
+            <header ref={heroRef} className="relative min-h-[85svh] md:min-h-screen pt-24 pb-16 md:py-0 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-blue-50/80 via-white to-white dark:from-[#0a0a0a] dark:via-[#0a0a0a] dark:to-[#0a0a0a]">
                 {/* Grid background */}
                 <div className="absolute inset-0 z-0" style={{
                     backgroundImage: 'linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px)',
@@ -401,6 +401,40 @@ const AISymposium = () => {
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
                     </motion.div>
+
+                    {/* ═══ MOBILE CARDS (Below CTAs, fills empty space) ═══ */}
+                    <div className="flex lg:hidden flex-wrap justify-center gap-4 mt-12 w-full max-w-2xl px-2">
+                        {/* Event Date */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="rounded-2xl border border-blue-100 dark:border-white/10 p-4 w-[160px] bg-white/80 dark:bg-slate-900/60 shadow-lg text-left" style={{ backdropFilter: 'blur(10px)' }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}><Calendar className="w-4 h-4 text-white" /></div>
+                                <div className="text-[9px] font-bold tracking-widest uppercase text-blue-400 leading-tight">Event<br />Date</div>
+                            </div>
+                            <div className="text-lg font-bold text-gray-900 dark:text-white">Apr 10–11</div>
+                        </motion.div>
+
+                        {/* Venue */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.3 }} className="rounded-2xl border border-blue-100 dark:border-white/10 p-4 w-[160px] bg-white/80 dark:bg-slate-900/60 shadow-lg text-left" style={{ backdropFilter: 'blur(10px)' }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}><Navigation className="w-4 h-4 text-white" /></div>
+                                <div className="text-[9px] font-bold tracking-widest uppercase text-cyan-400">Venue</div>
+                            </div>
+                            <div className="text-sm font-bold text-gray-900 dark:text-white">NWSM</div>
+                        </motion.div>
+
+                        {/* Stats */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="rounded-2xl border border-blue-100 dark:border-white/10 p-4 w-full sm:w-[336px] bg-white/80 dark:bg-slate-900/60 shadow-lg" style={{ backdropFilter: 'blur(10px)' }}>
+                            <div className="flex items-center justify-between mb-3 text-left">
+                                <div className="text-[10px] font-bold tracking-widest uppercase text-emerald-400">Event Stats</div>
+                            </div>
+                            <div className="grid grid-cols-4 gap-2 text-center">
+                                <div><div className="text-sm font-black text-gray-900 dark:text-white">6</div><div className="text-[8px] text-gray-400 uppercase">Workshops</div></div>
+                                <div><div className="text-sm font-black text-gray-900 dark:text-white">3</div><div className="text-[8px] text-gray-400 uppercase">Keynotes</div></div>
+                                <div><div className="text-sm font-black text-gray-900 dark:text-white">2</div><div className="text-[8px] text-gray-400 uppercase">Competitions</div></div>
+                                <div><div className="text-sm font-black text-gray-900 dark:text-white">4</div><div className="text-[8px] text-gray-400 uppercase">Panels</div></div>
+                            </div>
+                        </motion.div>
+                    </div>
                 </motion.div>
 
                 {/* Scroll indicator */}

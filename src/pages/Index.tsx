@@ -61,7 +61,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
 
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section className="relative pt-16 overflow-hidden min-h-[80vh] sm:min-h-[85vh] md:min-h-[90vh]">
+      <section className="relative pt-16 overflow-hidden min-h-[60vh] md:min-h-[85vh]">
         <ScientificBackground />
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/30 via-background/60 to-background pointer-events-none" />
 
