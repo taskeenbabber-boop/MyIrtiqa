@@ -11,13 +11,13 @@ const navigation = [{
   name: "Home",
   href: "/"
 }, {
-  name: "About",
-  href: "/about"
+  name: "AI Symposium",
+  href: "/ai-symposium"
 }, {
   name: "Programs",
   href: "/programs"
 }, {
-  name: "Certificate Verification",
+  name: "Verify Certificate",
   href: "/verify"
 }, {
   name: "Team",
@@ -26,8 +26,8 @@ const navigation = [{
   name: "Gallery",
   href: "/gallery"
 }, {
-  name: "AI Symposium",
-  href: "/ai-symposium"
+  name: "About",
+  href: "/about"
 }, {
   name: "Contact",
   href: "/contact"

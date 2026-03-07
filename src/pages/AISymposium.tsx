@@ -52,16 +52,18 @@ const SYMPOSIUM_EVENTS = [
         location: "Workshop Room 1", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-Note-Taking.png",
         description: "Led by Muhammad Haroon — a final-year MBBS student at Saidu Medical College with a deep passion for technology and AI. To simplify exam preparation for medical students, he created two powerful apps: MedMaster and ProffMaster, along with comprehensive study notes that help students study smarter and perform better. In this workshop, you'll learn how to leverage AI tools for efficient medical and academic note-taking, covering structure, synthesis, and retrieval of complex clinical information using cutting-edge NLP models.",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats",
+        socialUrl: "https://www.medmaster.site/medmaster"
     },
     {
-        id: "ws-2", category: "Workshop", title: "Prompt Engineering & AI in Design",
+        id: "ws-2", category: "Workshop", title: "Prompt Engineering & Talk to AI in Design",
         speaker: "Asad Raziq", speakerRole: "Visual Artist",
         speakerImage: "https://i.ibb.co/FkGZRYpd/Asad-Head-SHot.png",
         location: "Workshop Room 2", time: "10:00 AM – 12:00 PM", date: "10 Apr 2026",
         image: "/icons/Prompt-Engineering.png",
         description: "Discover how to think, design, and build with AI. This session explores the power of prompt engineering, how to communicate with AI in a designer’s language, and how tools like ChatGPT, Nano Banana, and Canva AI can transform ideas into visuals and personal brands. With interactive fun sessions like AI Prompt Battle, Prompt Build & Break, and Sell the Duck: The Quack Pitch, participants will learn, experiment, and compete while unlocking new ways to create with AI. Important: Bring your laptop, a pen, and a diary… because, why not?",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats",
+        socialUrl: "https://www.linkedin.com/in/asadraziq"
     },
     {
         id: "ws-3", category: "Workshop", title: "AI in Research",
@@ -70,7 +72,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Workshop Room 1", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/AI-in-Research.png",
         description: "A comprehensive guide to utilizing AI in literature review, data synthesis, and manuscript structuring while maintaining absolute academic integrity and bias awareness.",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats",
+        socialUrl: "https://www.linkedin.com/in/iftikharkhan49"
     },
     {
         id: "ws-4", category: "Workshop", title: "Clinical Audit & AI in Clinical Use",
@@ -79,7 +82,8 @@ const SYMPOSIUM_EVENTS = [
         location: "Workshop Room 2", time: "2:00 PM – 4:00 PM", date: "10 Apr 2026",
         image: "/icons/Clinical-Audit.png",
         description: "Exploring the practical application of AI in clinical settings. Covering diagnostic support algorithms, patient data auditing, and the integration of AI models in secure hospital workflows.",
-        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats"
+        fee: "Students: 500 PKR | Faculty/Doctors: 1000 PKR", capacity: "100 Seats",
+        socialUrl: "https://scholar.google.com/citations?user=unOLrykAAAAJ&hl=en"
     },
     {
         id: "kn-1", category: "Keynote", title: "AI and the Future of Global Surgery",
@@ -1114,12 +1118,26 @@ const AISymposium = () => {
                                                     <p className="text-xs text-muted-foreground truncate">{ev.speakerRole}</p>
                                                 </div>
                                             </div>
-                                            <div
-                                                className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
-                                                style={{ borderColor: "#333", color: "#666" }}
-                                            >
-                                                <ArrowUpRight className="w-4 h-4" />
-                                            </div>
+                                            {(ev as any).socialUrl && (
+                                                <a
+                                                    href={(ev as any).socialUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 hover:bg-[#3b82f6] hover:border-[#3b82f6] hover:text-black transition-all duration-300"
+                                                    style={{ borderColor: BORDER, color: "hsl(var(--muted-foreground))" }}
+                                                >
+                                                    <ArrowUpRight className="w-4 h-4" />
+                                                </a>
+                                            )}
+                                            {!(ev as any).socialUrl && (
+                                                <div
+                                                    className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
+                                                    style={{ borderColor: BORDER, color: "hsl(var(--muted-foreground))" }}
+                                                >
+                                                    <ArrowUpRight className="w-4 h-4" />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
