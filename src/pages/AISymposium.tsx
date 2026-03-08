@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X, MapPin, Clock, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb, ShieldCheck, FileDown, Sparkles, Tag } from "lucide-react";
+import { X, MapPin, Clock, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb, ShieldCheck, FileDown, Sparkles, Tag, Linkedin, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { RegistrationForm } from "@/components/symposium/RegistrationForm";
@@ -1110,12 +1110,12 @@ const AISymposium = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="hidden lg:flex items-center gap-4">
-                                            <div className="flex items-center gap-3 w-[220px]">
-                                                <img src={ev.speakerImage} alt={ev.speaker} className="w-10 h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: BORDER }} />
+                                        <div className="flex items-center gap-2 sm:gap-4 ml-auto lg:ml-0">
+                                            <div className="hidden sm:flex items-center gap-3 w-[140px] md:w-[180px] lg:w-[220px]">
+                                                <img src={ev.speakerImage} alt={ev.speaker} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 flex-shrink-0" style={{ borderColor: BORDER }} />
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-semibold text-foreground truncate">{ev.speaker}</p>
-                                                    <p className="text-xs text-muted-foreground truncate">{ev.speakerRole}</p>
+                                                    <p className="text-[11px] sm:text-sm font-semibold text-foreground truncate">{ev.speaker}</p>
+                                                    <p className="text-[9px] sm:text-xs text-muted-foreground truncate">{ev.speakerRole}</p>
                                                 </div>
                                             </div>
                                             {(ev as any).socialUrl && (
@@ -1124,19 +1124,11 @@ const AISymposium = () => {
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 hover:bg-[#3b82f6] hover:border-[#3b82f6] hover:text-black transition-all duration-300"
-                                                    style={{ borderColor: BORDER, color: "hsl(var(--muted-foreground))" }}
+                                                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center flex-shrink-0 hover:bg-[#3b82f6] hover:border-[#3b82f6] hover:text-black transition-all duration-300"
+                                                    style={{ borderColor: BORDER, color: "hsl(var(--foreground))" }}
                                                 >
-                                                    <ArrowUpRight className="w-4 h-4" />
+                                                    {(ev as any).socialUrl.includes("linkedin") ? <Linkedin className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                                                 </a>
-                                            )}
-                                            {!(ev as any).socialUrl && (
-                                                <div
-                                                    className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] group-hover:text-black transition-all duration-300"
-                                                    style={{ borderColor: BORDER, color: "hsl(var(--muted-foreground))" }}
-                                                >
-                                                    <ArrowUpRight className="w-4 h-4" />
-                                                </div>
                                             )}
                                         </div>
                                     )}
