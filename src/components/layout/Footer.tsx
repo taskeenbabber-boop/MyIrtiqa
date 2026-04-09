@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Mail, Linkedin, Twitter, Facebook, Phone } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
+
 const navigation = {
   main: [{
     name: "About",
@@ -32,7 +33,26 @@ const navigation = {
     href: "https://www.facebook.com/irtiqa_research"
   }]
 };
+
 export function Footer() {
+  const location = useLocation();
+  const isSymposium = location.pathname === "/ai-symposium";
+
+  if (isSymposium) {
+    return (
+      <footer className="bg-[#191923] border-t border-[#3c3f4a] py-6">
+        <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-2">
+          <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">
+            © {new Date().getFullYear()} IRTIQA • ALL RIGHTS RESERVED
+          </p>
+          <p className="text-gray-600 text-[9px] uppercase tracking-tighter">
+            Developed by <span className="text-blue-500 font-bold">Taskeen Baber</span>
+          </p>
+        </div>
+      </footer>
+    );
+  }
+
   return <footer className="bg-gradient-to-br from-secondary via-background to-secondary border-t border-border">
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

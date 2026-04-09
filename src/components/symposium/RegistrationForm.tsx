@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, CheckCircle, Upload, CreditCard, Users, User, ArrowRight, ShieldCheck, ArrowUpRight, Sparkles, Loader2, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -26,16 +26,22 @@ const CATEGORY_INFO: Record<Category, { label: string; desc: string; icon: typeo
 interface Workshop {
     id: string;
     title: string;
+    day: string;
     slot: string;
     time: string;
     speaker: string;
+    isSuturing?: boolean;
+    seatLimit?: number;
 }
 
 const WORKSHOPS: Workshop[] = [
-    { id: "ws-1", title: "AI for Note Taking", slot: "morning", time: "10 AM – 12 PM", speaker: "Haroon" },
-    { id: "ws-2", title: "Prompt Engineering & AI in Design", slot: "morning", time: "10 AM – 12 PM", speaker: "Mr. Asad" },
-    { id: "ws-3", title: "AI in Research", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Iftikhar" },
-    { id: "ws-4", title: "Clinical Audit & AI in Clinical Use", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Dr. Almas" },
+    // Day 1 (7 May)
+    { id: "ws-4", title: "Clinical Audit & AI in Clinical Use", day: "day1", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Almas" },
+    { id: "ws-2", title: "Prompt Engineering & AI in Design", day: "day1", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Mr. Asad" },
+    // Day 2 (8 May)
+    { id: "ws-5a", title: "Suturing Workshop (Morning)", day: "day2", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Obaidullah", isSuturing: true, seatLimit: 30 },
+    { id: "ws-5b", title: "Suturing Workshop (Afternoon)", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Dr. Obaidullah", isSuturing: true, seatLimit: 30 },
+    { id: "ws-3", title: "From Idea to Impact: Launch Your Startup", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Muhammad Waqar" },
 ];
 
 /* ═══════════ FEE CONSTANTS ═══════════ */
@@ -75,9 +81,38 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
         receiptFile: null as File | null,
     });
 
+    const [suturingSeatCounts, setSuturingSeatCounts] = useState<Record<string, number>>({ "ws-5a": 0, "ws-5b": 0 });
+
+    // Fetch suturing seat counts on mount
+    useEffect(() => {
+        (async () => {
+            try {
+                const { data } = await (supabase as any).from("symposium_registrations")
+                    .select("selected_workshops")
+                    .neq("status", "rejected");
+                if (data) {
+                    const counts: Record<string, number> = { "ws-5a": 0, "ws-5b": 0 };
+                    data.forEach((row: any) => {
+                        if (row.selected_workshops) {
+                            if (row.selected_workshops.includes("ws-5a")) counts["ws-5a"]++;
+                            if (row.selected_workshops.includes("ws-5b")) counts["ws-5b"]++;
+                        }
+                    });
+                    setSuturingSeatCounts(counts);
+                }
+            } catch (e) { console.error("Seat count error:", e); }
+        })();
+    }, []);
+
     const isTeam = category === "OUTSIDER_TEAM_3" || category === "OUTSIDER_TEAM_4";
     const isFaculty = category === "FACULTY";
     const workshopFee = isFaculty ? WORKSHOP_FEE_FACULTY : WORKSHOP_FEE_STUDENT;
+
+    const isSuturingFull = (wsId: string) => {
+        const ws = WORKSHOPS.find(w => w.id === wsId);
+        if (!ws?.seatLimit) return false;
+        return suturingSeatCounts[wsId] >= ws.seatLimit;
+    };
 
     /* ——— pricing ——— */
     const calculateTotal = () => {
@@ -85,23 +120,27 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
         let total = 0;
         if (wantConference) total += CONFERENCE_FEE[category];
         if (wantWorkshops && !isTeam) {
-            total += formData.selectedWorkshops.length * workshopFee;
-            // Faculty gets a 1000 PKR discount if they pick both workshops + conference (Full Event Pass = 2500)
-            if (wantConference && formData.selectedWorkshops.length === 2 && category === "FACULTY") {
-                total -= 1000;
-            }
+            formData.selectedWorkshops.forEach(wsId => {
+                const ws = WORKSHOPS.find(w => w.id === wsId);
+                if (ws?.isSuturing) {
+                    total += 1000; // flat fee for suturing
+                } else {
+                    total += workshopFee;
+                }
+            });
         }
         return total;
     };
 
-    /* ——— workshop toggle (mutually exclusive per slot) ——— */
-    const toggleWorkshop = (id: string, slot: string) => {
+    /* ——— workshop toggle (mutually exclusive per day+slot) ——— */
+    const toggleWorkshop = (id: string, day: string, slot: string) => {
+        if (isSuturingFull(id)) return; // can't select if full
         setFormData(prev => {
             const isSelected = prev.selectedWorkshops.includes(id);
             if (isSelected) {
                 return { ...prev, selectedWorkshops: prev.selectedWorkshops.filter(w => w !== id) };
             } else {
-                const otherInSlot = WORKSHOPS.filter(w => w.slot === slot && w.id !== id).map(w => w.id);
+                const otherInSlot = WORKSHOPS.filter(w => w.day === day && w.slot === slot && w.id !== id).map(w => w.id);
                 const filtered = prev.selectedWorkshops.filter(w => !otherInSlot.includes(w));
                 return { ...prev, selectedWorkshops: [...filtered, id] };
             }
@@ -192,10 +231,14 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
     /* ——— Workshop selection card ——— */
     const WorkshopCard = ({ ws }: { ws: Workshop }) => {
         const selected = formData.selectedWorkshops.includes(ws.id);
+        const full = isSuturingFull(ws.id);
+        const seatsLeft = ws.seatLimit ? ws.seatLimit - (suturingSeatCounts[ws.id] || 0) : null;
+        const otherShift = ws.id === "ws-5a" ? "ws-5b" : ws.id === "ws-5b" ? "ws-5a" : null;
+        const otherFull = otherShift ? isSuturingFull(otherShift) : false;
         return (
             <div
-                onClick={() => toggleWorkshop(ws.id, ws.slot)}
-                className="p-4 rounded-xl cursor-pointer transition-all duration-300"
+                onClick={() => !full && toggleWorkshop(ws.id, ws.day, ws.slot)}
+                className={`p-4 rounded-xl transition-all duration-300 ${full ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 style={{
                     background: selected ? ACCENT_BG : SURFACE,
                     border: `1px solid ${selected ? ACCENT : BORDER}`,
@@ -206,6 +249,21 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                         <span className={`font-semibold text-sm block ${selected ? "text-white" : "text-white/50"}`}>{ws.title}</span>
                         <span className="text-xs text-white/25 mt-0.5 block">{ws.speaker}</span>
                         <span className="text-xs text-white/20 mt-0.5 block">{ws.time}</span>
+                        {ws.isSuturing && (
+                            <div className="mt-1.5">
+                                {full ? (
+                                    <>
+                                        <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">FULL</span>
+                                        {otherShift && !otherFull && (
+                                            <span className="text-[10px] text-blue-400 block mt-0.5">Try the {ws.id === "ws-5a" ? "afternoon" : "morning"} session!</span>
+                                        )}
+                                    </>
+                                ) : (
+                                    <span className="text-[10px] text-emerald-400">{seatsLeft} / {ws.seatLimit} seats left</span>
+                                )}
+                                <span className="text-[10px] text-amber-400/70 block">Fee: 1,000 PKR</span>
+                            </div>
+                        )}
                     </div>
                     <div
                         className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
@@ -335,8 +393,8 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                                 <Calendar className="w-5 h-5" style={{ color: wantConference ? "#000" : ACCENT }} />
                                             </div>
                                             <div>
-                                                <span className="font-bold text-white text-base block">Day 2: Main Conference</span>
-                                                <span className="text-xs text-white/40 block mt-0.5">April 11 — Keynotes, Panel Discussion, AI Poster, AI Drill, AI Debate, AI Quiz, AI Pitch, Memes</span>
+                                                <span className="font-bold text-white text-base block">Day 3: Main Conference</span>
+                                                <span className="text-xs text-white/40 block mt-0.5">May 9 — Keynotes, Panel Discussion, AI Poster, AI Drill, AI Debate, AI Quiz, AI Pitch, Memes</span>
                                             </div>
                                         </div>
                                         {wantConference && <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: ACCENT }} />}
@@ -363,8 +421,8 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                                                 <Sparkles className="w-5 h-5" style={{ color: wantWorkshops ? "#000" : ACCENT }} />
                                             </div>
                                             <div>
-                                                <span className="font-bold text-white text-base block">Day 1: Pre-Conference Workshops</span>
-                                                <span className="text-xs text-white/40 block mt-0.5">April 10 — Select from 4 hands-on AI workshops (max 1 morning + 1 afternoon)</span>
+                                                <span className="font-bold text-white text-base block">Day 1 & 2: Pre-Conference Workshops</span>
+                                                <span className="text-xs text-white/40 block mt-0.5">May 7–8 — Select from 5 hands-on workshops across 2 days</span>
                                             </div>
                                         </div>
                                         {wantWorkshops && <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: ACCENT }} />}
@@ -373,23 +431,45 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
 
                                 {/* Workshop selection (shown inline if workshops enabled) */}
                                 {wantWorkshops && (
-                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-4 overflow-hidden">
+                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-6 overflow-hidden">
+                                        {/* Day 1 — May 7 */}
                                         <div>
                                             <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
-                                                Morning Session — Select 1
+                                                Day 1 (May 7) — Morning
                                             </h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                {WORKSHOPS.filter(ws => ws.slot === "morning").map(ws => (
+                                                {WORKSHOPS.filter(ws => ws.day === "day1" && ws.slot === "morning").map(ws => (
                                                     <WorkshopCard key={ws.id} ws={ws} />
                                                 ))}
                                             </div>
                                         </div>
                                         <div>
                                             <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
-                                                Afternoon Session — Select 1
+                                                Day 1 (May 7) — Afternoon
                                             </h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                {WORKSHOPS.filter(ws => ws.slot === "afternoon").map(ws => (
+                                                {WORKSHOPS.filter(ws => ws.day === "day1" && ws.slot === "afternoon").map(ws => (
+                                                    <WorkshopCard key={ws.id} ws={ws} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        {/* Day 2 — May 8 */}
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
+                                                Day 2 (May 8) — Morning
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {WORKSHOPS.filter(ws => ws.day === "day2" && ws.slot === "morning").map(ws => (
+                                                    <WorkshopCard key={ws.id} ws={ws} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>
+                                                Day 2 (May 8) — Afternoon — Select 1
+                                            </h4>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {WORKSHOPS.filter(ws => ws.day === "day2" && ws.slot === "afternoon").map(ws => (
                                                     <WorkshopCard key={ws.id} ws={ws} />
                                                 ))}
                                             </div>

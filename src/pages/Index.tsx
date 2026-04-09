@@ -14,35 +14,35 @@ import aiIconLogo from "@/assets/AI-icon.png";
 /* ——— Symposium highlight events ——— */
 const UPCOMING_EVENTS = [
   {
-    title: "AI for Note Taking",
+    title: "Clinical Audit & AI in Clinical Use",
     category: "Workshop",
-    date: "10 Apr 2026",
+    date: "7 May 2026",
     time: "10:00 AM – 12:00 PM",
-    speaker: "Haroon",
+    speaker: "Dr. Almas",
     color: "#3b82f6",
   },
   {
     title: "Prompt Engineering & AI in Design",
     category: "Workshop",
-    date: "10 Apr 2026",
-    time: "10:00 AM – 12:00 PM",
+    date: "7 May 2026",
+    time: "2:00 PM – 4:00 PM",
     speaker: "Mr. Asad",
     color: "#8b5cf6",
   },
   {
-    title: "AI in Research",
+    title: "Hands-On Suturing Workshop",
     category: "Workshop",
-    date: "10 Apr 2026",
-    time: "3:00 PM – 4:00 PM",
-    speaker: "Iftikhar",
+    date: "8 May 2026",
+    time: "Full Day",
+    speaker: "Dr. Obaidullah",
     color: "#06b6d4",
   },
   {
-    title: "AI Pitch Competition",
-    category: "Competition",
-    date: "11 Apr 2026",
-    time: "10:00 AM – 12:00 PM",
-    speaker: "Panel Judges",
+    title: "From Idea to Impact: Launch Your Startup",
+    category: "Workshop",
+    date: "8 May 2026",
+    time: "2:00 PM – 4:00 PM",
+    speaker: "Muhammad Waqar",
     color: "#f59e0b",
   },
 ];
@@ -235,7 +235,7 @@ const Index = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 text-white/70">
                       <Calendar className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                      <span className="text-sm">April 10–11, 2026</span>
+                      <span className="text-sm">May 7–9, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-white/70">
                       <MapPin className="w-5 h-5 text-blue-400 flex-shrink-0" />

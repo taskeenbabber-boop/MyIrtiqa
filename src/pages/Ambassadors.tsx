@@ -15,8 +15,8 @@ const BORDER = "rgba(255,255,255,0.06)";
 const SURFACE = "rgba(255,255,255,0.02)";
 const ACCENT_BG = "rgba(59,130,246,0.08)";
 
-/* ═══════ deadline: 8 March 2026, 11:59 PM PKT (UTC+5) ═══════ */
-const DEADLINE = new Date("2026-03-08T23:59:00+05:00").getTime();
+/* ═══════ deadline: 10 March 2026, 12:00 PM PKT (UTC+5) ═══════ */
+const DEADLINE = new Date("2026-03-10T12:00:00+05:00").getTime();
 
 /* ═══════ launch gate: 6 March 2026, 10:00 PM PKT ═══════ */
 const LAUNCH_TIME = new Date("2026-03-06T22:00:00+05:00").getTime();
@@ -242,7 +242,7 @@ const Ambassadors = () => {
                         <h2 className="text-2xl md:text-3xl font-black text-white uppercase mb-2">
                             {expired ? "Applications Closed" : "Applications Closing Soon"}
                         </h2>
-                        <p className="text-white/30 text-sm mb-8">March 8, 2026 — 11:59 PM PKT</p>
+                        <p className="text-white/30 text-sm mb-8">March 10, 2026 — 12:00 PM PKT</p>
 
                         {!expired ? (
                             <div className="flex justify-center gap-4 md:gap-6">

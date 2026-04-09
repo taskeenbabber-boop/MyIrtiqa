@@ -90,7 +90,7 @@ const Programs = () => {
                       <div className="space-y-3 text-muted-foreground">
                         <div className="flex items-center gap-3">
                           <Clock className="h-5 w-5 text-primary flex-shrink-0" />
-                          <span>April 10–11, 2026 — Two full days</span>
+                          <span>May 7–9, 2026 — Three full days</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <Users className="h-5 w-5 text-primary flex-shrink-0" />
