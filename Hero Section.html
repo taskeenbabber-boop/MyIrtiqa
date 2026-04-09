@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Symposium - #CodeSeCure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE THEME VARIABLES --- */
+        :root {
+            --bg-deep: #020617; 
+            --color-white: #ffffff;
+            --color-blue-main: #3b82f6;
+            --color-blue-glow: rgba(59, 130, 246, 0.2);
+            --color-pink-glow: rgba(236, 72, 153, 0.2);
+            --text-blue-outline: #60a5fa;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            font-family: var(--font-main);
+            color: var(--color-white);
+            overflow: hidden;
+        }
+
+        /* --- BACKGROUND & AMBIENCE --- */
+        .hero-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: center center;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            width: 70vw;
+            height: 70vw;
+            background: radial-gradient(circle, var(--color-blue-glow) 0%, transparent 60%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: pulseBackground 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseBackground {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        /* --- MAIN STACKED CONTAINER --- */
+        .content-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px; 
+            z-index: 10;
+        }
+
+        /* --- MOTION GRAPHICS LOGO --- */
+        .logo-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; 
+            margin-bottom: 0px;
+        }
+
+        .motion-logo {
+            width: 280px;
+            height: auto;
+            object-fit: contain;
+            animation: cinematicFloat 6s ease-in-out infinite;
+            will-change: transform, filter;
+        }
+
+        @keyframes cinematicFloat {
+            0% { 
+                transform: translateY(0px) rotateX(2deg) rotateY(-2deg); 
+                filter: drop-shadow(0 10px 20px rgba(236, 72, 153, 0.4)); 
+            }
+            50% { 
+                transform: translateY(-15px) rotateX(-2deg) rotateY(2deg) scale(1.02); 
+                filter: drop-shadow(0 25px 35px rgba(59, 130, 246, 0.6)); 
+            }
+            100% { 
+                transform: translateY(0px) rotateX(2deg) rotateY(-2deg); 
+                filter: drop-shadow(0 10px 20px rgba(236, 72, 153, 0.4)); 
+            }
+        }
+
+        /* --- KINETIC TYPOGRAPHY --- */
+        .kinetic-box {
+            position: relative;
+            height: 160px; 
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .text-group {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            will-change: transform, opacity, filter;
+        }
+
+        /* Frame 1: Symposium 2026 */
+        .group-symposium {
+            animation: kineticLoop1 8s infinite cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .text-symposium {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 6px;
+            color: var(--color-white);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .text-year {
+            font-size: 5.5rem;
+            font-weight: 50;
+            /* Replaced outline with a sleek vertical gradient */
+            background: linear-gradient(to bottom, #ffffff, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            letter-spacing: 0px;
+            filter: drop-shadow(0 5px 15px rgba(59, 130, 246, 0.3));
+        }
+
+        /* Frame 2: #Code SeCure */
+        .group-codesecure {
+            animation: kineticLoop2 8s infinite cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .text-code {
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--color-white);
+            line-height: 1.1;
+            letter-spacing: -2px;
+        }
+
+        /* Flex container to hold Se and Cure together without inline styling tags */
+        .text-secure-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-se {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #60a5fa, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            letter-spacing: -3px;
+        }
+
+        .text-cure {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--color-white);
+            line-height: 1;
+            letter-spacing: -3px;
+        }
+
+        /* Seamless Kinetic Transitions */
+        @keyframes kineticLoop1 {
+            0%, 42% { 
+                opacity: 1; 
+                transform: scale(1); 
+                filter: blur(0px); 
+            }
+            48%, 94% { 
+                opacity: 0; 
+                transform: scale(1.1); 
+                filter: blur(10px); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1); 
+                filter: blur(0px); 
+            }
+        }
+
+        @keyframes kineticLoop2 {
+            0%, 42% { 
+                opacity: 0; 
+                transform: scale(0.9); 
+                filter: blur(10px); 
+            }
+            48%, 94% { 
+                opacity: 1; 
+                transform: scale(1); 
+                filter: blur(0px); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(0.9); 
+                filter: blur(10px); 
+            }
+        }
+        
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            .motion-logo { width: 200px; }
+            .kinetic-box { height: 100px; }
+            .text-symposium { font-size: 1.2rem; letter-spacing: 4px; }
+            .text-year { font-size: 4.5rem; }
+            .text-code { font-size: 2.5rem; }
+            .text-se, .text-cure { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="hero-wrapper">
+        <div class="ambient-glow"></div>
+
+        <div class="content-stack">
+            
+            <div class="logo-container">
+                <img src="AI-icon.png" alt="AI Symposium Logo" class="motion-logo">
+            </div>
+
+            <div class="kinetic-box">
+                
+                <div class="text-group group-symposium">
+                    <div class="text-symposium">SYMPOSIUM</div>
+                    <div class="text-year">2026</div>
+                </div>
+
+                <div class="text-group group-codesecure">
+                    <div class="text-code">#Code</div>
+                    <div class="text-secure-wrapper">
+                        <div class="text-se">Se</div>
+                        <div class="text-cure">Cure</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>
