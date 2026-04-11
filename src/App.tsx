@@ -27,6 +27,7 @@ import AdminUsers from "./pages/admin/Users";
 import AdminMedia from "./pages/admin/Media";
 import AdminSettings from "./pages/admin/Settings";
 import AdminSymposium from "./pages/admin/Symposium";
+import AdminReferrals from "./pages/admin/Referrals";
 import NotFound from "./pages/NotFound";
 import { LaunchCountdown, isBeforeLaunch } from "./components/LaunchCountdown";
 
@@ -74,6 +75,7 @@ const AppContent = () => {
                     <Route index element={<AdminOverview />} />
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="symposium" element={<AdminSymposium />} />
+                    <Route path="referrals" element={<AdminReferrals />} />
                     <Route path="certificates" element={<AdminCertificates />} />
                     <Route path="team" element={<AdminTeam />} />
                     <Route path="users" element={<AdminUsers />} />

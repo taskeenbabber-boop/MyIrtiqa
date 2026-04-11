@@ -11,9 +11,10 @@ const BORDER = "hsl(var(--border))";
 
 interface MemeFormProps {
     onClose: () => void;
+    referralCode?: string;
 }
 
-export function MemeForm({ onClose }: MemeFormProps) {
+export function MemeForm({ onClose, referralCode }: MemeFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
@@ -40,6 +41,7 @@ export function MemeForm({ onClose }: MemeFormProps) {
                 meme_url: null,
                 description: formData.memeDescription,
                 status: "pending",
+                referral_code: referralCode || null,
             });
             if (error) throw error;
             setSubmitted(true);

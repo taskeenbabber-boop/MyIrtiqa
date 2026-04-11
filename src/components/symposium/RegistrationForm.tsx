@@ -59,9 +59,10 @@ const CONFERENCE_FEE: Record<Category, number> = {
 /* ═══════════ COMPONENT ═══════════ */
 interface RegistrationFormProps {
     onClose: () => void;
+    referralCode?: string;
 }
 
-export function RegistrationForm({ onClose }: RegistrationFormProps) {
+export function RegistrationForm({ onClose, referralCode }: RegistrationFormProps) {
     // Step order: 1=Events, 2=Category, 3=Details, 4=Payment
     const [step, setStep] = useState(1);
     const [category, setCategory] = useState<Category | null>(null);
@@ -205,6 +206,7 @@ export function RegistrationForm({ onClose }: RegistrationFormProps) {
                 wants_conference: wantConference,
                 workshop_fee_per: workshopFee,
                 conference_fee: confFee,
+                referral_code: referralCode || null,
             });
 
             if (error) throw error;

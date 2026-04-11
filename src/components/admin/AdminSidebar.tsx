@@ -9,6 +9,7 @@ import {
     Settings,
     ShoppingCart,
     Zap,
+    Link2,
 } from "lucide-react";
 import {
     Sidebar,
@@ -27,6 +28,7 @@ import logoIcon from "@/assets/logo-icon.png";
 const menuItems = [
     { title: "Overview", url: "/admin", icon: LayoutDashboard },
     { title: "Symposium", url: "/admin/symposium", icon: Zap },
+    { title: "Referrals", url: "/admin/referrals", icon: Link2 },
     { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
     { title: "Certificates", url: "/admin/certificates", icon: Award },
     { title: "Team", url: "/admin/team", icon: Users },

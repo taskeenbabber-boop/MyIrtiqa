@@ -12,9 +12,10 @@ const BORDER = "#222222";
 
 interface PitchFormProps {
     onClose: () => void;
+    referralCode?: string;
 }
 
-export function PitchForm({ onClose }: PitchFormProps) {
+export function PitchForm({ onClose, referralCode }: PitchFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
@@ -75,6 +76,7 @@ export function PitchForm({ onClose }: PitchFormProps) {
                 document_url: documentUrl,
                 receipt_url: receiptUrl,
                 status: "pending",
+                referral_code: referralCode || null,
             });
 
             if (error) throw error;

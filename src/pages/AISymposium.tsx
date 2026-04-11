@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { X, MapPin, Clock, ArrowLeft, ArrowUpRight, ChevronRight, ChevronDown, Zap, Calendar, Users, Award, Navigation, Lightbulb, ShieldCheck, FileDown, Sparkles, Tag, Linkedin, Globe, Menu, User, Mail, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RegistrationForm } from "@/components/symposium/RegistrationForm";
@@ -135,6 +136,8 @@ const SYMPOSIUM_EVENTS = [
 ];
 
 const AISymposium = () => {
+    const [searchParams] = useSearchParams();
+    const referralCode = searchParams.get("ref") || "";
     const [activeTab, setActiveTab] = useState("home");
     const [events, setEvents] = useState(SYMPOSIUM_EVENTS);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -557,13 +560,13 @@ const AISymposium = () => {
             </div>
 
             {/* Popups */}
-            {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} />}
-            {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} />}
-            {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} />}
-            {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} />}
-            {isQuizFormOpen && <QuizForm onClose={() => setIsQuizFormOpen(false)} />}
-            {isDrillFormOpen && <DrillForm onClose={() => setIsDrillFormOpen(false)} />}
-            {isDebateFormOpen && <DebateForm onClose={() => setIsDebateFormOpen(false)} />}
+            {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} referralCode={referralCode} />}
+            {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} referralCode={referralCode} />}
+            {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} referralCode={referralCode} />}
+            {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} referralCode={referralCode} />}
+            {isQuizFormOpen && <QuizForm onClose={() => setIsQuizFormOpen(false)} referralCode={referralCode} />}
+            {isDrillFormOpen && <DrillForm onClose={() => setIsDrillFormOpen(false)} referralCode={referralCode} />}
+            {isDebateFormOpen && <DebateForm onClose={() => setIsDebateFormOpen(false)} referralCode={referralCode} />}
         </div>
     );
 };

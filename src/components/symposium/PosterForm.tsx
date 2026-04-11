@@ -23,9 +23,10 @@ const POSTER_IDEAS = [
 
 interface PosterFormProps {
     onClose: () => void;
+    referralCode?: string;
 }
 
-export function PosterForm({ onClose }: PosterFormProps) {
+export function PosterForm({ onClose, referralCode }: PosterFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
@@ -70,6 +71,7 @@ export function PosterForm({ onClose }: PosterFormProps) {
                 topic_description: formData.topicDescription,
                 receipt_url: receiptUrl,
                 status: "pending",
+                referral_code: referralCode || null,
             });
             if (error) throw error;
             setSubmitted(true);

@@ -12,9 +12,10 @@ const BORDER = "#222222";
 
 interface DrillFormProps {
     onClose: () => void;
+    referralCode?: string;
 }
 
-export function DrillForm({ onClose }: DrillFormProps) {
+export function DrillForm({ onClose, referralCode }: DrillFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
@@ -57,6 +58,7 @@ export function DrillForm({ onClose }: DrillFormProps) {
                 roll_number: formData.rollNumber || null,
                 receipt_url: receiptUrl,
                 status: "pending",
+                referral_code: referralCode || null,
             });
             if (error) throw error;
             setSubmitted(true);

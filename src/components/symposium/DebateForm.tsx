@@ -12,9 +12,10 @@ const BORDER = "#222222";
 
 interface DebateFormProps {
     onClose: () => void;
+    referralCode?: string;
 }
 
-export function DebateForm({ onClose }: DebateFormProps) {
+export function DebateForm({ onClose, referralCode }: DebateFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
@@ -57,6 +58,7 @@ export function DebateForm({ onClose }: DebateFormProps) {
                 roll_number: formData.rollNumber || null,
                 receipt_url: receiptUrl,
                 status: "pending",
+                referral_code: referralCode || null,
             });
             if (error) throw error;
             setSubmitted(true);
