@@ -13,9 +13,10 @@ const BORDER = "#222222";
 interface QuizFormProps {
     onClose: () => void;
     referralCode?: string;
+    discountPercent?: number;
 }
 
-export function QuizForm({ onClose, referralCode }: QuizFormProps) {
+export function QuizForm({ onClose, referralCode, discountPercent = 0 }: QuizFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({

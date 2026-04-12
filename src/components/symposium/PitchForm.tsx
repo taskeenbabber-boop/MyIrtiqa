@@ -13,9 +13,10 @@ const BORDER = "#222222";
 interface PitchFormProps {
     onClose: () => void;
     referralCode?: string;
+    discountPercent?: number;
 }
 
-export function PitchForm({ onClose, referralCode }: PitchFormProps) {
+export function PitchForm({ onClose, referralCode, discountPercent = 0 }: PitchFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({

@@ -24,9 +24,10 @@ const POSTER_IDEAS = [
 interface PosterFormProps {
     onClose: () => void;
     referralCode?: string;
+    discountPercent?: number;
 }
 
-export function PosterForm({ onClose, referralCode }: PosterFormProps) {
+export function PosterForm({ onClose, referralCode, discountPercent = 0 }: PosterFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({

@@ -141,6 +141,8 @@ const AISymposium = () => {
     const [activeTab, setActiveTab] = useState("home");
     const [events, setEvents] = useState(SYMPOSIUM_EVENTS);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [discountPercent, setDiscountPercent] = useState(0);
+    const [discountAppliesTo, setDiscountAppliesTo] = useState<string[]>([]);
 
     // Popup Forms State
     const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
@@ -150,6 +152,28 @@ const AISymposium = () => {
     const [isQuizFormOpen, setIsQuizFormOpen] = useState(false);
     const [isDrillFormOpen, setIsDrillFormOpen] = useState(false);
     const [isDebateFormOpen, setIsDebateFormOpen] = useState(false);
+
+    // Track visitor + lookup discount when referral code is present
+    useEffect(() => {
+        if (!referralCode) return;
+        // Log the visit (fire-and-forget)
+        (supabase as any).from("symposium_referral_visits").insert({
+            referral_code: referralCode,
+            page_path: window.location.pathname,
+        }).then(() => {});
+        // Lookup discount
+        (supabase as any).from("symposium_referral_codes")
+            .select("discount_percent, discount_applies_to, active")
+            .eq("code", referralCode)
+            .eq("active", true)
+            .single()
+            .then(({ data }: any) => {
+                if (data && data.discount_percent > 0) {
+                    setDiscountPercent(data.discount_percent);
+                    setDiscountAppliesTo(data.discount_applies_to || []);
+                }
+            });
+    }, [referralCode]);
 
     useEffect(() => {
         const fetchSpeakers = async () => {
@@ -291,43 +315,68 @@ const AISymposium = () => {
         </div>
     );
 
-    const renderSchedule = () => (
-        <div className="max-w-5xl mx-auto animate-in fade-in duration-500 w-full text-left">
-            <h2 className="text-2xl font-bold mb-8 text-white flex items-center gap-3"><Calendar className="text-blue-500" /> Event Schedule & Workshops</h2>
-            <div className="grid gap-6">
-                {events.filter(e => e.category.toLowerCase().includes('workshop')).map(event => (
-                    <div key={event.id} className="bg-[#1f2229] border border-[#3c3f4a] p-6 rounded-xl flex flex-col md:flex-row gap-6 hover:border-blue-500 transition-colors shadow-lg group">
-                        <div className="w-16 h-16 rounded-xl bg-[#2a2d35] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                            {event.image ? <img src={event.image} alt={event.title} className="w-10 h-10 object-contain" /> : <Navigation className="text-blue-500" />}
-                        </div>
-                        <div className="flex-1">
-                            <div className="flex flex-wrap items-center gap-3 mb-3">
-                                <span className="bg-[#2a2d35] text-blue-400 border border-blue-500/20 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">{event.date}</span>
-                                <span className="text-gray-400 text-xs flex items-center gap-1.5"><Clock className="w-3 h-3 text-blue-500" /> {event.time}</span>
-                                <span className="text-gray-400 text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3 text-blue-500" /> {event.location}</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
-                            <p className="text-sm text-gray-400 mb-4">{event.description}</p>
+    const renderSchedule = () => {
+        const scheduleEvents = events.filter(e =>
+            e.category.toLowerCase().includes('workshop') || e.category.toLowerCase().includes('competition')
+        );
+        const dates = [...new Set(scheduleEvents.map(e => e.date))];
+        // Sort dates: 7 May, 8 May, 9 May
+        dates.sort((a, b) => {
+            const dayA = parseInt(a) || 0;
+            const dayB = parseInt(b) || 0;
+            return dayA - dayB;
+        });
 
-                            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#3c3f4a] pt-4 mt-4">
-                                <div className="flex items-center gap-3 bg-[#2a2d35] px-3 py-2 rounded-lg">
-                                    {event.speakerImage ? <img src={event.speakerImage} alt={event.speaker} className="w-10 h-10 rounded-full object-cover border-2 border-[#1f2229]" /> : <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center border-2 border-[#1f2229]"><User className="w-5 h-5" /></div>}
-                                    <div>
-                                        <div className="text-sm font-bold text-white">{event.speaker}</div>
-                                        <div className="text-[10px] text-gray-400">{event.speakerRole}</div>
+        return (
+            <div className="max-w-5xl mx-auto animate-in fade-in duration-500 w-full text-left">
+                <h2 className="text-2xl font-bold mb-8 text-white flex items-center gap-3"><Calendar className="text-blue-500" /> Full Event Schedule</h2>
+                {dates.map(date => (
+                    <div key={date} className="mb-10">
+                        <div className="flex items-center gap-3 mb-5">
+                            <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider">{date}</span>
+                            <div className="h-[1px] flex-1 bg-[#3c3f4a]"></div>
+                        </div>
+                        <div className="grid gap-6">
+                            {scheduleEvents.filter(e => e.date === date).map(event => (
+                                <div key={event.id} className="bg-[#1f2229] border border-[#3c3f4a] p-6 rounded-xl flex flex-col md:flex-row gap-6 hover:border-blue-500 transition-colors shadow-lg group">
+                                    <div className="w-16 h-16 rounded-xl bg-[#2a2d35] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                        {event.image ? <img src={event.image} alt={event.title} className="w-10 h-10 object-contain" /> : <Navigation className="text-blue-500" />}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex flex-wrap items-center gap-3 mb-3">
+                                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border ${
+                                                event.category.toLowerCase().includes('competition')
+                                                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                    : 'bg-[#2a2d35] text-blue-400 border-blue-500/20'
+                                            }`}>{event.category}</span>
+                                            <span className="text-gray-400 text-xs flex items-center gap-1.5"><Clock className="w-3 h-3 text-blue-500" /> {event.time}</span>
+                                            <span className="text-gray-400 text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3 text-blue-500" /> {event.location}</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
+                                        <p className="text-sm text-gray-400 mb-4">{event.description}</p>
+
+                                        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#3c3f4a] pt-4 mt-4">
+                                            <div className="flex items-center gap-3 bg-[#2a2d35] px-3 py-2 rounded-lg">
+                                                {event.speakerImage ? <img src={event.speakerImage} alt={event.speaker} className="w-10 h-10 rounded-full object-cover border-2 border-[#1f2229]" /> : <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center border-2 border-[#1f2229]"><User className="w-5 h-5" /></div>}
+                                                <div>
+                                                    <div className="text-sm font-bold text-white">{event.speaker}</div>
+                                                    <div className="text-[10px] text-gray-400">{event.speakerRole}</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Entry Fee</div>
+                                                <div className="text-sm text-blue-400 font-bold">{event.fee}</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Entry Fee</div>
-                                    <div className="text-sm text-blue-400 font-bold">{event.fee}</div>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 ))}
             </div>
-        </div>
-    );
+        );
+    };
 
     const renderCompetitions = () => (
         <div className="max-w-5xl mx-auto animate-in fade-in duration-500 w-full text-left">
@@ -461,6 +510,10 @@ const AISymposium = () => {
                             <div className="text-blue-500 font-bold mb-1 uppercase tracking-tighter">8 May</div>
                             <div className="text-gray-300">Suturing, Building a Startup</div>
                         </div>
+                        <div className="bg-blue-600/10 p-3 rounded-lg border border-blue-500/30">
+                            <div className="text-blue-400 font-bold mb-1 uppercase tracking-tighter">9 May — Main Event</div>
+                            <div className="text-gray-300">Competitions, Keynotes, Panels</div>
+                        </div>
                         <div className="pt-2">
                             <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
                                 <div className="h-[1px] flex-1 bg-[#3c3f4a]"></div> Free Online <div className="h-[1px] flex-1 bg-[#3c3f4a]"></div>
@@ -560,13 +613,13 @@ const AISymposium = () => {
             </div>
 
             {/* Popups */}
-            {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} referralCode={referralCode} />}
-            {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} referralCode={referralCode} />}
-            {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} referralCode={referralCode} />}
+            {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('registration') ? discountPercent : 0} />}
+            {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('pitch') ? discountPercent : 0} />}
+            {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('poster') ? discountPercent : 0} />}
             {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} referralCode={referralCode} />}
-            {isQuizFormOpen && <QuizForm onClose={() => setIsQuizFormOpen(false)} referralCode={referralCode} />}
-            {isDrillFormOpen && <DrillForm onClose={() => setIsDrillFormOpen(false)} referralCode={referralCode} />}
-            {isDebateFormOpen && <DebateForm onClose={() => setIsDebateFormOpen(false)} referralCode={referralCode} />}
+            {isQuizFormOpen && <QuizForm onClose={() => setIsQuizFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('quiz') ? discountPercent : 0} />}
+            {isDrillFormOpen && <DrillForm onClose={() => setIsDrillFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('drill') ? discountPercent : 0} />}
+            {isDebateFormOpen && <DebateForm onClose={() => setIsDebateFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('debate') ? discountPercent : 0} />}
         </div>
     );
 };

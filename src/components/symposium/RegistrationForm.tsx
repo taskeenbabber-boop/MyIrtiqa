@@ -60,9 +60,10 @@ const CONFERENCE_FEE: Record<Category, number> = {
 interface RegistrationFormProps {
     onClose: () => void;
     referralCode?: string;
+    discountPercent?: number;
 }
 
-export function RegistrationForm({ onClose, referralCode }: RegistrationFormProps) {
+export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }: RegistrationFormProps) {
     // Step order: 1=Events, 2=Category, 3=Details, 4=Payment
     const [step, setStep] = useState(1);
     const [category, setCategory] = useState<Category | null>(null);
@@ -129,6 +130,10 @@ export function RegistrationForm({ onClose, referralCode }: RegistrationFormProp
                     total += workshopFee;
                 }
             });
+        }
+        // Apply referral discount
+        if (discountPercent > 0) {
+            total = Math.round(total * (1 - discountPercent / 100));
         }
         return total;
     };

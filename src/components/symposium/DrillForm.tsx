@@ -13,9 +13,10 @@ const BORDER = "#222222";
 interface DrillFormProps {
     onClose: () => void;
     referralCode?: string;
+    discountPercent?: number;
 }
 
-export function DrillForm({ onClose, referralCode }: DrillFormProps) {
+export function DrillForm({ onClose, referralCode, discountPercent = 0 }: DrillFormProps) {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [formData, setFormData] = useState({
