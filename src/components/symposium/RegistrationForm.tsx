@@ -61,9 +61,10 @@ interface RegistrationFormProps {
     onClose: () => void;
     referralCode?: string;
     discountPercent?: number;
+    onOpenCompetitionForm?: (type: string) => void;
 }
 
-export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }: RegistrationFormProps) {
+export function RegistrationForm({ onClose, referralCode, discountPercent = 0, onOpenCompetitionForm }: RegistrationFormProps) {
     // Step order: 1=Events, 2=Category, 3=Details, 4=Payment
     const [step, setStep] = useState(1);
     const [category, setCategory] = useState<Category | null>(null);
@@ -71,6 +72,8 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
     const [submitted, setSubmitted] = useState(false);
     const [wantWorkshops, setWantWorkshops] = useState(false);
     const [wantConference, setWantConference] = useState(true);
+    const [conferenceRole, setConferenceRole] = useState<'observer' | 'participant' | null>(null);
+    const [selectedCompetitions, setSelectedCompetitions] = useState<string[]>([]);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -125,13 +128,13 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
             formData.selectedWorkshops.forEach(wsId => {
                 const ws = WORKSHOPS.find(w => w.id === wsId);
                 if (ws?.isSuturing) {
-                    total += 1000; // flat fee for suturing
+                    total += 1000;
                 } else {
                     total += workshopFee;
                 }
             });
         }
-        // Apply referral discount
+        // Apply referral discount to conference+workshop fees
         if (discountPercent > 0) {
             total = Math.round(total * (1 - discountPercent / 100));
         }
@@ -160,7 +163,11 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
     const stepLabels = ["Events", "Category", "Details", "Payment"];
 
     const canContinue = () => {
-        if (step === 1) return wantConference || wantWorkshops; // must pick at least one
+        if (step === 1) {
+            if (!wantConference && !wantWorkshops) return false;
+            if (wantConference && !conferenceRole) return false;
+            return true;
+        }
         if (step === 2) return !!category;
         if (step === 3) {
             const baseValid = formData.name.trim() !== "" && formData.email.trim() !== "" && formData.phone.trim() !== "";
@@ -209,6 +216,8 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
                 is_nwsm_student: category === "NWSM_STUDENT",
                 wants_workshops: wantWorkshops && !isTeam,
                 wants_conference: wantConference,
+                conference_role: wantConference ? conferenceRole : null,
+                selected_competitions: wantConference && conferenceRole === 'participant' ? selectedCompetitions : [],
                 workshop_fee_per: workshopFee,
                 conference_fee: confFee,
                 referral_code: referralCode || null,
@@ -303,6 +312,8 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
                     <p className="text-white/40 text-sm leading-relaxed mb-6">
                         Thank you for registering. Our team will verify your payment and send a confirmation email to <strong className="text-white/60">{formData.email}</strong> within 24–48 hours.
                     </p>
+
+
                     <button
                         onClick={onClose}
                         className="text-sm font-bold uppercase tracking-widest px-8 py-3 rounded-full transition-all hover:scale-105"
@@ -407,6 +418,87 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
                                         {wantConference && <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: ACCENT }} />}
                                     </div>
                                 </div>
+
+                                {/* Day 3 Observer / Participant Selection */}
+                                {wantConference && (
+                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-3 overflow-hidden">
+                                        <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: ACCENT }}>How will you attend Day 3?</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div
+                                                onClick={() => { setConferenceRole('observer'); setSelectedCompetitions([]); }}
+                                                className="p-4 rounded-xl cursor-pointer transition-all"
+                                                style={{
+                                                    background: conferenceRole === 'observer' ? ACCENT_BG : SURFACE,
+                                                    border: `${conferenceRole === 'observer' ? '2px' : '1px'} solid ${conferenceRole === 'observer' ? ACCENT : BORDER}`,
+                                                }}
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <span className="font-bold text-white text-sm block">👀 Observer</span>
+                                                        <span className="text-[11px] text-white/40 block mt-1">Attend keynotes, panels & networking — no competition entry</span>
+                                                    </div>
+                                                    {conferenceRole === 'observer' && <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT }} />}
+                                                </div>
+                                            </div>
+                                            <div
+                                                onClick={() => setConferenceRole('participant')}
+                                                className="p-4 rounded-xl cursor-pointer transition-all"
+                                                style={{
+                                                    background: conferenceRole === 'participant' ? ACCENT_BG : SURFACE,
+                                                    border: `${conferenceRole === 'participant' ? '2px' : '1px'} solid ${conferenceRole === 'participant' ? ACCENT : BORDER}`,
+                                                }}
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <span className="font-bold text-white text-sm block">🏆 Participant</span>
+                                                        <span className="text-[11px] text-white/40 block mt-1">Compete in AI competitions — select which ones below</span>
+                                                    </div>
+                                                    {conferenceRole === 'participant' && <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: ACCENT }} />}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Competition selection for participants — direct form redirect */}
+                                        {conferenceRole === 'participant' && (
+                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3 pt-2">
+                                                <h4 className="text-[11px] font-bold uppercase tracking-wider text-white/50">Choose a competition to register for</h4>
+                                                <div className="grid grid-cols-1 gap-2">
+                                                    {[
+                                                        { id: 'pitch', label: 'AI Pitch Competition', emoji: '💡', fee: '500 PKR', desc: '5-min pitch + 3-min Q&A' },
+                                                        { id: 'poster', label: 'AI Poster Competition', emoji: '🖼️', fee: '500 PKR', desc: 'Research poster presentation' },
+                                                        { id: 'quiz', label: 'AI Quiz Competition', emoji: '🧠', fee: '500 PKR', desc: 'Test your AI knowledge' },
+                                                        { id: 'drill', label: 'AI Drill Competition', emoji: '⚡', fee: '500 PKR', desc: 'Hands-on AI problem solving' },
+                                                        { id: 'debate', label: 'AI Debate Competition', emoji: '🎤', fee: '500 PKR', desc: 'Argue for or against AI topics' },
+                                                        { id: 'meme', label: 'AI Memes Competition', emoji: '😂', fee: 'Free', desc: 'Create the best AI meme' },
+                                                    ].map(comp => (
+                                                        <button key={comp.id}
+                                                            onClick={() => {
+                                                                if (onOpenCompetitionForm) {
+                                                                    onOpenCompetitionForm(comp.id);
+                                                                }
+                                                            }}
+                                                            className="w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all hover:scale-[1.01] group"
+                                                            style={{ background: SURFACE, border: `1px solid ${BORDER}` }}
+                                                        >
+                                                            <div className="text-2xl w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: ACCENT_BG }}>{comp.emoji}</div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">{comp.label}</div>
+                                                                <div className="text-[11px] text-white/30 mt-0.5">{comp.desc}</div>
+                                                            </div>
+                                                            <div className="flex flex-col items-end flex-shrink-0">
+                                                                <span className="text-xs font-bold" style={{ color: comp.fee === 'Free' ? '#4ade80' : ACCENT }}>{comp.fee}</span>
+                                                                <span className="text-[10px] text-white/30 flex items-center gap-1 mt-1 group-hover:text-blue-400 transition-colors">
+                                                                    Open Form <ArrowRight className="w-3 h-3" />
+                                                                </span>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <p className="text-[10px] text-white/30 italic">💡 Each competition has its own form with payment. Click to open it directly.</p>
+                                            </motion.div>
+                                        )}
+                                    </motion.div>
+                                )}
 
                                 {/* Day 1: Workshops */}
                                 <div
@@ -711,14 +803,14 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
 
                                         {wantConference && category && (
                                             <div className="flex justify-between text-white/40 text-xs">
-                                                <span>Day 2: Main Conference</span>
+                                                <span>Day 3: Main Conference ({conferenceRole === 'participant' ? 'Participant' : 'Observer'})</span>
                                                 <span className="font-bold" style={{ color: ACCENT }}>{CONFERENCE_FEE[category].toLocaleString()} PKR</span>
                                             </div>
                                         )}
 
                                         {wantWorkshops && formData.selectedWorkshops.length > 0 && !isTeam && (
                                             <div className="text-white/40 text-xs space-y-1 pt-2" style={{ borderTop: `1px solid ${BORDER}` }}>
-                                                <div className="font-bold uppercase tracking-wider text-[10px] text-white/20 mb-1">Day 1 Workshops</div>
+                                                <div className="font-bold uppercase tracking-wider text-[10px] text-white/20 mb-1">Day 1 & 2 Workshops</div>
                                                 {formData.selectedWorkshops.map(wsId => {
                                                     const ws = WORKSHOPS.find(w => w.id === wsId);
                                                     return ws ? (
@@ -727,19 +819,18 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0 }:
                                                                 <CheckCircle className="w-3 h-3" style={{ color: ACCENT }} />
                                                                 {ws.title} ({ws.slot === "morning" ? "Morning" : "Afternoon"})
                                                             </span>
-                                                            <span className="font-bold" style={{ color: ACCENT }}>{workshopFee.toLocaleString()} PKR</span>
+                                                            <span className="font-bold" style={{ color: ACCENT }}>{(ws.isSuturing ? 1000 : workshopFee).toLocaleString()} PKR</span>
                                                         </div>
                                                     ) : null;
                                                 })}
-                                                {wantConference && formData.selectedWorkshops.length === 2 && category === "FACULTY" && (
-                                                    <div className="flex justify-between items-center text-green-400/90 pt-1">
-                                                        <span className="flex items-center gap-2">
-                                                            <CheckCircle className="w-3 h-3" style={{ color: "#4ade80" }} />
-                                                            Full Event Pass Discount
-                                                        </span>
-                                                        <span className="font-bold">-1,000 PKR</span>
-                                                    </div>
-                                                )}
+                                            </div>
+                                        )}
+
+
+                                        {discountPercent > 0 && (
+                                            <div className="flex justify-between items-center text-emerald-400 text-xs pt-2" style={{ borderTop: `1px solid ${BORDER}` }}>
+                                                <span>Referral Discount (on pass only)</span>
+                                                <span className="font-bold">-{discountPercent}%</span>
                                             </div>
                                         )}
                                     </div>

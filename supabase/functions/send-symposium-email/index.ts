@@ -74,126 +74,81 @@ function getAgendaHtml() {
     <div class="agenda-section">
       <div class="agenda-header">EVENT<br><span>AGENDA</span></div>
       
+      <div style="margin-bottom:20px;">
+        <div style="display:inline-block;padding:6px 16px;background:#3b82f6;border-radius:50px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;">DAY 1 — 7 MAY 2026</div>
+      </div>
+
       <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Note-Taking.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
+        <div class="card-left"><img src="https://myirtiqa.com/icons/Clinical-Audit.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">WORKSHOP <span>• 10 Apr 2026</span></p>
-          <p class="card-title">AI for Note Taking</p>
-          <p class="card-time">🕒 10:00 AM – 12:00 PM &nbsp;&nbsp; 📍 Workshop Room 1</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="width: 40px; vertical-align: middle;">
-                <img src="https://i.ibb.co/LdhCMhkb/Haroon-Head-SHot.png" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Muhammad Haroon" />
-              </td>
-              <td style="vertical-align: middle;">
-                <p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Muhammad Haroon</p>
-                <p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">AI Specialist & App Developer</p>
-              </td>
-            </tr>
-          </table>
+          <p class="card-meta">WORKSHOP <span>• 7 May 2026</span></p>
+          <p class="card-title">Clinical Audit & AI in Clinical Use</p>
+          <p class="card-time">🕒 10:00 AM – 12:00 PM &nbsp;&nbsp; 📍 Workshop Room 1 • Hybrid</p>
+          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="width: 40px; vertical-align: middle;"><img src="https://i.ibb.co/gbhNLhWy/Almas-Fasih-Khattak.jpg" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Dr. Almas" /></td>
+            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Dr. Almas Fasih Khattak</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Asst. Director GSRH | Director Research HMC</p></td>
+          </tr></table>
         </div>
       </div>
       
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/Prompt-Engineering.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">WORKSHOP <span>• 10 Apr 2026</span></p>
-          <p class="card-title">Prompt Engineering & Talk to AI in Design</p>
-          <p class="card-time">🕒 10:00 AM – 12:00 PM &nbsp;&nbsp; 📍 Workshop Room 2</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="width: 40px; vertical-align: middle;">
-                <img src="https://i.ibb.co/FkGZRYpd/Asad-Head-SHot.png" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Asad Raziq" />
-              </td>
-              <td style="vertical-align: middle;">
-                <p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Asad Raziq</p>
-                <p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Visual Artist</p>
-              </td>
-            </tr>
-          </table>
+          <p class="card-meta">WORKSHOP <span>• 7 May 2026</span></p>
+          <p class="card-title">Prompt Engineering: Talk to AI in Design</p>
+          <p class="card-time">🕒 2:00 PM – 4:00 PM &nbsp;&nbsp; 📍 Workshop Room 1 • Hybrid</p>
+          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="width: 40px; vertical-align: middle;"><img src="https://i.ibb.co/FkGZRYpd/Asad-Head-SHot.png" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Asad" /></td>
+            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Asad Raziq</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Visual Artist</p></td>
+          </tr></table>
         </div>
       </div>
-      
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-in-Research.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">WORKSHOP <span>• 10 Apr 2026</span></p>
-          <p class="card-title">AI in Research</p>
-          <p class="card-time">🕒 2:00 PM – 4:00 PM &nbsp;&nbsp; 📍 Workshop Room 1</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="width: 40px; vertical-align: middle;">
-                <img src="https://i.ibb.co/Y70W3nx6/Iftikhar-khan-Head-SHot.png" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Iftikhar" />
-              </td>
-              <td style="vertical-align: middle;">
-                <p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Iftikhar</p>
-                <p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Founder IRC | 61 Publications</p>
-              </td>
-            </tr>
-          </table>
-        </div>
+
+      <div style="margin:25px 0 20px;">
+        <div style="display:inline-block;padding:6px 16px;background:#3b82f6;border-radius:50px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;">DAY 2 — 8 MAY 2026</div>
       </div>
-      
+
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/Clinical-Audit.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">WORKSHOP <span>• 10 Apr 2026</span></p>
-          <p class="card-title">Clinical Audit & AI in Clinical Use</p>
-          <p class="card-time">🕒 2:00 PM – 4:00 PM &nbsp;&nbsp; 📍 Workshop Room 2</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="width: 40px; vertical-align: middle;">
-                <img src="https://i.ibb.co/gbhNLhWy/Almas-Fasih-Khattak.jpg" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Dr. Almas" />
-              </td>
-              <td style="vertical-align: middle;">
-                <p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Dr. Almas Fasih Khattak</p>
-                <p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Director Research HMC</p>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-      
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-and-the-Future-of-Global-Surgery.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">KEYNOTE <span>• 11 Apr 2026</span></p>
-          <p class="card-title">AI and the Future of Global Surgery</p>
-          <p class="card-time">🕒 Morning Session &nbsp;&nbsp; 📍 Main Auditorium</p>
-        </div>
-      </div>
-      
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/Thinking-Like-a-Builder.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">KEYNOTE <span>• 11 Apr 2026</span></p>
-          <p class="card-title">Thinking Like a Builder: AI Solutions in Healthcare</p>
-          <p class="card-time">🕒 Midday Session &nbsp;&nbsp; 📍 Main Auditorium</p>
+          <p class="card-meta">HANDS-ON WORKSHOP <span>• 8 May 2026</span></p>
+          <p class="card-title">Suturing with a Plastic Surgeon</p>
+          <p class="card-time">🕒 Full Day: 10 AM – 12 PM & 2 – 4 PM &nbsp;&nbsp; 📍 Skills Lab</p>
+          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Prof. Dr. Obaidullah</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Consultant Plastic & Reconstructive Surgeon</p></td>
+          </tr></table>
         </div>
       </div>
 
       <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/Human-Expertise-vs-AI-Systems.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
+        <div class="card-left"><img src="https://myirtiqa.com/icons/Thinking-Like-a-Builder.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">PANEL <span>• 11 Apr 2026</span></p>
-          <p class="card-title">Human Expertise vs AI Systems</p>
-          <p class="card-time">🕒 60 Minutes &nbsp;&nbsp; 📍 Main Auditorium</p>
+          <p class="card-meta">WORKSHOP <span>• 8 May 2026</span></p>
+          <p class="card-title">How to Build and Scale a Startup</p>
+          <p class="card-time">🕒 2:00 PM – 4:00 PM &nbsp;&nbsp; 📍 Workshop Room 2 • Hybrid</p>
+          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Muhammad Waqar</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Founder, Black Byte</p></td>
+          </tr></table>
         </div>
+      </div>
+
+      <div style="margin:25px 0 20px;">
+        <div style="display:inline-block;padding:6px 16px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:50px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;">DAY 3 — 9 MAY 2026 • MAIN EVENT</div>
       </div>
 
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Poster-Competition.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 11 Apr 2026</span></p>
+          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
           <p class="card-title">AI Poster Competition</p>
-          <p class="card-time">🕒 TBA &nbsp;&nbsp; 📍 Front Lobby</p>
+          <p class="card-time">📍 Front Lobby</p>
         </div>
       </div>
 
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Drill.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 11 Apr 2026</span></p>
+          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
           <p class="card-title">AI Drill</p>
           <p class="card-time">🕒 1 Hour &nbsp;&nbsp; 📍 Computer Lab</p>
         </div>
@@ -202,16 +157,16 @@ function getAgendaHtml() {
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Debate.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 11 Apr 2026</span></p>
+          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
           <p class="card-title">AI Debate</p>
-          <p class="card-time">🕒 TBA &nbsp;&nbsp; 📍 Debate Hall</p>
+          <p class="card-time">📍 Debate Hall</p>
         </div>
       </div>
 
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Pitch-Competition.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 11 Apr 2026</span></p>
+          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
           <p class="card-title">AI Pitch Competition</p>
           <p class="card-time">🕒 5m Pitch + 3m Q&A &nbsp;&nbsp; 📍 Pitch Room</p>
         </div>
@@ -220,18 +175,18 @@ function getAgendaHtml() {
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Drill.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 11 Apr 2026</span></p>
+          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
           <p class="card-title">AI Quiz</p>
-          <p class="card-time">🕒 TBA &nbsp;&nbsp; 📍 Quiz Hall</p>
+          <p class="card-time">📍 Quiz Hall</p>
         </div>
       </div>
 
       <div class="event-card">
         <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Debate.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 11 Apr 2026</span></p>
+          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
           <p class="card-title">AI Memes Competition</p>
-          <p class="card-time">🕒 TBA &nbsp;&nbsp; 📍 Online + Venue</p>
+          <p class="card-time">📍 Online + Venue</p>
         </div>
       </div>
 

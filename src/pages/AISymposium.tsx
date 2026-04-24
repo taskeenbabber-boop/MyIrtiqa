@@ -613,7 +613,11 @@ const AISymposium = () => {
             </div>
 
             {/* Popups */}
-            {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('registration') ? discountPercent : 0} />}
+            {isRegistrationOpen && <RegistrationForm onClose={() => setIsRegistrationOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('registration') ? discountPercent : 0} onOpenCompetitionForm={(type) => {
+                setIsRegistrationOpen(false);
+                const formMap: Record<string, (v: boolean) => void> = { pitch: setIsPitchFormOpen, poster: setIsPosterFormOpen, meme: setIsMemeFormOpen, quiz: setIsQuizFormOpen, drill: setIsDrillFormOpen, debate: setIsDebateFormOpen };
+                formMap[type]?.(true);
+            }} />}
             {isPitchFormOpen && <PitchForm onClose={() => setIsPitchFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('pitch') ? discountPercent : 0} />}
             {isPosterFormOpen && <PosterForm onClose={() => setIsPosterFormOpen(false)} referralCode={referralCode} discountPercent={discountAppliesTo.includes('poster') ? discountPercent : 0} />}
             {isMemeFormOpen && <MemeForm onClose={() => setIsMemeFormOpen(false)} referralCode={referralCode} />}

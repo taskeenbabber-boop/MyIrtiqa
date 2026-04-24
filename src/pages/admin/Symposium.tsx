@@ -321,11 +321,48 @@ export default function AdminSymposium() {
         speakers: 0
     };
 
+    const WORKSHOP_NAMES: Record<string, string> = {
+        "ws-4": "Clinical Audit & AI in Clinical Use (7 May AM)",
+        "ws-2": "Prompt Engineering & AI in Design (7 May PM)",
+        "ws-5a": "Suturing Workshop - Morning (8 May AM)",
+        "ws-5b": "Suturing Workshop - Afternoon (8 May PM)",
+        "ws-3": "From Idea to Impact: Startup (8 May PM)",
+    };
+
+    const exportRegistrationsCSV = () => {
+        const headers = ["Name", "Email", "Phone", "Institution", "Roll Number", "Category", "Workshops", "Amount (PKR)", "Status", "Date"];
+        const rows = registrations.map(r => [
+            `"${r.name}"`,
+            r.email,
+            r.phone,
+            `"${r.institution || ''}"`,
+            r.roll_number || '',
+            r.ticket_type,
+            `"${(r.selected_workshops || []).map((w: string) => WORKSHOP_NAMES[w] || w).join('; ')}"`,
+            r.total_amount,
+            r.status,
+            new Date(r.created_at).toLocaleDateString(),
+        ]);
+        const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        a.download = `symposium_registrations_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    };
+
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold">AI Symposium Management</h1>
-                <p className="text-muted-foreground text-sm mt-1">Review registrations, pitch submissions, and poster applications</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold">AI Symposium Management</h1>
+                    <p className="text-muted-foreground text-sm mt-1">Review registrations, pitch submissions, and poster applications</p>
+                </div>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={exportRegistrationsCSV}>
+                        <Download className="w-3.5 h-3.5 mr-1.5" /> Export Registrations CSV
+                    </Button>
+                    <Button size="sm" onClick={fetchData} disabled={loading}>
+                        {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Refresh"}
+                    </Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -398,7 +435,7 @@ export default function AdminSymposium() {
                                                 <span className="text-xs text-muted-foreground block mb-1">Workshops</span>
                                                 <div className="flex flex-wrap gap-1.5">
                                                     {workshops.map(ws => (
-                                                        <span key={ws} className="px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-medium">{ws}</span>
+                                                        <span key={ws} className="px-2 py-0.5 bg-primary/10 text-primary rounded text-xs font-medium">{WORKSHOP_NAMES[ws] || ws}</span>
                                                     ))}
                                                 </div>
                                             </div>
