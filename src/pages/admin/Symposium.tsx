@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download, MessageSquare, Loader2 } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, FileText, Download, MessageSquare, Loader2, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -164,6 +164,9 @@ export default function AdminSymposium() {
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [noteText, setNoteText] = useState("");
     const [updating, setUpdating] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
+    const [workshopFilter, setWorkshopFilter] = useState<string>("all");
 
     // New Speaker Form State
     const [newSpeaker, setNewSpeaker] = useState({
@@ -394,13 +397,94 @@ export default function AdminSymposium() {
                 ))}
             </div>
 
+            {/* Search & Filters */}
+            <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                        type="text"
+                        placeholder="Search by name, email, phone, institution..."
+                        className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-background border border-border text-sm"
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <div className="flex gap-2">
+                    <select
+                        className="h-10 rounded-lg border border-border bg-background px-3 text-sm min-w-[130px]"
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value as any)}
+                    >
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    {tab === "registrations" && (
+                        <select
+                            className="h-10 rounded-lg border border-border bg-background px-3 text-sm min-w-[180px]"
+                            value={workshopFilter}
+                            onChange={e => setWorkshopFilter(e.target.value)}
+                        >
+                            <option value="all">All Workshops</option>
+                            {Object.entries(WORKSHOP_NAMES).map(([id, name]) => (
+                                <option key={id} value={id}>{name}</option>
+                            ))}
+                        </select>
+                    )}
+                </div>
+            </div>
+
             {loading ? (
                 <div className="flex items-center justify-center py-20">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-            ) : (
+            ) : (() => {
+                const q = searchQuery.toLowerCase().trim();
+                const matchSearch = (item: { name?: string; full_name?: string; email?: string; phone?: string; whatsapp?: string; institution?: string }) => {
+                    if (!q) return true;
+                    return [item.name, item.full_name, item.email, item.phone, item.whatsapp, item.institution]
+                        .filter(Boolean).some(v => v!.toLowerCase().includes(q));
+                };
+                const matchStatus = (status: string) => statusFilter === "all" || status === statusFilter;
+
+                const filteredRegistrations = registrations.filter(r => {
+                    if (!matchSearch(r) || !matchStatus(r.status)) return false;
+                    if (workshopFilter !== "all") {
+                        let ws: string[] = [];
+                        try { ws = Array.isArray(r.selected_workshops) ? r.selected_workshops : JSON.parse(r.selected_workshops || "[]"); } catch {}
+                        if (!ws.includes(workshopFilter)) return false;
+                    }
+                    return true;
+                });
+                const filteredPitch = pitchSubs.filter(p => matchSearch(p) && matchStatus(p.status));
+                const filteredPoster = posterSubs.filter(p => matchSearch(p) && matchStatus(p.status));
+                const filteredQuiz = quizSubs.filter(p => matchSearch(p) && matchStatus(p.status));
+                const filteredDrill = drillSubs.filter(p => matchSearch(p) && matchStatus(p.status));
+                const filteredDebate = debateSubs.filter(p => matchSearch(p) && matchStatus(p.status));
+                const filteredMeme = memeSubs.filter(p => matchSearch(p) && matchStatus(p.status));
+                const filteredAmbassadors = ambassadorApps.filter(a => matchSearch(a) && matchStatus(a.status));
+
+                const activeCount = tab === "registrations" ? filteredRegistrations.length
+                    : tab === "pitch" ? filteredPitch.length : tab === "poster" ? filteredPoster.length
+                    : tab === "quiz" ? filteredQuiz.length : tab === "drill" ? filteredDrill.length
+                    : tab === "debate" ? filteredDebate.length : tab === "meme" ? filteredMeme.length
+                    : tab === "ambassadors" ? filteredAmbassadors.length : 0;
+
+                return (
                 <div className="space-y-3">
-                    {tab === "registrations" && registrations.map(reg => {
+                    {(q || statusFilter !== "all" || workshopFilter !== "all") && tab !== "speakers" && (
+                        <div className="text-sm text-muted-foreground flex items-center gap-2">
+                            <Filter className="w-3.5 h-3.5" />
+                            Showing {activeCount} result{activeCount !== 1 ? 's' : ''}
+                            {q && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">"{searchQuery}"</span>}
+                            {statusFilter !== "all" && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{statusFilter}</span>}
+                            {workshopFilter !== "all" && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{WORKSHOP_NAMES[workshopFilter]}</span>}
+                            <button onClick={() => { setSearchQuery(""); setStatusFilter("all"); setWorkshopFilter("all"); }} className="text-xs text-red-400 hover:text-red-300 ml-2">Clear</button>
+                        </div>
+                    )}
+
+                    {tab === "registrations" && filteredRegistrations.map(reg => {
                         let workshops: string[] = [];
                         try { workshops = Array.isArray(reg.selected_workshops) ? reg.selected_workshops : JSON.parse(reg.selected_workshops || "[]"); } catch { }
 
@@ -471,7 +555,7 @@ export default function AdminSymposium() {
                         )
                     })}
 
-                    {tab === "pitch" && pitchSubs.map(pitch => (
+                    {tab === "pitch" && filteredPitch.map(pitch => (
                         <div key={pitch.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === pitch.id ? null : pitch.id)}>
                                 <div>
@@ -518,7 +602,7 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
-                    {tab === "poster" && posterSubs.map(poster => (
+                    {tab === "poster" && filteredPoster.map(poster => (
                         <div key={poster.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === poster.id ? null : poster.id)}>
                                 <div>
@@ -560,7 +644,7 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
-                    {tab === "quiz" && quizSubs.map(quiz => (
+                    {tab === "quiz" && filteredQuiz.map(quiz => (
                         <div key={quiz.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === quiz.id ? null : quiz.id)}>
                                 <div>
@@ -603,7 +687,7 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
-                    {tab === "drill" && drillSubs.map(drill => (
+                    {tab === "drill" && filteredDrill.map(drill => (
                         <div key={drill.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === drill.id ? null : drill.id)}>
                                 <div>
@@ -646,7 +730,7 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
-                    {tab === "debate" && debateSubs.map(debate => (
+                    {tab === "debate" && filteredDebate.map(debate => (
                         <div key={debate.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === debate.id ? null : debate.id)}>
                                 <div>
@@ -689,7 +773,7 @@ export default function AdminSymposium() {
                         </div>
                     ))}
 
-                    {tab === "meme" && memeSubs.map(meme => (
+                    {tab === "meme" && filteredMeme.map(meme => (
                         <div key={meme.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === meme.id ? null : meme.id)}>
                                 <div>
@@ -764,7 +848,7 @@ export default function AdminSymposium() {
                         </div>
                     )}
 
-                    {tab === "ambassadors" && ambassadorApps.map(app => (
+                    {tab === "ambassadors" && filteredAmbassadors.map(app => (
                         <div key={app.id} className="rounded-xl border border-border bg-card overflow-hidden">
                             <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}>
                                 <div>
@@ -898,7 +982,8 @@ export default function AdminSymposium() {
                         </div>
                     )}
                 </div>
-            )}
+                );
+            })()}
         </div>
     );
 }
