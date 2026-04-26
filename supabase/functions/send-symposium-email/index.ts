@@ -7,9 +7,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 /* ═══════ Email "from" addresses ═══════ */
-/* ═══════ Email "from" addresses ═══════ */
 const FROM_ADDRESSES: Record<string, string> = {
   registration: "AI Symposium <symposium@myirtiqa.com>",
+  registrations: "AI Symposium <symposium@myirtiqa.com>",
   ambassador: "Campus Ambassadors <ambassador@myirtiqa.com>",
   pitch: "AI Competitions <competitions@myirtiqa.com>",
   poster: "AI Competitions <competitions@myirtiqa.com>",
@@ -20,6 +20,42 @@ const FROM_ADDRESSES: Record<string, string> = {
   default: "AI Symposium <info@myirtiqa.com>",
 };
 
+/* ═══════ WhatsApp Group Links ═══════ */
+const WHATSAPP_LINKS: Record<string, string> = {
+  // Workshops (by workshop ID)
+  "ws-4": "https://chat.whatsapp.com/BuCogfzRgsd6MiWxpkU87b?mode=gi_t",       // Clinical Audit
+  "ws-6": "https://chat.whatsapp.com/CeGEbtIjlv3DsQSK5uWSNU?mode=gi_t",       // Prompt Engineering
+  "ws-5a": "https://chat.whatsapp.com/DgCsGekcIWZ6MEsINEZDkX?mode=gi_t",      // Suturing (Morning)
+  "ws-5b": "https://chat.whatsapp.com/DgCsGekcIWZ6MEsINEZDkX?mode=gi_t",      // Suturing (Afternoon)
+  "ws-7": "https://chat.whatsapp.com/BjIll6ySxr4BXa3IB6H9fJ?mode=gi_t",       // Startup Workshop
+  // Competitions (by type keyword)
+  "pitch": "https://chat.whatsapp.com/CnrcPo0ZtK1I6GFfnwvYoK?mode=gi_t",
+  "poster": "https://chat.whatsapp.com/J9E5tcUxl2HGIyAj3Owg13?mode=gi_t",
+  "quiz": "https://chat.whatsapp.com/KvB7UfN1GayClP4DIPzOa3?mode=gi_t",
+  "drill": "https://chat.whatsapp.com/HSrheh1Jx7nIBwI6jIPBP7?mode=gi_t",
+  "debate": "https://chat.whatsapp.com/CrjPVMB0Fq0BhADLtRsDXw?mode=gi_t",
+  "meme": "",
+};
+
+/* ═══════ Workshop name mapping ═══════ */
+const WORKSHOP_NAMES: Record<string, string> = {
+  "ws-4": "Clinical Audit & AI in Clinical Use",
+  "ws-6": "Prompt Engineering: Talk to AI in Design",
+  "ws-5a": "Suturing with a Plastic Surgeon (Morning)",
+  "ws-5b": "Suturing with a Plastic Surgeon (Afternoon)",
+  "ws-7": "How to Build and Scale a Startup",
+};
+
+/* ═══════ Competition display names ═══════ */
+const COMPETITION_NAMES: Record<string, string> = {
+  pitch: "AI Pitch Competition",
+  poster: "AI Poster Competition",
+  quiz: "AI Quiz Competition",
+  drill: "AI Drill Competition",
+  debate: "AI Debate Competition",
+  meme: "AI Memes Competition",
+};
+
 /* ═══════ Shared HTML Components ═══════ */
 const EMAIL_STYLES = `
   body { margin: 0; padding: 0; background-color: #f3f4f6; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -27,7 +63,7 @@ const EMAIL_STYLES = `
   .container { max-width: 650px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
   .dark-header { background-color: #111827; padding: 0; text-align: center; }
   .dark-header img { width: 100%; height: auto; display: block; }
-  .title-logo { font-size: 28px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .title-logo { font-size: 28px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
   .title-logo span { color: #fdf2f8; font-weight: 300; }
   
   .content-body { padding: 40px; text-align: center; }
@@ -84,10 +120,6 @@ function getAgendaHtml() {
           <p class="card-meta">WORKSHOP <span>• 7 May 2026</span></p>
           <p class="card-title">Clinical Audit & AI in Clinical Use</p>
           <p class="card-time">🕒 10:00 AM – 12:00 PM &nbsp;&nbsp; 📍 Workshop Room 1 • Hybrid</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
-            <td style="width: 40px; vertical-align: middle;"><img src="https://i.ibb.co/gbhNLhWy/Almas-Fasih-Khattak.jpg" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Dr. Almas" /></td>
-            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Dr. Almas Fasih Khattak</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Asst. Director GSRH | Director Research HMC</p></td>
-          </tr></table>
         </div>
       </div>
       
@@ -97,10 +129,6 @@ function getAgendaHtml() {
           <p class="card-meta">WORKSHOP <span>• 7 May 2026</span></p>
           <p class="card-title">Prompt Engineering: Talk to AI in Design</p>
           <p class="card-time">🕒 2:00 PM – 4:00 PM &nbsp;&nbsp; 📍 Workshop Room 1 • Hybrid</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
-            <td style="width: 40px; vertical-align: middle;"><img src="https://i.ibb.co/FkGZRYpd/Asad-Head-SHot.png" width="32" height="32" style="width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover;" alt="Asad" /></td>
-            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Asad Raziq</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Visual Artist</p></td>
-          </tr></table>
         </div>
       </div>
 
@@ -114,9 +142,6 @@ function getAgendaHtml() {
           <p class="card-meta">HANDS-ON WORKSHOP <span>• 8 May 2026</span></p>
           <p class="card-title">Suturing with a Plastic Surgeon</p>
           <p class="card-time">🕒 Full Day: 10 AM – 12 PM & 2 – 4 PM &nbsp;&nbsp; 📍 Skills Lab</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
-            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Prof. Dr. Obaidullah</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Consultant Plastic & Reconstructive Surgeon</p></td>
-          </tr></table>
         </div>
       </div>
 
@@ -126,9 +151,6 @@ function getAgendaHtml() {
           <p class="card-meta">WORKSHOP <span>• 8 May 2026</span></p>
           <p class="card-title">How to Build and Scale a Startup</p>
           <p class="card-time">🕒 2:00 PM – 4:00 PM &nbsp;&nbsp; 📍 Workshop Room 2 • Hybrid</p>
-          <table style="margin-top: 10px; width: 100%;" cellpadding="0" cellspacing="0" border="0"><tr>
-            <td style="vertical-align: middle;"><p style="font-size: 11px; font-weight: 700; color: #ffffff; margin: 0 0 2px 0;">Muhammad Waqar</p><p style="font-size: 9px; color: rgba(255,255,255,0.5); margin: 0;">Founder, Black Byte</p></td>
-          </tr></table>
         </div>
       </div>
 
@@ -137,59 +159,12 @@ function getAgendaHtml() {
       </div>
 
       <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Poster-Competition.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
         <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
-          <p class="card-title">AI Poster Competition</p>
-          <p class="card-time">📍 Front Lobby</p>
+          <p class="card-meta">MAIN CONFERENCE <span>• 9 May 2026</span></p>
+          <p class="card-title">Keynotes, Panel Discussion & AI Competitions</p>
+          <p class="card-time">🕒 Full Day &nbsp;&nbsp; 📍 Northwest School of Medicine, Peshawar</p>
         </div>
       </div>
-
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Drill.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
-          <p class="card-title">AI Drill</p>
-          <p class="card-time">🕒 1 Hour &nbsp;&nbsp; 📍 Computer Lab</p>
-        </div>
-      </div>
-
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Debate.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
-          <p class="card-title">AI Debate</p>
-          <p class="card-time">📍 Debate Hall</p>
-        </div>
-      </div>
-
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Pitch-Competition.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
-          <p class="card-title">AI Pitch Competition</p>
-          <p class="card-time">🕒 5m Pitch + 3m Q&A &nbsp;&nbsp; 📍 Pitch Room</p>
-        </div>
-      </div>
-
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Drill.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
-          <p class="card-title">AI Quiz</p>
-          <p class="card-time">📍 Quiz Hall</p>
-        </div>
-      </div>
-
-      <div class="event-card">
-        <div class="card-left"><img src="https://myirtiqa.com/icons/AI-Debate.png" width="50" height="50" style="width: 50px; height: 50px; border-radius: 10px; display: block;" alt="icon" /></div>
-        <div class="card-middle">
-          <p class="card-meta">COMPETITION <span>• 9 May 2026</span></p>
-          <p class="card-title">AI Memes Competition</p>
-          <p class="card-time">📍 Online + Venue</p>
-        </div>
-      </div>
-
     </div>
   `;
 }
@@ -204,6 +179,7 @@ function getShareBlockHtml() {
     
     <div class="footer-venue">
       <p class="venue-text">Venue: Northwest School of Medicine, Peshawar</p>
+      <p style="font-size:12px; color:#6b7280; margin:0 0 10px;">May 7-9, 2026</p>
       <div class="footer-links">
         <a href="https://myirtiqa.com/ai-symposium">Full Program</a>
         <a href="mailto:info@myirtiqa.com">Contact Support</a>
@@ -212,12 +188,34 @@ function getShareBlockHtml() {
   `;
 }
 
-/* ═══════ Confirmation email HTML ═══════ */
-function buildConfirmationHtml(name: string, type: string, extras: { whatsappLink?: string } = {}): string {
-  const whatsappHtml = extras.whatsappLink
-    ? `<div style="margin-top: 15px;"><a href="${extras.whatsappLink}" style="display:inline-block;background-color:#25d366;color:#fff;padding:12px 24px;border-radius:50px;text-decoration:none;font-weight:700;">📱 Join WhatsApp Group</a></div>`
-    : "";
+/* ═══════ WhatsApp block builder ═══════ */
+function buildWhatsAppBlock(links: { name: string; url: string }[]): string {
+  if (links.length === 0) return "";
+  
+  const buttons = links.map(l => `
+    <tr><td style="padding: 6px 0;">
+      <a href="${l.url}" style="display:inline-block; width: 100%; max-width: 400px; padding:14px 24px; background-color:#25D366; color:#ffffff; font-size:13px; font-weight:700; text-decoration:none; border-radius:12px; text-align:center; box-sizing:border-box;">
+        📱 Join: ${l.name}
+      </a>
+    </td></tr>
+  `).join("");
 
+  return `
+    <div style="background: linear-gradient(135deg, #128C7E 0%, #25D366 100%); border-radius: 16px; padding: 30px; text-align: center; margin: 0 0 10px;">
+      <p style="font-size:11px; font-weight:700; color:rgba(255,255,255,0.8); text-transform:uppercase; letter-spacing:2px; margin:0 0 5px;">⚡ IMPORTANT — JOIN NOW</p>
+      <p style="font-size:20px; font-weight:900; color:#ffffff; text-transform:uppercase; margin:0 0 8px;">Join Your WhatsApp Group</p>
+      <p style="font-size:12px; color:rgba(255,255,255,0.8); margin:0 0 20px; line-height:1.5;">
+        Stay updated with announcements, schedules, and connect with fellow participants. This is <strong>required</strong> — don't miss out!
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${buttons}
+      </table>
+    </div>
+  `;
+}
+
+/* ═══════ Confirmation email HTML ═══════ */
+function buildConfirmationHtml(name: string, type: string, extras: { workshops?: string[] } = {}): string {
   let headerWord = "REGISTRATION";
   if (type === "ambassador") headerWord = "APPLICATION";
   else if (["pitch", "poster", "quiz", "drill", "debate", "meme"].includes(type)) headerWord = "SUBMISSION";
@@ -225,7 +223,20 @@ function buildConfirmationHtml(name: string, type: string, extras: { whatsappLin
   let typeFormatted = type.charAt(0).toUpperCase() + type.slice(1) + " Registration";
   if (type === "registration") typeFormatted = "Symposium Registration";
   else if (type === "ambassador") typeFormatted = "Campus Ambassador Application";
-  else if (["pitch", "poster", "quiz", "drill", "debate", "meme"].includes(type)) typeFormatted = "Competition Submission";
+  else if (["pitch", "poster", "quiz", "drill", "debate", "meme"].includes(type)) typeFormatted = COMPETITION_NAMES[type] || "Competition Submission";
+
+  // Build WhatsApp links for confirmation
+  const waLinks: { name: string; url: string }[] = [];
+  if (["pitch", "poster", "quiz", "drill", "debate"].includes(type) && WHATSAPP_LINKS[type]) {
+    waLinks.push({ name: COMPETITION_NAMES[type] || type, url: WHATSAPP_LINKS[type] });
+  }
+  if (extras.workshops) {
+    extras.workshops.forEach(wsId => {
+      if (WHATSAPP_LINKS[wsId]) {
+        waLinks.push({ name: WORKSHOP_NAMES[wsId] || wsId, url: WHATSAPP_LINKS[wsId] });
+      }
+    });
+  }
 
   return `
 <!DOCTYPE html>
@@ -251,14 +262,14 @@ function buildConfirmationHtml(name: string, type: string, extras: { whatsappLin
         </p>
         
         <div class="next-steps">
-          <strong>NEXT STEPS:</strong> Your ${typeFormatted} has been securely stored in our systems. Our team will review your application soon. Keep an eye out for further updates!
+          <strong>NEXT STEPS:</strong> Your ${typeFormatted} has been securely stored in our systems. Our team will review your payment and send a confirmation email within 24-48 hours. Keep an eye out!
         </div>
         
         <div style="text-align: center; margin-bottom: 20px;">
           <img src="https://myirtiqa.com/Ticket-Preview.png" alt="Ticket Preview" style="width: 100%; max-width: 400px; height: auto; border-radius: 12px; display: inline-block;" />
         </div>
-        
-        ${whatsappHtml}
+
+        ${waLinks.length > 0 ? buildWhatsAppBlock(waLinks) : ""}
       </div>
       
       ${getAgendaHtml()}
@@ -270,18 +281,140 @@ function buildConfirmationHtml(name: string, type: string, extras: { whatsappLin
   `;
 }
 
-/* ═══════ Status update email HTML ═══════ */
-function buildStatusHtml(name: string, status: string, type: string, notes: string, registrationCode?: string): string {
-  const isApproved = status === "approved";
-  const titleText = isApproved ? "CONGRATULATIONS!" : "APPLICATION UPDATE";
-  const subText = `Your ${type} ${isApproved ? "has been reviewed and <strong>approved</strong>. We are absolutely thrilled to welcome you to the AI Symposium!" : "has been carefully reviewed. Unfortunately, we were unable to select your application at this time."}`;
+/* ═══════ APPROVAL email HTML (customized per type) ═══════ */
+function buildApprovalHtml(
+  name: string,
+  type: string,
+  registrationCode?: string,
+  notes?: string,
+  workshops?: string[],
+): string {
+  // Determine what they registered for
+  const isRegistration = type === "registration" || type === "registrations";
+  const isCompetition = ["pitch", "poster", "quiz", "drill", "debate", "meme"].includes(type);
+  const isAmbassador = type === "ambassador" || type === "ambassador applications";
 
-  const codeBlock = (isApproved && registrationCode)
-    ? `<div style="text-align: center; margin-bottom: 20px;"><img src="https://myirtiqa.com/Ticket-Preview.png" alt="Ticket Preview" style="width: 100%; max-width: 400px; height: auto; border-radius: 12px; display: inline-block;" /></div><div style="font-size:24px; letter-spacing:4px; padding: 10px 40px; margin-top:10px; font-weight: 900; color: #3b82f6;">${registrationCode}</div><p style="font-size:11px;color:#a1a1aa;text-transform:uppercase;">ORDER NO / REGISTRATION CODE</p>`
-    : `<div style="display:inline-block; padding:10px 20px; background-color:${isApproved ? '#dcfce7' : '#fee2e2'}; color:${isApproved ? '#166534' : '#991b1b'}; font-weight:900; border-radius:8px; margin-top:10px;">STATUS: ${status.toUpperCase()}</div>`;
+  // Build descriptive title
+  let eventTitle = "AI Symposium 2026";
+  let eventSubtitle = "May 7-9, 2026 — Northwest School of Medicine, Peshawar";
+  if (isCompetition) {
+    eventTitle = COMPETITION_NAMES[type] || `AI ${type.charAt(0).toUpperCase() + type.slice(1)} Competition`;
+    eventSubtitle = "Day 3 — 9 May 2026 — Northwest School of Medicine, Peshawar";
+  }
 
-  const notesHtml = notes
+  // Registration code block
+  const codeBlock = registrationCode
+    ? `<div style="margin: 25px 0;">
+        <div style="text-align: center;">
+          <img src="https://myirtiqa.com/Ticket-Preview.png" alt="Ticket Preview" style="width: 100%; max-width: 400px; height: auto; border-radius: 12px; display: inline-block;" />
+        </div>
+        <div style="font-size:28px; letter-spacing:6px; padding: 15px 40px; margin-top:15px; font-weight: 900; color: #3b82f6; text-align:center;">${registrationCode}</div>
+        <p style="font-size:10px;color:#a1a1aa;text-transform:uppercase; text-align:center; letter-spacing:2px;">YOUR REGISTRATION CODE</p>
+      </div>`
+    : "";
+
+  // Notes block
+  const notesBlock = notes
     ? `<div class="next-steps"><strong>Note from organizers:</strong><br>${notes}</div>`
+    : "";
+
+  // Build WhatsApp links
+  const waLinks: { name: string; url: string }[] = [];
+  
+  // For competitions — add the competition WhatsApp group
+  if (isCompetition && WHATSAPP_LINKS[type]) {
+    waLinks.push({ name: COMPETITION_NAMES[type] || type, url: WHATSAPP_LINKS[type] });
+  }
+  
+  // For registrations — add workshop WhatsApp groups
+  if (isRegistration && workshops && workshops.length > 0) {
+    workshops.forEach(wsId => {
+      if (WHATSAPP_LINKS[wsId]) {
+        waLinks.push({ name: WORKSHOP_NAMES[wsId] || wsId, url: WHATSAPP_LINKS[wsId] });
+      }
+    });
+  }
+
+  // Build workshop summary for registrations
+  let workshopSummary = "";
+  if (isRegistration && workshops && workshops.length > 0) {
+    const wsItems = workshops.map(wsId => {
+      const name = WORKSHOP_NAMES[wsId] || wsId;
+      return `<li style="margin-bottom:6px; color:#374151;">${name}</li>`;
+    }).join("");
+    workshopSummary = `
+      <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:20px; margin:20px 0; text-align:left;">
+        <p style="font-size:11px; font-weight:700; color:#0369a1; text-transform:uppercase; letter-spacing:1px; margin:0 0 10px;">📋 Your Registered Workshops</p>
+        <ul style="font-size:13px; padding-left:20px; margin:0; line-height:1.8;">${wsItems}</ul>
+      </div>
+    `;
+  }
+
+  // What to bring section
+  const whatToBring = `
+    <div style="background:#fefce8; border:1px solid #fde047; border-radius:12px; padding:20px; margin:20px 0; text-align:left;">
+      <p style="font-size:11px; font-weight:700; color:#a16207; text-transform:uppercase; letter-spacing:1px; margin:0 0 10px;">📌 What to Bring</p>
+      <ul style="font-size:13px; color:#374151; padding-left:20px; margin:0; line-height:1.8;">
+        <li>Valid university/college ID card</li>
+        <li>This email (screenshot or printed)</li>
+        ${registrationCode ? `<li>Your registration code: <strong>${registrationCode}</strong></li>` : ""}
+        <li>Notebook and pen for workshop notes</li>
+      </ul>
+    </div>
+  `;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>${EMAIL_STYLES}</style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="dark-header" style="background-color: transparent; padding: 0;">
+        <img src="https://myirtiqa.com/Email-Header.png" alt="AI SYMPOSIUM 2026" style="width: 100%; height: auto; display: block;" />
+      </div>
+      
+      <div class="content-body">
+        <p class="greeting">Hello, ${name}! 🎉</p>
+        <h2 class="main-heading">YOU'RE <span>APPROVED!</span></h2>
+        
+        <p class="intro-text">
+          Great news! Your ${isCompetition ? eventTitle + " entry" : isAmbassador ? "Campus Ambassador application" : "registration for the AI Symposium 2026"} has been reviewed and <strong style="color:#059669;">approved</strong>. We are absolutely thrilled to welcome you!
+        </p>
+
+        <div style="display:inline-block; padding:8px 24px; background:linear-gradient(135deg,#dcfce7,#bbf7d0); color:#166534; font-weight:900; border-radius:50px; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:20px;">✅ APPROVED & CONFIRMED</div>
+        
+        ${codeBlock}
+        ${workshopSummary}
+        ${notesBlock}
+
+        ${waLinks.length > 0 ? buildWhatsAppBlock(waLinks) : ""}
+
+        ${whatToBring}
+      </div>
+      
+      ${getAgendaHtml()}
+      ${getShareBlockHtml()}
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/* ═══════ REJECTION email HTML ═══════ */
+function buildRejectionHtml(name: string, type: string, notes?: string): string {
+  const isCompetition = ["pitch", "poster", "quiz", "drill", "debate", "meme"].includes(type);
+  const typeLabel = isCompetition
+    ? (COMPETITION_NAMES[type] || type)
+    : type === "ambassador" ? "Campus Ambassador application" : "AI Symposium registration";
+
+  const notesBlock = notes
+    ? `<div class="next-steps"><strong>Feedback from organizers:</strong><br>${notes}</div>`
     : "";
 
   return `
@@ -300,16 +433,22 @@ function buildStatusHtml(name: string, status: string, type: string, notes: stri
       </div>
       
       <div class="content-body">
-        <p class="greeting">Hello, ${name}!</p>
-        <h2 class="main-heading">YOUR ${type.toUpperCase()}<br><span style="color:${isApproved ? '#3b82f6' : '#ec4899'};">${titleText}</span></h2>
+        <p class="greeting">Hello, ${name},</p>
+        <h2 class="main-heading">APPLICATION <span style="color:#ec4899;">UPDATE</span></h2>
         
-        <p class="intro-text">${subText}</p>
+        <p class="intro-text">
+          We appreciate your interest in the AI Symposium 2026. After careful review, we were unfortunately unable to approve your ${typeLabel} at this time.
+        </p>
+
+        <div style="display:inline-block; padding:8px 24px; background:#fee2e2; color:#991b1b; font-weight:900; border-radius:50px; font-size:13px; text-transform:uppercase; letter-spacing:1px;">STATUS: NOT APPROVED</div>
         
-        ${notesHtml}
-        ${codeBlock}
+        ${notesBlock}
+        
+        <div style="margin-top:25px;">
+          <p class="intro-text">If you believe there has been an error, or you'd like to reapply, please reach out to us at <a href="mailto:info@myirtiqa.com" style="color:#3b82f6; font-weight:600;">info@myirtiqa.com</a>.</p>
+        </div>
       </div>
       
-      ${isApproved ? getAgendaHtml() : ""}
       ${getShareBlockHtml()}
     </div>
   </div>
@@ -319,9 +458,9 @@ function buildStatusHtml(name: string, status: string, type: string, notes: stri
 }
 
 /* ═══════ Subject lines ═══════ */
-function getConfirmationSubject(type: string, code?: string): string {
+function getConfirmationSubject(type: string): string {
   switch (type) {
-    case "registration": return `Registration Confirmed — AI Symposium 2026${code ? ` (Code: ${code})` : ""} `;
+    case "registration": return "Registration Received — AI Symposium 2026";
     case "ambassador": return "Application Received — Campus Ambassador Program";
     case "pitch": return "Submission Received — AI Pitch Competition";
     case "poster": return "Submission Received — AI Poster Competition";
@@ -331,6 +470,12 @@ function getConfirmationSubject(type: string, code?: string): string {
     case "meme": return "Submission Received — AI Meme Competition";
     default: return "Submission Received — AI Symposium 2026";
   }
+}
+
+function getApprovalSubject(type: string, code?: string): string {
+  const isComp = ["pitch", "poster", "quiz", "drill", "debate", "meme"].includes(type);
+  const label = isComp ? (COMPETITION_NAMES[type] || type) : "AI Symposium 2026";
+  return `✅ You're Approved! — ${label}${code ? ` (Code: ${code})` : ""}`;
 }
 
 /* ═══════ Main handler ═══════ */
@@ -352,10 +497,21 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json();
-    const { mode = "status_update", to, name, status, type, notes, registrationCode, whatsappLink } = body;
+    const {
+      mode = "status_update",
+      to,
+      name,
+      status,
+      type,
+      notes,
+      registrationCode,
+      workshops,   // string[] of workshop IDs
+    } = body;
+
+    console.log(`[EMAIL] mode=${mode} to=${to} type=${type} status=${status} workshops=${JSON.stringify(workshops)}`);
 
     if (!RESEND_API_KEY) {
-      console.log(`[EMAIL] Would send ${mode} email to ${to} for ${type}`);
+      console.log(`[EMAIL] Would send ${mode} email to ${to} for ${type} (no RESEND_API_KEY configured)`);
       return new Response(
         JSON.stringify({ success: true, message: "Email logged (no RESEND_API_KEY)" }),
         { headers: corsHeaders }
@@ -367,14 +523,19 @@ Deno.serve(async (req: Request) => {
     let fromAddr: string;
 
     if (mode === "confirmation") {
-      html = buildConfirmationHtml(name, type, { whatsappLink });
+      // Sent immediately after form submission
+      html = buildConfirmationHtml(name, type, { workshops });
       subject = getConfirmationSubject(type);
       fromAddr = FROM_ADDRESSES[type] || FROM_ADDRESSES.default;
     } else {
-      html = buildStatusHtml(name, status, type, notes || "", registrationCode);
-      subject = status === "approved"
-        ? `✓ Your ${type} has been approved — AI Symposium 2026`
-        : `Update on your ${type} — AI Symposium 2026`;
+      // Status update (approval/rejection) from admin
+      if (status === "approved") {
+        html = buildApprovalHtml(name, type, registrationCode, notes, workshops);
+        subject = getApprovalSubject(type, registrationCode);
+      } else {
+        html = buildRejectionHtml(name, type, notes);
+        subject = `Update on your submission — AI Symposium 2026`;
+      }
       fromAddr = FROM_ADDRESSES[type] || FROM_ADDRESSES.default;
     }
 
@@ -382,7 +543,7 @@ Deno.serve(async (req: Request) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY} `,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
         from: fromAddr,
@@ -395,13 +556,14 @@ Deno.serve(async (req: Request) => {
     const data = await res.json();
 
     if (!res.ok) {
-      console.error("[EMAIL ERROR] Resend API failed:", data);
+      console.error("[EMAIL ERROR] Resend API failed:", JSON.stringify(data));
     } else {
-      console.log(`[EMAIL SUCCESS] Sent to ${to} `);
+      console.log(`[EMAIL SUCCESS] Sent ${mode} email to ${to} (type: ${type}, status: ${status || "n/a"})`);
     }
 
     return new Response(JSON.stringify({ success: res.ok, ...data }), { headers: corsHeaders });
   } catch (error: any) {
+    console.error("[EMAIL ERROR] Exception:", error.message);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: corsHeaders }

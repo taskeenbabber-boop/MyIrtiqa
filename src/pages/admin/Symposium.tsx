@@ -239,14 +239,34 @@ export default function AdminSymposium() {
                 }
 
                 if (item && (newStatus === "approved" || newStatus === "rejected")) {
+                    // Determine clean type name for the email
+                    let emailType = table.replace("symposium_", "").replace("_submissions", "").replace("_applications", "");
+                    // e.g. "registrations", "pitch", "poster", "quiz", "drill", "debate", "meme", "ambassador"
+                    if (emailType === "registrations") emailType = "registration";
+                    if (emailType === "ambassador") emailType = "ambassador";
+
+                    // Get workshops for registration emails
+                    let workshops: string[] = [];
+                    if (table === "symposium_registrations") {
+                        try {
+                            const reg = registrations.find(r => r.id === id);
+                            if (reg) {
+                                workshops = Array.isArray(reg.selected_workshops)
+                                    ? reg.selected_workshops
+                                    : JSON.parse(reg.selected_workshops || "[]");
+                            }
+                        } catch {}
+                    }
+
                     await supabase.functions.invoke("send-symposium-email", {
                         body: {
                             to: item.email,
                             name: item.name,
                             status: newStatus,
-                            type: table.replace("symposium_", "").replace("_submissions", "").replace("_", " "),
+                            type: emailType,
                             notes: notes || "",
                             registrationCode: regCode,
+                            workshops,
                         },
                     });
                 }
