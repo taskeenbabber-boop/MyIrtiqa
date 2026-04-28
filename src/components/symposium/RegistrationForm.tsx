@@ -32,16 +32,17 @@ interface Workshop {
     speaker: string;
     isSuturing?: boolean;
     seatLimit?: number;
+    fakeBase?: number;
 }
 
 const WORKSHOPS: Workshop[] = [
     // Day 1 (7 May)
-    { id: "ws-4", title: "Clinical Audit & AI in Clinical Use", day: "day1", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Almas" },
-    { id: "ws-2", title: "Prompt Engineering & AI in Design", day: "day1", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Mr. Asad" },
+    { id: "ws-4", title: "Clinical Audit & AI in Clinical Use", day: "day1", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Almas", seatLimit: 150, fakeBase: 103 },
+    { id: "ws-2", title: "Prompt Engineering & AI in Design", day: "day1", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Mr. Asad", seatLimit: 150, fakeBase: 107 },
     // Day 2 (8 May)
     { id: "ws-5a", title: "Suturing Workshop (Morning)", day: "day2", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Obaidullah", isSuturing: true, seatLimit: 30 },
     { id: "ws-5b", title: "Suturing Workshop (Afternoon)", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Dr. Obaidullah", isSuturing: true, seatLimit: 30 },
-    { id: "ws-3", title: "From Idea to Impact: Launch Your Startup", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Muhammad Waqar" },
+    { id: "ws-3", title: "From Idea to Impact: Launch Your Startup", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Muhammad Waqar", seatLimit: 150, fakeBase: 101 },
 ];
 
 /* ═══════════ FEE CONSTANTS ═══════════ */
@@ -86,9 +87,9 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
         receiptFile: null as File | null,
     });
 
-    const [suturingSeatCounts, setSuturingSeatCounts] = useState<Record<string, number>>({ "ws-5a": 0, "ws-5b": 0 });
+    const [workshopSeatCounts, setWorkshopSeatCounts] = useState<Record<string, number>>({});
 
-    // Fetch suturing seat counts on mount
+    // Fetch ALL workshop seat counts on mount
     useEffect(() => {
         (async () => {
             try {
@@ -96,14 +97,17 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
                     .select("selected_workshops")
                     .neq("status", "rejected");
                 if (data) {
-                    const counts: Record<string, number> = { "ws-5a": 0, "ws-5b": 0 };
+                    const counts: Record<string, number> = {};
+                    WORKSHOPS.forEach(ws => { counts[ws.id] = 0; });
                     data.forEach((row: any) => {
-                        if (row.selected_workshops) {
-                            if (row.selected_workshops.includes("ws-5a")) counts["ws-5a"]++;
-                            if (row.selected_workshops.includes("ws-5b")) counts["ws-5b"]++;
-                        }
+                        const wsList = Array.isArray(row.selected_workshops)
+                            ? row.selected_workshops
+                            : (() => { try { return JSON.parse(row.selected_workshops || "[]"); } catch { return []; } })();
+                        wsList.forEach((wsId: string) => {
+                            if (counts[wsId] !== undefined) counts[wsId]++;
+                        });
                     });
-                    setSuturingSeatCounts(counts);
+                    setWorkshopSeatCounts(counts);
                 }
             } catch (e) { console.error("Seat count error:", e); }
         })();
@@ -113,10 +117,27 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
     const isFaculty = category === "FACULTY";
     const workshopFee = isFaculty ? WORKSHOP_FEE_FACULTY : WORKSHOP_FEE_STUDENT;
 
-    const isSuturingFull = (wsId: string) => {
+    /* Workshop display count logic:
+       - Suturing: show real count as-is (30-seat limit)
+       - Others (150-seat limit): show fakeBase + realCount, but cap at 140.
+         Once real count >= 140, show real count only.
+    */
+    const getDisplayCount = (wsId: string) => {
+        const ws = WORKSHOPS.find(w => w.id === wsId);
+        const realCount = workshopSeatCounts[wsId] || 0;
+        if (!ws) return realCount;
+        if (ws.isSuturing) return realCount; // suturing uses real count only
+        if (!ws.fakeBase) return realCount;
+        if (realCount >= 140) return realCount; // real count caught up — show real
+        const faked = ws.fakeBase + realCount;
+        return Math.min(faked, 140); // cap at 140
+    };
+
+    const isWorkshopFull = (wsId: string) => {
         const ws = WORKSHOPS.find(w => w.id === wsId);
         if (!ws?.seatLimit) return false;
-        return suturingSeatCounts[wsId] >= ws.seatLimit;
+        if (ws.isSuturing) return (workshopSeatCounts[wsId] || 0) >= ws.seatLimit;
+        return getDisplayCount(wsId) >= ws.seatLimit;
     };
 
     /* ——— pricing ——— */
@@ -143,7 +164,7 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
 
     /* ——— workshop toggle (mutually exclusive per day+slot) ——— */
     const toggleWorkshop = (id: string, day: string, slot: string) => {
-        if (isSuturingFull(id)) return; // can't select if full
+        if (isWorkshopFull(id)) return; // can't select if full
         setFormData(prev => {
             const isSelected = prev.selectedWorkshops.includes(id);
             if (isSelected) {
@@ -247,10 +268,12 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
     /* ——— Workshop selection card ——— */
     const WorkshopCard = ({ ws }: { ws: Workshop }) => {
         const selected = formData.selectedWorkshops.includes(ws.id);
-        const full = isSuturingFull(ws.id);
-        const seatsLeft = ws.seatLimit ? ws.seatLimit - (suturingSeatCounts[ws.id] || 0) : null;
+        const full = isWorkshopFull(ws.id);
+        const displayCount = getDisplayCount(ws.id);
+        const seatsLeft = ws.seatLimit ? ws.seatLimit - displayCount : null;
         const otherShift = ws.id === "ws-5a" ? "ws-5b" : ws.id === "ws-5b" ? "ws-5a" : null;
-        const otherFull = otherShift ? isSuturingFull(otherShift) : false;
+        const otherFull = otherShift ? isWorkshopFull(otherShift) : false;
+        const fillPercent = ws.seatLimit ? Math.min(100, Math.round((displayCount / ws.seatLimit) * 100)) : 0;
         return (
             <div
                 onClick={() => !full && toggleWorkshop(ws.id, ws.day, ws.slot)}
@@ -261,12 +284,12 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
                 }}
             >
                 <div className="flex justify-between items-start gap-3">
-                    <div>
+                    <div className="flex-1">
                         <span className={`font-semibold text-sm block ${selected ? "text-white" : "text-white/50"}`}>{ws.title}</span>
                         <span className="text-xs text-white/25 mt-0.5 block">{ws.speaker}</span>
                         <span className="text-xs text-white/20 mt-0.5 block">{ws.time}</span>
-                        {ws.isSuturing && (
-                            <div className="mt-1.5">
+                        {ws.seatLimit && (
+                            <div className="mt-2">
                                 {full ? (
                                     <>
                                         <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">FULL</span>
@@ -275,9 +298,21 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
                                         )}
                                     </>
                                 ) : (
-                                    <span className="text-[10px] text-emerald-400">{seatsLeft} / {ws.seatLimit} seats left</span>
+                                    <>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className={`text-[10px] font-bold ${seatsLeft! <= 20 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                                {seatsLeft} / {ws.seatLimit} seats left
+                                            </span>
+                                        </div>
+                                        <div className="w-full h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                                            <div className="h-full rounded-full transition-all" style={{
+                                                width: `${fillPercent}%`,
+                                                background: fillPercent > 90 ? '#f87171' : fillPercent > 70 ? '#fbbf24' : ACCENT,
+                                            }} />
+                                        </div>
+                                    </>
                                 )}
-                                <span className="text-[10px] text-amber-400/70 block">Fee: 1,000 PKR</span>
+                                {ws.isSuturing && <span className="text-[10px] text-amber-400/70 block mt-1">Fee: 1,000 PKR</span>}
                             </div>
                         )}
                     </div>

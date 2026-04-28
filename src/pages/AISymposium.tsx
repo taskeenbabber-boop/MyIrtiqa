@@ -160,7 +160,10 @@ const AISymposium = () => {
         (supabase as any).from("symposium_referral_visits").insert({
             referral_code: referralCode,
             page_path: window.location.pathname,
-        }).then(() => {});
+        }).then(({ error }: any) => {
+            if (error) console.error("Referral visit insert failed:", error);
+            else console.log("Referral visit tracked for:", referralCode);
+        });
         // Lookup discount
         (supabase as any).from("symposium_referral_codes")
             .select("discount_percent, discount_applies_to, active")
