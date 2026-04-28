@@ -37,12 +37,12 @@ interface Workshop {
 
 const WORKSHOPS: Workshop[] = [
     // Day 1 (7 May)
-    { id: "ws-4", title: "Clinical Audit & AI in Clinical Use", day: "day1", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Almas", seatLimit: 150, fakeBase: 103 },
-    { id: "ws-2", title: "Prompt Engineering & AI in Design", day: "day1", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Mr. Asad", seatLimit: 150, fakeBase: 107 },
+    { id: "ws-4", title: "Clinical Audit & AI in Clinical Use", day: "day1", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Almas", seatLimit: 150, fakeBase: 112 },
+    { id: "ws-2", title: "Prompt Engineering & AI in Design", day: "day1", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Mr. Asad", seatLimit: 150, fakeBase: 97 },
     // Day 2 (8 May)
     { id: "ws-5a", title: "Suturing Workshop (Morning)", day: "day2", slot: "morning", time: "10 AM – 12 PM", speaker: "Dr. Obaidullah", isSuturing: true, seatLimit: 30 },
     { id: "ws-5b", title: "Suturing Workshop (Afternoon)", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Dr. Obaidullah", isSuturing: true, seatLimit: 30 },
-    { id: "ws-3", title: "From Idea to Impact: Launch Your Startup", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Muhammad Waqar", seatLimit: 150, fakeBase: 101 },
+    { id: "ws-3", title: "From Idea to Impact: Launch Your Startup", day: "day2", slot: "afternoon", time: "2 PM – 4 PM", speaker: "Muhammad Waqar", seatLimit: 150, fakeBase: 105 },
 ];
 
 /* ═══════════ FEE CONSTANTS ═══════════ */
@@ -72,7 +72,7 @@ export function RegistrationForm({ onClose, referralCode, discountPercent = 0, o
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [wantWorkshops, setWantWorkshops] = useState(false);
-    const [wantConference, setWantConference] = useState(true);
+    const [wantConference, setWantConference] = useState(false);
     const [conferenceRole, setConferenceRole] = useState<'observer' | 'participant' | null>(null);
     const [selectedCompetitions, setSelectedCompetitions] = useState<string[]>([]);
 
